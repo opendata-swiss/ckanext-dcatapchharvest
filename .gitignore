@@ -1,0 +1,7 @@
+.idea
+ckanext_dcataapchharvest.egg-info/*
+ckanext_dcataapchharvest.egg-info/PKG-INFO
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
