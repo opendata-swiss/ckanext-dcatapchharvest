@@ -1,10 +1,13 @@
 import iribaker
-import urlparse
+from urlparse import urlparse
 
-# convert URI to IRI (used for RDF)
-# this function also validates the URI and throws a ValueError if the
-# provided URI is invalid
+
 def uri_to_iri(uri):
+    """
+    convert URI to IRI (used for RDF)
+    this function also validates the URI and throws a ValueError if the
+    provided URI is invalid
+    """
     result = urlparse(uri)
     if not result.scheme or not result.netloc or result.netloc == '-':
         raise ValueError("Provided URI does not have a valid schema or netloc")
