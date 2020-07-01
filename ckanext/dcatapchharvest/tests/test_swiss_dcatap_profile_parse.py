@@ -9,7 +9,7 @@ from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import RDF
 
 from ckanext.dcat.processors import RDFParser
-from ckanext.switzerland.dcat.profiles import (DCAT, DCT)
+from ckanext.dcatapchharvest.profiles import (DCAT, DCT)
 
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true

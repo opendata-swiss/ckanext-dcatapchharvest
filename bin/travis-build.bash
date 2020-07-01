@@ -46,25 +46,6 @@ cd ckan
 paster db init -c test-core.ini
 cd -
 
-echo "Installing ckanext-scheming and its requirements..."
-git clone https://github.com/ckan/ckanext-scheming
-cd ckanext-scheming
-python setup.py develop
-pip install -r requirements.txt
-cd -
-
-echo "Installing ckanext-fluent and its requirements..."
-git clone https://github.com/ckan/ckanext-fluent
-cd ckanext-fluent
-python setup.py develop
-cd -
-
-echo "Installing ckanext-hierarchy and its requirements..."
-git clone https://github.com/opendata-swiss/ckanext-hierarchy
-cd ckanext-hierarchy
-python setup.py develop
-cd -
-
 echo "Installing ckanext-harvest and its requirements..."
 git clone https://github.com/ckan/ckanext-harvest
 cd ckanext-harvest
@@ -79,25 +60,6 @@ cd ckanext-dcat
 python setup.py develop
 pip install -r requirements.txt
 pip install -r dev-requirements.txt
-cd -
-
-echo "Installing ckanext-xloader and its requirements..."
-git clone https://github.com/ckan/ckanext-xloader
-cd ckanext-xloader
-python setup.py develop
-pip install -r requirements.txt
-cd -
-
-echo "Installing ckanext-showcase..."
-git clone https://github.com/ckan/ckanext-showcase
-cd ckanext-showcase
-python setup.py develop
-cd -
-
-echo "Installing ckanext-switzerland-ng..."
-git clone https://github.com/opendata-swiss/ckanext-switzerland-ng
-cd ckanext-switzerland-ng
-python setup.py develop
 cd -
 
 echo "Installing ckanext-dcatapchharvest and its requirements..."
