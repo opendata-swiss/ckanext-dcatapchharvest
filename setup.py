@@ -16,11 +16,11 @@ setup(
     # http://packaging.python.org/en/latest/tutorial.html#version
     version='0.0.1',
 
-    description='''DCAT-AP Switzerland and Scheming extensions''',
+    description='''DCAT-AP Switzerland''',
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/ogdch/ckanext-switzerland',
+    url='https://github.com/ogdch/ckanext-dcatapchharvest',
 
     # Author details
     author='''Liip AG''',
@@ -47,7 +47,7 @@ setup(
 
 
     # What does your project relate to?
-    keywords='''CKAN schema dcat dcat-ap switzerland''',
+    keywords='''CKAN dcat dcat-ap switzerland''',
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
