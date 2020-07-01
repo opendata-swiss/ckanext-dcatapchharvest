@@ -2,7 +2,7 @@ import json
 
 import nose
 
-from rdflib import URIRef, BNode, Literal
+from rdflib import Literal
 from rdflib.namespace import RDF
 
 from ckanext.dcat import utils
