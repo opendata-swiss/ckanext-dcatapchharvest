@@ -12,7 +12,7 @@ from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile
 from ckanext.dcat.utils import resource_uri, publisher_uri_from_dataset_dict
 from ckan.lib.munge import munge_tag
 
-from ckanext.switzerland.helpers import get_langs, uri_to_iri
+import ckanext.dcatapchharvest.dcat_helpers as dh
 
 import logging
 log = logging.getLogger(__name__)
@@ -136,7 +136,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                 return unicode(o)
         if multilang:
             # when translation does not exist, create an empty one
-            for lang in get_langs():
+            for lang in dh.get_langs():
                 if lang not in lang_dict:
                     lang_dict[lang] = ''
         return lang_dict
@@ -167,7 +167,7 @@ class SwissDCATAPProfile(MultiLangProfile):
     def _keywords(self, subject, predicate):
         keywords = {}
         # initialize the keywords with empty lists for all languages
-        for lang in get_langs():
+        for lang in dh.get_langs():
             keywords[lang] = []
 
         for keyword_node in self.g.objects(subject, predicate):
@@ -333,7 +333,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                     ('media_type', DCAT.mediaType),
                     ('download_url', DCAT.downloadURL),
                     ('url', DCAT.accessURL),
-                    ('coverage', DCT.coverage),
                     ('rights', DCT.rights),
                     ('license', DCT.license),
                     ):
@@ -435,7 +434,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # LandingPage
         try:
-            landing_page = uri_to_iri(dataset_dict['url'])
+            landing_page = dh.uri_to_iri(dataset_dict['url'])
         except ValueError:
             landing_page = ''
 
@@ -486,7 +485,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             for relation in relations:
                 relation_name = relation['label']
                 try:
-                    relation_url = uri_to_iri(relation['url'])
+                    relation_url = dh.uri_to_iri(relation['url'])
                 except ValueError:
                     # skip this relation if the URL is invalid
                     continue
@@ -579,7 +578,6 @@ class SwissDCATAPProfile(MultiLangProfile):
             items = [
                 ('status', ADMS.status, None, Literal),
                 ('rights', DCT.rights, None, Literal),
-                ('coverage', DCT.coverage, None, Literal),
                 ('license', DCT.license, None, Literal),
                 ('identifier', DCT.identifier, None, Literal),
                 ('media_type', DCAT.mediaType, None, Literal),
@@ -604,7 +602,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             download_url = resource_dict.get('download_url')
             if download_url:
                 try:
-                    download_url = uri_to_iri(download_url)
+                    download_url = dh.uri_to_iri(download_url)
                     g.add((
                         distribution,
                         DCAT.downloadURL,
@@ -617,7 +615,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             url = resource_dict.get('url')
             if (url and not download_url) or (url and url != download_url):
                 try:
-                    url = uri_to_iri(url)
+                    url = dh.uri_to_iri(url)
                     g.add((distribution, DCAT.accessURL, URIRef(url)))
                 except ValueError:
                     # only add valid URL
