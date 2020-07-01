@@ -10,5 +10,3 @@ trap "cleanup" EXIT
 
 # Check PEP-8 code style and McCabe complexity
 flake8 --statistics --show-source ckanext
-
-# Tests will be added in the next step
