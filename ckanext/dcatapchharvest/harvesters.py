@@ -6,6 +6,7 @@ import ckan.model as model
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
+from ckanext.switzerland.helpers.localize_utils import localize_by_language_order  # noqa
 
 import logging
 log = logging.getLogger(__name__)
@@ -118,10 +119,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         return guid
 
     def _gen_new_name(self, title):
-        try:
-            return super(SwissDCATRDFHarvester, self)._gen_new_name(title['de'])  # noqa
-        except TypeError:
-            return super(SwissDCATRDFHarvester, self)._gen_new_name(title)  # noqa
+        return super(SwissDCATRDFHarvester, self)._gen_new_name(localize_by_language_order(title))  # noqa
 
     def before_create(self, harvest_object, dataset_dict, temp_dict):
         try:
