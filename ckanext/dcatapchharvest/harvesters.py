@@ -118,10 +118,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         return guid
 
     def _gen_new_name(self, title):
-        try:
-            return super(SwissDCATRDFHarvester, self)._gen_new_name(title['de'])  # noqa
-        except TypeError:
-            return super(SwissDCATRDFHarvester, self)._gen_new_name(title)  # noqa
+        return super(SwissDCATRDFHarvester, self)._gen_new_name(_derive_flat_title(title))  # noqa
 
     def before_create(self, harvest_object, dataset_dict, temp_dict):
         try:
@@ -159,3 +156,8 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
             identifier = resource.get('identifier')
             if identifier and identifier in resource_mapping:
                 resource['id'] = resource_mapping[identifier]
+
+
+def _derive_flat_title(title_dict):
+    """localizes language dict if no language is specified"""
+    return title_dict.get('de') or title_dict.get('fr') or title_dict.get('en') or title_dict.get('it') or ""  # noqa
