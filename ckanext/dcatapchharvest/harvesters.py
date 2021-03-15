@@ -6,7 +6,6 @@ import ckan.model as model
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
-from ckanext.switzerland.helpers.localize_utils import localize_by_language_order  # noqa
 
 import logging
 log = logging.getLogger(__name__)
@@ -119,7 +118,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         return guid
 
     def _gen_new_name(self, title):
-        return super(SwissDCATRDFHarvester, self)._gen_new_name(localize_by_language_order(title))  # noqa
+        return super(SwissDCATRDFHarvester, self)._gen_new_name(_derive_flat_title(title))  # noqa
 
     def before_create(self, harvest_object, dataset_dict, temp_dict):
         try:
@@ -157,3 +156,8 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
             identifier = resource.get('identifier')
             if identifier and identifier in resource_mapping:
                 resource['id'] = resource_mapping[identifier]
+
+
+def _derive_flat_title(title_dict):
+    """localizes language dict if no language is specified"""
+    return title_dict.get('de') or title_dict.get('fr') or title_dict.get('en') or title_dict.get('it') or ""  # noqa
