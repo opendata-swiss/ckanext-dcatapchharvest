@@ -39,3 +39,24 @@ do:
     python setup.py develop
     pip install -r dev-requirements.txt
     pip install -r requirements.txt
+
+## Configuration options for the Swiss DCAT Harevster
+
+The Swiss DCAT Harvester inherits all configuration options from the DCAT rdf harvester. 
+Additionally the following additional configuration options:
+
+Exclude datasets from import: this will prevent the import of datasets with ceratin identifiers.
+
+```
+{"excluded_dataset_identifiers":["aaa@oevch", "fahrtprognose@oevch"]}
+```
+
+Exclude resource rights from import: this prevent the import of datasets with certain resource 
+rights.
+
+```
+{"excluded_rights":["NonCommercialWithPermission-CommercialWithPermission-ReferenceRequired"]}
+```
+
+Both configurations only works on the first import. Once imported the harvest 
+source must be cleared in order to prevent the import.

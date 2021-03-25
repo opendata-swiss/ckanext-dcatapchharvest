@@ -41,6 +41,16 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
                 raise ValueError('excluded_dataset_identifiers must be '
                                  'a list of strings')
 
+        if 'excluded_rights' in source_config_obj:
+            excluded_rights = source_config_obj['excluded_rights']
+            if not isinstance(excluded_rights, list):
+                raise ValueError('excluded_rights must be '
+                                 'a list of strings')
+            if not all(isinstance(item, basestring)
+                       for item in excluded_rights):
+                raise ValueError('excluded_rights must be '
+                                 'a list of strings')
+
         return source_config
 
     def before_download(self, url, harvest_job):
@@ -123,12 +133,14 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
     def before_create(self, harvest_object, dataset_dict, temp_dict):
         try:
             source_config_obj = json.loads(harvest_object.job.source.config)
-
             for excluded_dataset_identifier in source_config_obj.get('excluded_dataset_identifiers', []):  # noqa
                 if excluded_dataset_identifier == dataset_dict.get('identifier'):  # noqa
                     dataset_dict.clear()
+            excluded_rights = source_config_obj.get('excluded_rights', [])
+            dataset_rights = set([res.get('rights') for res in dataset_dict.get('resources', [])])  # noqa
+            if [rights for rights in dataset_rights if rights in excluded_rights]:  # noqa
+                dataset_dict.clear()
         except ValueError:
-            # nothing configured
             pass
 
     def before_update(self, harvest_object, dataset_dict, temp_dict):
