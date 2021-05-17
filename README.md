@@ -21,9 +21,9 @@ To install ckanext-dcatapchharvest:
 
      pip install ckanext-dcatapchharvest
 
-3. Add ``dcat_ch_rdf_harvester and ogdch_dcat`` to the ``ckan.plugins`` setting in your CKAN
+3. Add `dcat_ch_rdf_harvester ogdch_dcat` to the `ckan.plugins` setting in your CKAN
    config file (by default the config file is located at
-   ``/etc/ckan/default/production.ini``).
+   `/etc/ckan/default/production.ini`).
 
 4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu:
 
@@ -40,23 +40,29 @@ do:
     pip install -r dev-requirements.txt
     pip install -r requirements.txt
 
-## Configuration options for the Swiss DCAT Harevster
+## Configuration options for the Swiss DCAT Harvester
 
-The Swiss DCAT Harvester inherits all configuration options from the DCAT rdf harvester. 
-Additionally the following additional configuration options:
+When importing data that contains URIs from a test environment, the harvester can be configured
+to overwrite those URIs with ones containing the current `ckan.site_url`. Add any test urls to
+the CKAN config file, comma separated:
 
-Exclude datasets from import: this will prevent the import of datasets with ceratin identifiers.
+    ckanext.dcat_ch_rdf_harvester.test_env_urls = https://test.example.com,https://staging.example.com 
+
+The Swiss DCAT Harvester inherits all configuration options from the DCAT RDF harvester. 
+It has the following additional configuration options:
+
+Exclude datasets from import: this will prevent the import of datasets with certain identifiers.
 
 ```
 {"excluded_dataset_identifiers":["aaa@oevch", "fahrtprognose@oevch"]}
 ```
 
-Exclude resource rights from import: this prevent the import of datasets with certain resource 
+Exclude resource rights from import: this prevents the import of datasets with certain resource 
 rights.
 
 ```
 {"excluded_rights":["NonCommercialWithPermission-CommercialWithPermission-ReferenceRequired"]}
 ```
 
-Both configurations only works on the first import. Once imported the harvest 
+Both configurations only work on the first import. Once imported the harvest 
 source must be cleared in order to prevent the import.

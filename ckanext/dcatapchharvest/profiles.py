@@ -9,7 +9,7 @@ from ckantoolkit import config
 import re
 
 from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile
-from ckanext.dcat.utils import resource_uri, publisher_uri_from_dataset_dict
+from ckanext.dcat.utils import publisher_uri_from_dataset_dict
 from ckan.lib.munge import munge_tag
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
@@ -311,10 +311,8 @@ class SwissDCATAPProfile(MultiLangProfile):
         for see_also in see_alsos:
             dataset_dict['see_alsos'].append({'dataset_identifier': see_also})
 
-        # Dataset URI (explicitly show the missing ones)
-        dataset_uri = (unicode(dataset_ref)
-                       if isinstance(dataset_ref, rdflib.term.URIRef)
-                       else '')
+        # Dataset URI
+        dataset_uri = dh.dataset_uri(dataset_dict)
         dataset_dict['extras'].append({'key': 'uri', 'value': dataset_uri})
 
         # Resources
@@ -385,10 +383,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                 resource_dict['byte_size'] = byte_size
 
             # Distribution URI (explicitly show the missing ones)
-            resource_dict['uri'] = (unicode(distribution)
-                                    if isinstance(distribution,
-                                                  rdflib.term.URIRef)
-                                    else '')
+            resource_dict['uri'] = dh.resource_uri(resource_dict)
 
             dataset_dict['resources'].append(resource_dict)
 
@@ -399,6 +394,9 @@ class SwissDCATAPProfile(MultiLangProfile):
     def graph_from_dataset(self, dataset_dict, dataset_ref):  # noqa
 
         log.debug("Create graph from dataset '%s'" % dataset_dict['name'])
+
+        dataset_uri = dh.dataset_uri(dataset_dict)
+        dataset_ref = URIRef(dataset_uri)
 
         g = self.g
 
@@ -569,8 +567,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Resources
         for resource_dict in dataset_dict.get('resources', []):
-
-            distribution = URIRef(resource_uri(resource_dict))
+            distribution = URIRef(dh.resource_uri(resource_dict))
 
             g.add((dataset_ref, DCAT.distribution, distribution))
             g.add((distribution, RDF.type, DCAT.Distribution))
