@@ -1,4 +1,3 @@
-import rdflib
 from rdflib import URIRef, BNode, Literal
 from rdflib.namespace import Namespace, RDFS, RDF, SKOS
 
