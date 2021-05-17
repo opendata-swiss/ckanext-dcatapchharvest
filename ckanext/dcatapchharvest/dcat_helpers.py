@@ -35,7 +35,7 @@ def dataset_uri(dataset_dict):
     url of the test environment, so we have to replace it with the prod one.
     """
     test_env_urls = config.get(
-        'ckanext.dcat_ch_rdf_harvester.test_env_urls').split(',')
+        'ckanext.dcat_ch_rdf_harvester.test_env_urls', '').split(',')
 
     uri = dataset_dict.get('uri', '')
     if not uri:
