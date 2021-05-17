@@ -1,6 +1,7 @@
 import iribaker
 from urlparse import urlparse
 from ckantoolkit import config
+from rdflib import URIRef
 
 
 def uri_to_iri(uri):
@@ -25,7 +26,7 @@ def get_langs():
     return language_priorities
 
 
-def dataset_uri(dataset_dict):
+def dataset_uri(dataset_dict, dataset_ref=None):
     """
     Returns a URI for the dataset
 
@@ -34,19 +35,23 @@ def dataset_uri(dataset_dict):
     to the production site. In that case, the dataset uris will contain the
     url of the test environment, so we have to replace it with the prod one.
     """
-    test_env_urls = config.get(
-        'ckanext.dcat_ch_rdf_harvester.test_env_urls', '').split(',')
-
-    uri = dataset_dict.get('uri', '')
+    uri = (unicode(dataset_ref)
+           if isinstance(dataset_ref, URIRef)
+           else '')
+    if not uri:
+        uri = dataset_dict.get('uri', '')
     if not uri:
         for extra in dataset_dict.get('extras', []):
             if extra['key'] == 'uri' and extra['value'] != 'None':
                 uri = extra['value']
                 break
-    for test_url in test_env_urls:
-        if test_url in uri:
-            uri = ''
-            break
+    test_env_url_string = config.get(
+        'ckanext.dcat_ch_rdf_harvester.test_env_urls', '')
+    if len(test_env_url_string) > 0:
+        for test_url in test_env_url_string.split(''):
+            if test_url in uri:
+                uri = ''
+                break
     if not uri:
         site_url = config.get('ckan.site_url')
         uri = '{0}/perma/{1}'.format(site_url,
@@ -55,7 +60,7 @@ def dataset_uri(dataset_dict):
     return uri
 
 
-def resource_uri(resource_dict):
+def resource_uri(resource_dict, distribution=None):
     """
     Returns a URI for the resource
 
@@ -69,15 +74,19 @@ def resource_uri(resource_dict):
     resource haven't been saved. This is all right as it will be generated
     when the dataset is output in RDF format.
     """
-
-    uri = resource_dict.get('uri', '')
+    uri = (unicode(distribution)
+           if isinstance(distribution, URIRef)
+           else '')
+    if not uri:
+        uri = resource_dict.get('uri', '')
     if uri:
-        test_env_urls = config.get(
-            'ckanext.dcat_ch_rdf_harvester.test_env_urls').split(',')
-        for test_url in test_env_urls:
-            if test_url in uri:
-                uri = ''
-                break
+        test_env_url_string = config.get(
+            'ckanext.dcat_ch_rdf_harvester.test_env_urls', '')
+        if len(test_env_url_string) > 0:
+            for test_url in test_env_url_string.split(''):
+                if test_url in uri:
+                    uri = ''
+                    break
     if not uri or uri == 'None':
         site_url = config.get('ckan.site_url')
         dataset_id = resource_dict.get('package_id')
