@@ -311,7 +311,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             dataset_dict['see_alsos'].append({'dataset_identifier': see_also})
 
         # Dataset URI
-        dataset_uri = dh.dataset_uri(dataset_dict)
+        dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
         dataset_dict['extras'].append({'key': 'uri', 'value': dataset_uri})
 
         # Resources
@@ -382,7 +382,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 resource_dict['byte_size'] = byte_size
 
             # Distribution URI (explicitly show the missing ones)
-            resource_dict['uri'] = dh.resource_uri(resource_dict)
+            resource_dict['uri'] = dh.resource_uri(
+                resource_dict, distribution)
 
             dataset_dict['resources'].append(resource_dict)
 
@@ -394,7 +395,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         log.debug("Create graph from dataset '%s'" % dataset_dict['name'])
 
-        dataset_uri = dh.dataset_uri(dataset_dict)
+        dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
         dataset_ref = URIRef(dataset_uri)
 
         g = self.g
