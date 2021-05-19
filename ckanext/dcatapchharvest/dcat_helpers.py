@@ -48,7 +48,7 @@ def dataset_uri(dataset_dict, dataset_ref=None):
     test_env_url_string = config.get(
         'ckanext.dcat_ch_rdf_harvester.test_env_urls', '')
     if len(test_env_url_string) > 0:
-        for test_url in test_env_url_string.split(''):
+        for test_url in test_env_url_string.split(','):
             if test_url in uri:
                 uri = ''
                 break
@@ -83,7 +83,7 @@ def resource_uri(resource_dict, distribution=None):
         test_env_url_string = config.get(
             'ckanext.dcat_ch_rdf_harvester.test_env_urls', '')
         if len(test_env_url_string) > 0:
-            for test_url in test_env_url_string.split(''):
+            for test_url in test_env_url_string.split(','):
                 if test_url in uri:
                     uri = ''
                     break
