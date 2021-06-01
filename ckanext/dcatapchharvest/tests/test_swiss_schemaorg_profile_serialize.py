@@ -52,7 +52,8 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
                         {
                             'fr': '',
                             'de': '',
-                            'en': '',
+                            'en': 'some descriptiom'
+                                  '',
                             'it': ''
                         },
                     'image_display_url': '',
@@ -164,14 +165,16 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, dataset_ref, SCHEMA.dateModified, dataset['metadata_modified'])
 
         for key, value in dataset['description'].iteritems():
-            assert self._triple(g, dataset_ref, SCHEMA.description, Literal(value, lang=key))
-        eq_(len([t for t in g.triples((dataset_ref, SCHEMA.description, None))]), 4)
+            if dataset['description'].get(key):
+                assert self._triple(g, dataset_ref, SCHEMA.description, Literal(value, lang=key))
+        eq_(len([t for t in g.triples((dataset_ref, SCHEMA.description, None))]), 2)
 
         # Tags
-        eq_(len([t for t in g.triples((dataset_ref, SCHEMA.keywords, None))]), 5)
+        eq_(len([t for t in g.triples((dataset_ref, SCHEMA.keywords, None))]), 3)
         for key, keywords in dataset['keywords'].iteritems():
-            for keyword in keywords:
-                assert self._triple(g, dataset_ref, SCHEMA.keywords, Literal(keyword, lang=key))
+            if dataset['keywords'].get(key):
+                for keyword in keywords:
+                    assert self._triple(g, dataset_ref, SCHEMA.keywords, Literal(keyword, lang=key))
 
         # List
         for item in [
