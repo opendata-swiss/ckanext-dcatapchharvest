@@ -65,10 +65,8 @@ class MultiLangProfile(RDFProfile):
                         if not hasattr(values, '__iter__'):
                             values = [values]
                         for value in values:
-                            self.g.add((subject, predicate, Literal(value, lang=key)))  # noqa
-                    # add default for each language
-                    else:
-                        self.g.add((subject, predicate, Literal('', lang=key)))  # noqa
+                            if value:
+                                self.g.add((subject, predicate, Literal(value, lang=key)))  # noqa
             # if multilang_values is not iterable, it is simply added as a non-
             # translated Literal
             except AttributeError:
@@ -92,15 +90,9 @@ class MultiLangProfile(RDFProfile):
         The subject and predicate of the triple are passed as the relevant
         RDFLib objects (URIRef or BNode). The object is always a literal value,
         which is extracted from the dict using the provided key (see
-        `_get_dict_value`). If the value for the key is not found, then
-        additional fallback keys are checked.
+        `_get_dict_value`).
         '''
         value = self._get_dict_value(_dict, key)
-        if not value and fallbacks:
-            for fallback in fallbacks:
-                value = self._get_dict_value(_dict, fallback)
-                if value:
-                    break
 
         if value:
             self._add_multilang_value(
