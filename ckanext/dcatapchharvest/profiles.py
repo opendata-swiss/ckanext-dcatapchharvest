@@ -507,7 +507,8 @@ class SwissDCATAPProfile(MultiLangProfile):
             contact_points = self._get_dataset_value(dataset_dict, 'contact_points')  # noqa
             for contact_point in contact_points:
                 contact_details = BNode()
-                contact_point_email = EMAIL_MAILTO_PREFIX + contact_point['email']
+                contact_point_email = \
+                    EMAIL_MAILTO_PREFIX + contact_point['email']
                 contact_point_name = contact_point['name']
 
                 g.add((contact_details, RDF.type, VCARD.Organization))
