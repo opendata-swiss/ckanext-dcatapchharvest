@@ -32,6 +32,8 @@ XML = Namespace('http://www.w3.org/2001/XMLSchema')
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
+EMAIL_MAILTO_PREFIX = 'mailto:'
+
 namespaces = {
     'dct': DCT,
     'dcat': DCAT,
@@ -175,7 +177,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         for contact_node in self.g.objects(subject, predicate):
             email = self._object_value(contact_node, VCARD.hasEmail)
             if email:
-                email_clean = email.replace('mailto:', '')
+                email_clean = email.replace(EMAIL_MAILTO_PREFIX, '')
             else:
                 email_clean = ''
             contact = {
@@ -505,7 +507,8 @@ class SwissDCATAPProfile(MultiLangProfile):
             contact_points = self._get_dataset_value(dataset_dict, 'contact_points')  # noqa
             for contact_point in contact_points:
                 contact_details = BNode()
-                contact_point_email = contact_point['email']
+                contact_point_email = \
+                    EMAIL_MAILTO_PREFIX + contact_point['email']
                 contact_point_name = contact_point['name']
 
                 g.add((contact_details, RDF.type, VCARD.Organization))
