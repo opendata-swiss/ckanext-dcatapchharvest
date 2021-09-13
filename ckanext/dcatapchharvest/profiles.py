@@ -442,8 +442,8 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Dates
         items = [
-            ('issued', DCT.issued, ['metadata_created'], Literal),
-            ('modified', DCT.modified, ['metadata_modified'], Literal),
+            ('issued', DCT.issued, ['issued'], Literal),
+            ('modified', DCT.modified, ['modified'], Literal),
         ]
         self._add_date_triples_from_dict(dataset_dict, dataset_ref, items)
 
