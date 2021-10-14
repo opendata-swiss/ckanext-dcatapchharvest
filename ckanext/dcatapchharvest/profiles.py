@@ -772,3 +772,10 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             distribution,
             items
         )
+
+    def graph_from_dataset(self, dataset_dict, dataset_ref):
+        super(SchemaOrgProfile, self).graph_from_dataset(dataset_dict, dataset_ref)
+
+    def parse_dataset(self, dataset_dict, dataset_ref):
+        super(SchemaOrgProfile, self).parse_from_dataset(dataset_dict, dataset_ref)
+
