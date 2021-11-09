@@ -7,8 +7,8 @@ from ckantoolkit import config
 
 import re
 
-from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile
-from ckanext.dcat.utils import publisher_uri_from_dataset_dict
+from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
+from ckanext.dcat.utils import publisher_uri_organization_fallback
 from ckan.lib.munge import munge_tag
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
@@ -682,12 +682,21 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             self._get_dataset_value(dataset_dict, 'publisher_name'),
             dataset_dict.get('organization'),
         ]):
-
-            publisher_uri = publisher_uri_from_dataset_dict(dataset_dict)
+            publisher_uri = self._get_dataset_value(
+                dataset_dict, 'publisher_uri')
+            publisher_uri_fallback = publisher_uri_organization_fallback(
+                dataset_dict)
+            publisher_name = self._get_dataset_value(
+                dataset_dict, 'publisher_name')
             if publisher_uri:
-                publisher_details = URIRef(publisher_uri)
+                publisher_details = CleanedURIRef(publisher_uri)
+            elif not publisher_name and publisher_uri_fallback:
+                # neither URI nor name are available:
+                # use organization as fallback
+                publisher_details = CleanedURIRef(publisher_uri_fallback)
             else:
                 # No organization nor publisher_uri
+                # No publisher_uri
                 publisher_details = BNode()
 
             self.g.add((publisher_details, RDF.type, SCHEMA.Organization))
