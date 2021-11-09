@@ -428,11 +428,11 @@ class SwissDCATAPProfile(MultiLangProfile):
         # LandingPage
         try:
             landing_page = dh.uri_to_iri(dataset_dict['url'])
-        except ValueError:
-            landing_page = ''
-
-        g.add((dataset_ref, DCAT.landingPage,
-               Literal(landing_page)))
+        except (ValueError, KeyError):
+            pass
+        else:
+            g.add((dataset_ref, DCAT.landingPage,
+                   Literal(landing_page)))
 
         # Keywords
         self._add_multilang_value(
