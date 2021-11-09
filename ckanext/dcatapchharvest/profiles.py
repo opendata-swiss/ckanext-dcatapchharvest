@@ -696,7 +696,6 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 publisher_details = CleanedURIRef(publisher_uri_fallback)
             else:
                 # No organization nor publisher_uri
-                # No publisher_uri
                 publisher_details = BNode()
 
             self.g.add((publisher_details, RDF.type, SCHEMA.Organization))
