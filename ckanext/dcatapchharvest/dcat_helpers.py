@@ -29,7 +29,6 @@ def uri_to_iri(uri):
     result = urlparse(uri)
     if not result.scheme or not result.netloc or result.netloc == '-':
         raise ValueError("Provided URI does not have a valid schema or netloc")
-
     try:
         iri = iribaker.to_iri(uri)
         return iri
