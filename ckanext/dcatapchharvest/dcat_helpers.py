@@ -1,7 +1,23 @@
 import iribaker
+import os
 from urlparse import urlparse
 from ckantoolkit import config
-from rdflib import URIRef
+from rdflib import URIRef, Graph
+from rdflib.namespace import Namespace
+
+import logging
+log = logging.getLogger(__name__)
+
+DCT = Namespace("http://purl.org/dc/terms/")
+SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
+
+namespaces = {
+  "skos": SKOS,
+  "dct": DCT,
+}
+
+__location__ = \
+    os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 def uri_to_iri(uri):
@@ -95,5 +111,13 @@ def resource_uri(resource_dict, distribution=None):
             uri = '{0}/dataset/{1}/resource/{2}'.format(site_url.rstrip('/'),
                                                         dataset_id,
                                                         resource_dict['id'])
-
     return uri
+
+
+def get_frequency_values():
+    g = Graph()
+    for prefix, namespace in namespaces.items():
+        g.bind(prefix, namespace)
+    file = os.path.join(__location__, 'frequency.ttl')
+    g.parse(file, format='turtle')
+    return [item for item in g.subjects(object=SKOS.Concept)]

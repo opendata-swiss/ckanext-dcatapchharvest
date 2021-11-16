@@ -14,8 +14,10 @@ from ckan.lib.munge import munge_tag
 import ckanext.dcatapchharvest.dcat_helpers as dh
 
 import logging
+
 log = logging.getLogger(__name__)
 
+valid_frequencies = dh.get_frequency_values()
 
 DCT = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -55,7 +57,9 @@ slug_id_pattern = re.compile('[^/]+(?=/$|$)')
 
 
 class MultiLangProfile(RDFProfile):
-    def _add_multilang_value(self, subject, predicate, dataset_key=None, dataset_dict=None, multilang_values=None):  # noqa
+    def _add_multilang_value(self, subject, predicate, dataset_key=None,
+                             dataset_dict=None,
+                             multilang_values=None):  # noqa
         if not multilang_values and dataset_dict and dataset_key:
             multilang_values = dataset_dict.get(dataset_key)
         if multilang_values:
@@ -110,6 +114,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     It requires the European DCAT-AP profile (`euro_dcat_ap`)
     '''
+
     def _object_value(self, subject, predicate, multilang=False):
         '''
         Given a subject and a predicate, returns the value of the object
@@ -236,7 +241,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('spatial_uri', DCT.spatial),
                 ('spatial', DCT.spatial),
                 ('url', DCAT.landingPage),
-                ):
+        ):
             value = self._object_value(dataset_ref, predicate)
             if value:
                 dataset_dict[key] = value
@@ -245,7 +250,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         for key, predicate in (
                 ('issued', DCT.issued),
                 ('modified', DCT.modified),
-                ):
+        ):
             value = self._object_value(dataset_ref, predicate)
             if value:
                 dataset_dict[key] = self._clean_datetime(value)
@@ -254,7 +259,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         for key, predicate in (
                 ('title', DCT.title),
                 ('description', DCT.description),
-                ):
+        ):
             value = self._object_value(dataset_ref, predicate, multilang=True)
             if value:
                 dataset_dict[key] = value
@@ -327,7 +332,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     ('coverage', DCT.coverage),
                     ('rights', DCT.rights),
                     ('license', DCT.license),
-                    ):
+            ):
                 value = self._object_value(distribution, predicate)
                 if value:
                     resource_dict[key] = value
@@ -341,7 +346,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             for key, predicate in (
                     ('issued', DCT.issued),
                     ('modified', DCT.modified),
-                    ):
+            ):
                 value = self._object_value(distribution, predicate)
                 if value:
                     resource_dict[key] = self._clean_datetime(value)
@@ -350,7 +355,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             for key, predicate in (
                     ('title', DCT.title),
                     ('description', DCT.description),
-                    ):
+            ):
                 value = self._object_value(
                     distribution,
                     predicate,
@@ -452,11 +457,8 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Update Interval
         accrual_periodicity = dataset_dict.get('accrual_periodicity')
         if accrual_periodicity:
-            g.add((
-                dataset_ref,
-                DCT.accrualPeriodicity,
-                URIRef(accrual_periodicity)
-            ))
+            self._accrual_periodicity_to_graph(dataset_ref,
+                                               accrual_periodicity)
 
         # Lists
         items = [
@@ -650,6 +652,15 @@ class SwissDCATAPProfile(MultiLangProfile):
     def graph_from_catalog(self, catalog_dict, catalog_ref):
         g = self.g
         g.add((catalog_ref, RDF.type, DCAT.Catalog))
+
+    def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
+        g = self.g
+        if URIRef(accrual_periodicity) in valid_frequencies:
+            g.add((
+                dataset_ref,
+                DCT.accrualPeriodicity,
+                URIRef(accrual_periodicity)
+            ))
 
 
 class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
