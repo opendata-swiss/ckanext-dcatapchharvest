@@ -16,6 +16,7 @@ import ckanext.dcatapchharvest.dcat_helpers as dh
 import logging
 log = logging.getLogger(__name__)
 
+valid_frequencies = dh.get_frequency_values()
 
 DCT = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -452,11 +453,8 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Update Interval
         accrual_periodicity = dataset_dict.get('accrual_periodicity')
         if accrual_periodicity:
-            g.add((
-                dataset_ref,
-                DCT.accrualPeriodicity,
-                URIRef(accrual_periodicity)
-            ))
+            self._accrual_periodicity_to_graph(dataset_ref,
+                                               accrual_periodicity)
 
         # Lists
         items = [
@@ -650,6 +648,15 @@ class SwissDCATAPProfile(MultiLangProfile):
     def graph_from_catalog(self, catalog_dict, catalog_ref):
         g = self.g
         g.add((catalog_ref, RDF.type, DCAT.Catalog))
+
+    def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
+        g = self.g
+        if URIRef(accrual_periodicity) in valid_frequencies:
+            g.add((
+                dataset_ref,
+                DCT.accrualPeriodicity,
+                URIRef(accrual_periodicity)
+            ))
 
 
 class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
