@@ -8,7 +8,7 @@ from ckantoolkit import config
 import re
 
 from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
-from ckanext.dcat.utils import publisher_uri_organization_fallback
+from ckanext.dcat.utils import publisher_uri_from_dataset_dict
 from ckan.lib.munge import munge_tag
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
@@ -16,6 +16,7 @@ import ckanext.dcatapchharvest.dcat_helpers as dh
 import logging
 log = logging.getLogger(__name__)
 
+valid_frequencies = dh.get_frequency_values()
 
 DCT = Namespace("http://purl.org/dc/terms/")
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -452,11 +453,8 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Update Interval
         accrual_periodicity = dataset_dict.get('accrual_periodicity')
         if accrual_periodicity:
-            g.add((
-                dataset_ref,
-                DCT.accrualPeriodicity,
-                URIRef(accrual_periodicity)
-            ))
+            self._accrual_periodicity_to_graph(dataset_ref,
+                                               accrual_periodicity)
 
         # Lists
         items = [
@@ -651,6 +649,15 @@ class SwissDCATAPProfile(MultiLangProfile):
         g = self.g
         g.add((catalog_ref, RDF.type, DCAT.Catalog))
 
+    def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
+        g = self.g
+        if URIRef(accrual_periodicity) in valid_frequencies:
+            g.add((
+                dataset_ref,
+                DCT.accrualPeriodicity,
+                URIRef(accrual_periodicity)
+            ))
+
 
 class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
     def _basic_fields_graph(self, dataset_ref, dataset_dict):
@@ -682,18 +689,10 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             self._get_dataset_value(dataset_dict, 'publisher_name'),
             dataset_dict.get('organization'),
         ]):
-            publisher_uri = self._get_dataset_value(
-                dataset_dict, 'publisher_uri')
-            publisher_uri_fallback = publisher_uri_organization_fallback(
-                dataset_dict)
-            publisher_name = self._get_dataset_value(
-                dataset_dict, 'publisher_name')
+
+            publisher_uri = publisher_uri_from_dataset_dict(dataset_dict)
             if publisher_uri:
-                publisher_details = CleanedURIRef(publisher_uri)
-            elif not publisher_name and publisher_uri_fallback:
-                # neither URI nor name are available:
-                # use organization as fallback
-                publisher_details = CleanedURIRef(publisher_uri_fallback)
+                publisher_details = URIRef(publisher_uri)
             else:
                 # No organization nor publisher_uri
                 publisher_details = BNode()
