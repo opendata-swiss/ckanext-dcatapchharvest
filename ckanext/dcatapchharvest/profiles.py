@@ -780,3 +780,115 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             distribution,
             items
         )
+
+    def graph_from_dataset(self, dataset_dict, dataset_ref):
+        dataset_uri = dh.dataset_uri(dataset_dict)
+        dataset_ref = URIRef(dataset_uri)
+        g = self.g
+
+        # Contact details
+        if dataset_dict.get('contact_points'):
+            contact_points = self._get_dataset_value(dataset_dict, 'contact_points')  # noqa
+            for contact_point in contact_points:
+                contact_details = BNode()
+                contact_point_email = \
+                    EMAIL_MAILTO_PREFIX + contact_point['email']
+                contact_point_name = contact_point['name']
+
+                g.add((contact_details, RDF.type, VCARD.Organization))
+                g.add((contact_details, VCARD.hasEmail, URIRef(contact_point_email)))  # noqa
+                g.add((contact_details, VCARD.fn, Literal(contact_point_name)))
+
+                g.add((dataset_ref, SCHEMA.contactPoint, contact_details))
+
+        # Resources
+        for resource_dict in dataset_dict.get('resources', []):
+            distribution = URIRef(dh.resource_uri(resource_dict))
+
+            g.add((dataset_ref, SCHEMA.distribution, distribution))
+            g.add((distribution, RDF.type, SCHEMA.Distribution))
+
+            #  Simple values
+            items = [
+                ('status', ADMS.status, None, Literal),
+                ('rights', DCT.rights, None, Literal),
+                ('coverage', DCT.coverage, None, Literal),
+                ('license', DCT.license, None, Literal),
+                ('identifier', DCT.identifier, None, Literal),
+                ('media_type', SCHEMA.mediaType, None, Literal),
+                ('spatial', DCT.spatial, None, Literal),
+            ]
+
+            self._add_triples_from_dict(resource_dict, distribution, items)
+
+            self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
+            self._add_multilang_value(distribution, DCT.description, 'description', resource_dict)  # noqa
+
+            #  Lists
+            items = [
+                ('documentation', FOAF.page, None, Literal),
+                ('language', DCT.language, None, Literal),
+                ('conforms_to', DCT.conformsTo, None, Literal),
+            ]
+            self._add_list_triples_from_dict(resource_dict, distribution,
+                                             items)
+
+            # Download URL & Access URL
+            download_url = resource_dict.get('download_url')
+            if download_url:
+                try:
+                    download_url = dh.uri_to_iri(download_url)
+                    g.add((
+                        distribution,
+                        SCHEMA.downloadURL,
+                        URIRef(download_url)
+                    ))
+                except ValueError:
+                    # only add valid URL
+                    pass
+
+            url = resource_dict.get('url')
+            if (url and not download_url) or (url and url != download_url):
+                try:
+                    url = dh.uri_to_iri(url)
+                    g.add((distribution, SCHEMA.accessURL, URIRef(url)))
+                except ValueError:
+                    # only add valid URL
+                    pass
+            elif download_url:
+                g.add((distribution, SCHEMA.accessURL, URIRef(download_url)))
+
+            # Format
+            if resource_dict.get('format'):
+                g.add((
+                    distribution,
+                    DCT['format'],
+                    Literal(resource_dict['format'])
+                ))
+
+            # Mime-Type
+            if resource_dict.get('mimetype'):
+                g.add((
+                    distribution,
+                    SCHEMA.mediaType,
+                    Literal(resource_dict['mimetype'])
+                ))
+
+            # Dates
+            items = [
+                ('issued', DCT.issued, None, Literal),
+                ('modified', DCT.modified, None, Literal),
+            ]
+
+            self._add_date_triples_from_dict(resource_dict, distribution,
+                                             items)
+
+            # ByteSize
+            if resource_dict.get('byte_size'):
+                g.add((distribution, SCHEMA.byteSize,
+                       Literal(resource_dict['byte_size'])))
+
+        super(SwissSchemaOrgProfile, self).graph_from_dataset(dataset_dict, dataset_ref)
+
+    def parse_dataset(self, dataset_dict, dataset_ref):
+        super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict, dataset_ref)
