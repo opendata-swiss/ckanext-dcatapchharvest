@@ -33,17 +33,15 @@ class BaseParseTest(object):
 
 class TestSwissDCATAPProfileParsing(BaseParseTest):
 
-    def test_landing_page_uri_parsing(self):
-        g = Graph()
+    def test_catalog(self):
 
-        dataset1 = URIRef("http://example.org/datasets/1")
-        g.add((dataset1, RDF.type, DCAT.Dataset))
+        contents = self._get_file_contents('catalog-dcatap-conform.xml')
 
         p = RDFParser(profiles=['swiss_dcat_ap'])
 
-        p.g = g
+        p.parse(contents)
 
         datasets = [d for d in p.datasets()]
-        dataset = datasets[0]
 
-        eq_(dataset['url'], u'https://www.bfs.admin.ch/bfs/de/home/statistiken.html')
+        eq_(len(datasets), 2)
+
