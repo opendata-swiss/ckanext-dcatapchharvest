@@ -434,7 +434,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         landing_page_url = dataset_dict.get('url')
         if landing_page_url:
             try:
-                landing_page = dh.uri_to_iri(dataset_dict['url'])
+                landing_page = dh.uri_to_iri(landing_page_url)
             except ValueError:
                 pass
             else:
