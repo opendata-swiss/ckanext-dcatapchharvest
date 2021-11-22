@@ -50,5 +50,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         from pprint import pprint
         pprint(dataset)
+        print(dataset['url'])
+        eq_(dataset['url'], u"https://www.bfs.admin.ch/bfs/de/home/statistiken.html")
 
 
