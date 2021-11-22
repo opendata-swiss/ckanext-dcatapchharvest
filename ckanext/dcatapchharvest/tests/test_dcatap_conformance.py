@@ -45,3 +45,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         eq_(len(datasets), 2)
 
+        dataset = datasets[0]
+        eq_(len(dataset.get('url')), 1)
+        print(dataset.get('url'))
+
