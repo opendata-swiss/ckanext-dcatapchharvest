@@ -16,13 +16,6 @@ assert_true = nose.tools.assert_true
 
 
 class BaseParseTest(object):
-
-    def _extras(self, dataset):
-        extras = {}
-        for extra in dataset.get('extras'):
-            extras[extra['key']] = extra['value']
-        return extras
-
     def _get_file_contents(self, file_name):
         path = os.path.join(os.path.dirname(__file__),
                             'fixtures',
@@ -32,25 +25,12 @@ class BaseParseTest(object):
 
 
 class TestSwissDCATAPProfileParsing(BaseParseTest):
-
-    def test_catalog(self):
-
+    def setUp(self):
         contents = self._get_file_contents('catalog-dcatap-conform.xml')
-
         p = RDFParser(profiles=['swiss_dcat_ap'])
-
         p.parse(contents)
+        self.datasets = datasets = [d for d in p.datasets()]
+        self.dataset = datasets[0]
 
-        datasets = [d for d in p.datasets()]
-
-        eq_(len(datasets), 2)
-
-
-        dataset = datasets[0]
-
-        from pprint import pprint
-        pprint(dataset)
-        print(dataset['url'])
-        eq_(dataset['url'], u"https://www.bfs.admin.ch/bfs/de/home/statistiken.html")
-
-
+    def test_dcatap_conformant_landing_page_import(self):
+        eq_(self.dataset['url'], u"https://www.bfs.admin.ch/bfs/de/home/statistiken.html")
