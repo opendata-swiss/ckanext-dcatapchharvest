@@ -842,7 +842,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         return g
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):
-        dataset_uri = dh.dataset_uri(dataset_dict)
+        dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
         dataset_ref = URIRef(dataset_uri)
         g = self.g
 
