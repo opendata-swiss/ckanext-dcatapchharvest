@@ -814,6 +814,8 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
                 g.add((dataset_ref, SCHEMA.contactPoint, contact_details))
 
+        return g
+
     def download_access_url(self, resource_dict, distribution, g):
         # Download URL & Access URL used by graph_from_dataset
         download_url = resource_dict.get("download_url")
@@ -836,6 +838,8 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 pass
         elif download_url:
             g.add((distribution, SCHEMA.accessURL, URIRef(download_url)))
+
+        return g
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):
         dataset_uri = dh.dataset_uri(dataset_dict)
