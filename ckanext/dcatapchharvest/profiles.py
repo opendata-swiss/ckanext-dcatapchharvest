@@ -805,12 +805,14 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             )  # noqa
             for contact_point in contact_points:
                 contact_details = BNode()
-                contact_point_email = EMAIL_MAILTO_PREFIX + contact_point["email"]
+                contact_point_email = \
+                    EMAIL_MAILTO_PREFIX + contact_point["email"]
                 contact_point_name = contact_point["name"]
 
                 g.add((contact_details, RDF.type, VCARD.Organization))
                 g.add(
-                    (contact_details, VCARD.hasEmail, URIRef(contact_point_email))
+                    (contact_details, VCARD.hasEmail,
+                        URIRef(contact_point_email))
                 )  # noqa
                 g.add((contact_details, VCARD.fn, Literal(contact_point_name)))
 
@@ -849,14 +851,16 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 ("language", DCT.language, None, Literal),
                 ("conforms_to", DCT.conformsTo, None, Literal),
             ]
-            self._add_list_triples_from_dict(resource_dict, distribution, items)
+            self._add_list_triples_from_dict(resource_dict, distribution,
+                                             items)
 
             # Download URL & Access URL
             download_url = resource_dict.get("download_url")
             if download_url:
                 try:
                     download_url = dh.uri_to_iri(download_url)
-                    g.add((distribution, SCHEMA.downloadURL, URIRef(download_url)))
+                    g.add((distribution, SCHEMA.downloadURL,
+                           URIRef(download_url)))
                 except ValueError:
                     # only add valid URL
                     pass
@@ -874,12 +878,14 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             # Format
             if resource_dict.get("format"):
-                g.add((distribution, DCT["format"], Literal(resource_dict["format"])))
+                g.add((distribution, DCT["format"],
+                       Literal(resource_dict["format"])))
 
             # Mime-Type
             if resource_dict.get("mimetype"):
                 g.add(
-                    (distribution, SCHEMA.mediaType, Literal(resource_dict["mimetype"]))
+                    (distribution, SCHEMA.mediaType,
+                     Literal(resource_dict["mimetype"]))
                 )
 
             # Dates
@@ -888,14 +894,18 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 ("modified", DCT.modified, None, Literal),
             ]
 
-            self._add_date_triples_from_dict(resource_dict, distribution, items)
+            self._add_date_triples_from_dict(resource_dict, distribution,
+                                             items)
             # ByteSize
             if resource_dict.get("byte_size"):
                 g.add(
-                    (distribution, SCHEMA.byteSize, Literal(resource_dict["byte_size"]))
+                    (distribution, SCHEMA.byteSize,
+                     Literal(resource_dict["byte_size"]))
                 )
 
-        super(SwissSchemaOrgProfile, self).graph_from_dataset(dataset_dict, dataset_ref)
+        super(SwissSchemaOrgProfile, self).graph_from_dataset(dataset_dict,
+                                                              dataset_ref)
 
     def parse_dataset(self, dataset_dict, dataset_ref):
-        super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,  dataset_ref)
+        super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,
+                                                         dataset_ref)
