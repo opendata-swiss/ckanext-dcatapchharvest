@@ -793,12 +793,8 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             items
         )
 
-    def graph_from_dataset(self, dataset_dict, dataset_ref):
-        dataset_uri = dh.dataset_uri(dataset_dict)
-        dataset_ref = URIRef(dataset_uri)
-        g = self.g
-
-        # Contact details
+    def contact_details(self, dataset_dict, dataset_ref, g):
+        # Contact details used by graph_from_dataset
         if dataset_dict.get("contact_points"):
             contact_points = self._get_dataset_value(
                 dataset_dict, "contact_points"
@@ -812,11 +808,42 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 g.add((contact_details, RDF.type, VCARD.Organization))
                 g.add(
                     (contact_details, VCARD.hasEmail,
-                        URIRef(contact_point_email))
+                     URIRef(contact_point_email))
                 )  # noqa
                 g.add((contact_details, VCARD.fn, Literal(contact_point_name)))
 
                 g.add((dataset_ref, SCHEMA.contactPoint, contact_details))
+
+    def download_access_url(self, resource_dict, distribution, g):
+        # Download URL & Access URL used by graph_from_dataset
+        download_url = resource_dict.get("download_url")
+        if download_url:
+            try:
+                download_url = dh.uri_to_iri(download_url)
+                g.add((distribution, SCHEMA.downloadURL,
+                       URIRef(download_url)))
+            except ValueError:
+                # only add valid URL
+                pass
+
+        url = resource_dict.get("url")
+        if (url and not download_url) or (url and url != download_url):
+            try:
+                url = dh.uri_to_iri(url)
+                g.add((distribution, SCHEMA.accessURL, URIRef(url)))
+            except ValueError:
+                # only add valid URL
+                pass
+        elif download_url:
+            g.add((distribution, SCHEMA.accessURL, URIRef(download_url)))
+
+    def graph_from_dataset(self, dataset_dict, dataset_ref):
+        dataset_uri = dh.dataset_uri(dataset_dict)
+        dataset_ref = URIRef(dataset_uri)
+        g = self.g
+
+        # Contact details
+        self.contact_details(dataset_dict, dataset_ref, g)
 
         # Resources
         for resource_dict in dataset_dict.get("resources", []):
@@ -855,26 +882,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                                              items)
 
             # Download URL & Access URL
-            download_url = resource_dict.get("download_url")
-            if download_url:
-                try:
-                    download_url = dh.uri_to_iri(download_url)
-                    g.add((distribution, SCHEMA.downloadURL,
-                           URIRef(download_url)))
-                except ValueError:
-                    # only add valid URL
-                    pass
-
-            url = resource_dict.get("url")
-            if (url and not download_url) or (url and url != download_url):
-                try:
-                    url = dh.uri_to_iri(url)
-                    g.add((distribution, SCHEMA.accessURL, URIRef(url)))
-                except ValueError:
-                    # only add valid URL
-                    pass
-            elif download_url:
-                g.add((distribution, SCHEMA.accessURL, URIRef(download_url)))
+            self.download_access_url(resource_dict, distribution, g)
 
             # Format
             if resource_dict.get("format"):
