@@ -898,4 +898,4 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         super(SwissSchemaOrgProfile, self).graph_from_dataset(dataset_dict, dataset_ref)
 
     def parse_dataset(self, dataset_dict, dataset_ref):
-        super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict, dataset_
+        super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,  dataset_ref)
