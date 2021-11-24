@@ -23,7 +23,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
             'title': 'Test DCAT dataset',
-            'url': 'http://example.com/ds1',
+            'uri': 'https://test.example.com/dataset/foo',
             'version': '1.0b',
             'metadata_created': '2015-06-26T15:21:09.034694',
             'metadata_modified': '2015-06-26T15:21:09.075774',
