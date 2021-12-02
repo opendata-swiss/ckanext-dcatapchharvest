@@ -192,7 +192,8 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
            'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
            'name': 'test-dataset',
            'title': 'Test DCAT dataset',
-           'url': 'https://test.example.com/dataset/foo'
+           #'uri': 'https://test.example.com/dataset/foo',
+           'uri': 'http://example.com/ds1',
            'version': '1.0b',
            'metadata_created': '2015-06-26T15:21:09.034694',
            'metadata_modified': '2015-06-26T15:21:09.075774'
@@ -208,6 +209,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
 
        # Basic fields
        assert self._triple(g, dataset_ref, RDF.type, SCHEMA.Dataset)
+       assert self._triple(g, dataset_ref, SCHEMA.url, dataset['uri'])
        assert self._triple(g, dataset_ref, SCHEMA.name, dataset['title'])
        assert self._triple(g, dataset_ref, SCHEMA.version, dataset['version'])
        assert self._triple(g, dataset_ref, SCHEMA.identifier, extras['identifier'])
