@@ -23,7 +23,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
             'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
             'name': 'test-dataset',
             'title': 'Test DCAT dataset',
-            'uri': 'https://test.example.com/dataset/foo',
+            'url': 'http://example.com/ds1',
             'version': '1.0b',
             'metadata_created': '2015-06-26T15:21:09.034694',
             'metadata_modified': '2015-06-26T15:21:09.075774',
@@ -184,3 +184,30 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
             eq_(len([t for t in g.triples((dataset_ref, item[1], None))]), len(values))
             for value in values:
                 assert self._triple(g, dataset_ref, item[1], item[2](value))
+
+   # new test
+   def test_graph_from_dataset_uri(self):
+
+       dataset = {
+           'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
+           'name': 'test-dataset',
+           'title': 'Test DCAT dataset',
+           'url': 'https://test.example.com/dataset/foo'
+           'version': '1.0b',
+           'metadata_created': '2015-06-26T15:21:09.034694',
+           'metadata_modified': '2015-06-26T15:21:09.075774'
+       }
+       extras = self._extras(dataset)
+
+       s = RDFSerializer(profiles=['swiss_schemaorg'])
+       g = s.g
+
+       dataset_ref = s.graph_from_dataset(dataset)
+
+       eq_(unicode(dataset_ref), utils.dataset_uri(dataset))
+
+       # Basic fields
+       assert self._triple(g, dataset_ref, RDF.type, SCHEMA.Dataset)
+       assert self._triple(g, dataset_ref, SCHEMA.name, dataset['title'])
+       assert self._triple(g, dataset_ref, SCHEMA.version, dataset['version'])
+       assert self._triple(g, dataset_ref, SCHEMA.identifier, extras['identifier'])
