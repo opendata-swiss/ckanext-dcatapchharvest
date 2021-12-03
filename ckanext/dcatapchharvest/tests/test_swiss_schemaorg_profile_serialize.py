@@ -9,7 +9,13 @@ from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
 from ckanext.dcat.profiles import SCHEMA
 
+from rdflib import URIRef
+import ckanext.dcatapchharvest.dcat_helpers as dh
+
 from ckanext.dcat.tests.test_euro_dcatap_profile_serialize import BaseSerializeTest
+import logging
+
+log = logging.getLogger(__name__)
 
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
@@ -185,31 +191,35 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
             for value in values:
                 assert self._triple(g, dataset_ref, item[1], item[2](value))
 
-   # new test
-   def test_graph_from_dataset_uri(self):
+    # new test
+    def test_graph_from_dataset_uri(self):
 
-       dataset = {
-           'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
-           'name': 'test-dataset',
-           'title': 'Test DCAT dataset',
-           #'uri': 'https://test.example.com/dataset/foo',
-           'uri': 'http://example.com/ds1',
-           'version': '1.0b',
-           'metadata_created': '2015-06-26T15:21:09.034694',
-           'metadata_modified': '2015-06-26T15:21:09.075774'
-       }
-       extras = self._extras(dataset)
+        dataset = {
+            'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
+            'name': 'test-dataset',
+            'title': 'Test DCAT dataset',
+            'uri': 'https://test.example.com/dataset/foo',
+            'version': '1.0b',
+            'metadata_created': '2015-06-26T15:21:09.034694',
+            'metadata_modified': '2015-06-26T15:21:09.075774'
+        }
 
-       s = RDFSerializer(profiles=['swiss_schemaorg'])
-       g = s.g
+        s = RDFSerializer(profiles=['swiss_schemaorg'])
+        g = s.g
+        dataset_ref = s.graph_from_dataset(dataset)
 
-       dataset_ref = s.graph_from_dataset(dataset)
+        # Change dataset uri that includes a test url
+        dataset_uri = dh.dataset_uri(dataset, dataset_ref)
 
-       eq_(unicode(dataset_ref), utils.dataset_uri(dataset))
+        # New Resource for dataset with changed uri
+        dataset_ref_changed = URIRef(dataset_uri)
 
-       # Basic fields
-       assert self._triple(g, dataset_ref, RDF.type, SCHEMA.Dataset)
-       assert self._triple(g, dataset_ref, SCHEMA.url, dataset['uri'])
-       assert self._triple(g, dataset_ref, SCHEMA.name, dataset['title'])
-       assert self._triple(g, dataset_ref, SCHEMA.version, dataset['version'])
-       assert self._triple(g, dataset_ref, SCHEMA.identifier, extras['identifier'])
+        distribution = URIRef(dh.resource_uri(dataset))
+
+        g.add((dataset_ref_changed, SCHEMA.distribution, distribution))
+        g.add((distribution, RDF.type, SCHEMA.Distribution))
+
+        # Basic fields
+        assert self._triple(g, dataset_ref_changed, RDF.type, SCHEMA.Dataset)
+        assert self._triple(g, dataset_ref_changed, SCHEMA.name, dataset['title'])
+        assert self._triple(g, dataset_ref_changed, SCHEMA.version, dataset['version'])
