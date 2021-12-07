@@ -570,6 +570,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                     DCAT.theme,
                     eu_theme_ref,
                 ))
+            g.add((
+                dataset_ref,
+                DCAT.theme,
+                ogdch_theme_ref,
+            ))
 
         # Resources
         for resource_dict in dataset_dict.get('resources', []):
