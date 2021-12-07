@@ -3,17 +3,25 @@ import os
 from urlparse import urlparse
 from ckantoolkit import config
 from rdflib import URIRef, Graph
-from rdflib.namespace import Namespace
+from rdflib.namespace import Namespace, RDF, SKOS
 
 import logging
 log = logging.getLogger(__name__)
 
 DCT = Namespace("http://purl.org/dc/terms/")
-SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
+EUTHEMES = \
+    Namespace("http://publications.europa.eu/resource/authority/data-theme/")
 
-namespaces = {
+frequency_namespaces = {
   "skos": SKOS,
   "dct": DCT,
+}
+
+theme_namespaces = {
+    "euthemes": EUTHEMES,
+    "skos": SKOS,
+    "dct": DCT,
+    "rdf": RDF,
 }
 
 __location__ = \
@@ -116,8 +124,25 @@ def resource_uri(resource_dict, distribution=None):
 
 def get_frequency_values():
     g = Graph()
-    for prefix, namespace in namespaces.items():
+    for prefix, namespace in frequency_namespaces.items():
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'frequency.ttl')
     g.parse(file, format='turtle')
     return [item for item in g.subjects(object=SKOS.Concept)]
+
+
+def get_theme_mapping():
+    g = Graph()
+    theme_mapping = {}
+    for prefix, namespace in theme_namespaces.items():
+        g.bind(prefix, namespace)
+    file = os.path.join(__location__, 'themes.ttl')
+    g.parse(file, format='turtle')
+    for ogdch_theme_ref in g.subjects(predicate=RDF.type,
+                                      object=SKOS.Concept):
+        theme_mapping[ogdch_theme_ref] = [
+            obj
+            for obj in g.objects(subject=ogdch_theme_ref,
+                                 predicate=SKOS.mappingRelation)
+            if g.namespace_manager.compute_qname(obj)[0] == 'euthemes']
+    return theme_mapping

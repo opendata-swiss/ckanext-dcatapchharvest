@@ -18,8 +18,9 @@ import logging
 log = logging.getLogger(__name__)
 
 valid_frequencies = dh.get_frequency_values()
+eu_theme_mapping = dh.get_theme_mapping()
 
-DCT = Namespace("http://purl.org/dc/terms/")
+DCT = dh.DCT
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
 SCHEMA = Namespace('http://schema.org/')
@@ -31,6 +32,9 @@ GSP = Namespace('http://www.opengis.net/ont/geosparql#')
 OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SPDX = Namespace('http://spdx.org/rdf/terms#')
 XML = Namespace('http://www.w3.org/2001/XMLSchema')
+EUTHEMES = dh.EUTHEMES
+CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
+CHTHEMES = Namespace(CHTHEMES_URI)
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
@@ -49,6 +53,7 @@ namespaces = {
     'gsp': GSP,
     'owl': OWL,
     'xml': XML,
+    'euthemes': EUTHEMES,
 }
 
 ogd_theme_base_url = 'http://opendata.swiss/themes'
@@ -557,10 +562,18 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Themes
         groups = self._get_dataset_value(dataset_dict, 'groups')
         for group_name in groups:
+            ogdch_theme_ref = URIRef(CHTHEMES_URI + group_name.get('name'))
+            eu_theme_ref_list = eu_theme_mapping.get(ogdch_theme_ref)
+            for eu_theme_ref in eu_theme_ref_list:
+                g.add((
+                    dataset_ref,
+                    DCAT.theme,
+                    eu_theme_ref,
+                ))
             g.add((
                 dataset_ref,
                 DCAT.theme,
-                URIRef('%s/%s' % (ogd_theme_base_url, group_name.get('name')))
+                ogdch_theme_ref,
             ))
 
         # Resources
