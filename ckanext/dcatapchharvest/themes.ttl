@@ -1,6 +1,9 @@
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix euthemes: <http://publications.europa.eu/resource/authority/data-theme/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix euthemes: <http://publications.europa.eu/resource/authority/data-theme/> .
 @prefix geothemes: <https://inspire.ec.europa.eu/metadata-codelist/TopicCategory/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix dct: <http://purl.org/dc/terms/> .
@@ -19,7 +22,7 @@
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
   skos:prefLabel "Arbeit, Erwerb"@de,
-                 "Travail, rÃ©munÃ©ration"@fr,
+                 "Travail, rémunération"@fr,
                  "Lavoro e reddito"@it,
                  "Work and income"@en ;
   skos:mappingRelation euthemes:ECON ,
@@ -34,7 +37,7 @@
 <http://dcat-ap.ch/vocabulary/themes/population>
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
-  skos:prefLabel "BevÃ¶lkerung"@de,
+  skos:prefLabel "Bevölkerung"@de,
                  "Population"@fr,
                  "Popolazione"@it,
                  "Population"@en ;
@@ -70,7 +73,7 @@
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
   skos:prefLabel "Geographie"@de,
-                 "GÃ©ographie"@fr,
+                 "Géographie"@fr,
                  "Geografia"@it,
                  "Geography"@en ;
   skos:mappingRelation euthemes:REGI ,
@@ -110,7 +113,7 @@
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
   skos:prefLabel "Gesetzgebung"@de,
-                 "LÃ©gislation"@fr,
+                 "Législation"@fr,
                  "Legislazione"@it,
                  "Legislation"@en ;
   skos:mappingRelation euthemes:JUST .
@@ -118,8 +121,8 @@
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
   skos:prefLabel "Gesundheit"@de,
-                 "SantÃ©"@fr,
-                 "SanitÃ "@it,
+                 "Santé"@fr,
+                 "Sanità"@it,
                  "Health"@en ;
   skos:mappingRelation euthemes:HEAL ,
                        geothemes:health .
@@ -142,17 +145,17 @@
 <http://dcat-ap.ch/vocabulary/themes/crime>
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
-  skos:prefLabel "KriminalitÃ¤t, Strafrecht"@de,
-                 "CriminalitÃ©, droit pÃ©nal"@fr,
-                 "CriminalitÃ , diritto penale"@it,
+  skos:prefLabel "Kriminalität, Strafrecht"@de,
+                 "Criminalité, droit pénal"@fr,
+                 "Criminalità, diritto penale"@it,
                  "Crime, criminal justice"@en ;
   skos:mappingRelation euthemes:JUST .
 <http://dcat-ap.ch/vocabulary/themes/culture>
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
   skos:prefLabel "Kultur, Medien, Informationsgesellschaft, Sport"@de,
-                 "Culture, mÃ©dias, sociÃ©tÃ© de l'information, sport"@fr,
-                 "Cultura, media, societÃ  dell'informazione, sport"@it,
+                 "Culture, médias, société de l'information, sport"@fr,
+                 "Cultura, media, società dell'informazione, sport"@it,
                  "Culture, media, information society, sport"@en ;
   skos:mappingRelation euthemes:EDUC ,
                        geothemes:geothemes:society ,
@@ -171,17 +174,17 @@
 <http://dcat-ap.ch/vocabulary/themes/mobility>
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
-  skos:prefLabel "MobilitÃ¤t und Verkehr"@de,
-                 "MobilitÃ© et transports"@fr,
-                 "MobilitÃ  e trasporti"@it,
+  skos:prefLabel "Mobilität und Verkehr"@de,
+                 "Mobilité et transports"@fr,
+                 "Mobilità e trasporti"@it,
                  "Mobility and Transport"@en ;
   skos:mappingRelation euthemes:TRAN ,
                        geothemes:transportation .
 <http://dcat-ap.ch/vocabulary/themes/public-order>
   a skos:Concept ;
   skos:inScheme <http://dcat-ap.ch/vocabulary/themes/> ;
-  skos:prefLabel "Ã–ffentliche Ordnung und Sicherheit"@de,
-                 "Ordre et sÃ©curitÃ© publics"@fr,
+  skos:prefLabel "Öffentliche Ordnung und Sicherheit"@de,
+                 "Ordre et sécurité publics"@fr,
                  "Ordine pubblico e sicurezza pubblica"@it,
                  "Public order and security"@en ;
   skos:mappingRelation euthemes:GOVE ,
