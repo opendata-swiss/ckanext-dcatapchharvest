@@ -216,7 +216,15 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         dataset_uri = dh.dataset_uri(dataset, dataset_ref)
         dataset_ref_changed = URIRef(dataset_uri)
 
+        # To test that the distribution is present in the graph with the new resource uri
+        for resource_dict in dataset.get("resources", []):
+            distribution = URIRef(dh.resource_uri(resource_dict))
+            # adding distribution (triples) to the graph
+            g.add((dataset_ref_changed, SCHEMA.distribution, distribution))
+            g.add((distribution, RDF.type, SCHEMA.Distribution))
+
         # Basic fields
         assert self._triple(g, dataset_ref_changed, RDF.type, SCHEMA.Dataset)
         assert self._triple(g, dataset_ref_changed, SCHEMA.name, dataset['title'])
         assert self._triple(g, dataset_ref_changed, SCHEMA.version, dataset['version'])
+        assert self._triple(g, dataset_ref_changed, SCHEMA.distribution, distribution)
