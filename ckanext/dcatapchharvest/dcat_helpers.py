@@ -11,7 +11,8 @@ log = logging.getLogger(__name__)
 DCT = Namespace("http://purl.org/dc/terms/")
 SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
 RDF = Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
-EUTHEMES = Namespace("http://publications.europa.eu/resource/authority/data-theme/")
+EUTHEMES = \
+    Namespace("http://publications.europa.eu/resource/authority/data-theme/")
 
 frequency_namespaces = {
   "skos": SKOS,
@@ -139,9 +140,11 @@ def get_theme_mapping():
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'themes.ttl')
     g.parse(file, format='turtle')
-    for ogdch_theme_ref in g.subjects(predicate=RDF.type, object=SKOS.Concept):
-        object_list = [obj
-                       for obj in g.objects(subject=ogdch_theme_ref, predicate=SKOS.mappingRelation)
-                       if g.namespace_manager.compute_qname(obj)[0] == 'euthemes']
-        theme_mapping[ogdch_theme_ref] = object_list
+    for ogdch_theme_ref in g.subjects(predicate=RDF.type,
+                                      object=SKOS.Concept):
+        theme_mapping[ogdch_theme_ref] = [
+            obj
+            for obj in g.objects(subject=ogdch_theme_ref,
+                                 predicate=SKOS.mappingRelation)
+            if g.namespace_manager.compute_qname(obj)[0] == 'euthemes']
     return theme_mapping
