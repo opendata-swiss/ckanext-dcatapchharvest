@@ -20,7 +20,7 @@ log = logging.getLogger(__name__)
 valid_frequencies = dh.get_frequency_values()
 eu_theme_mapping = dh.get_theme_mapping()
 
-DCT = Namespace("http://purl.org/dc/terms/")
+DCT = dh.DCT
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
 VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
 SCHEMA = Namespace('http://schema.org/')
@@ -32,7 +32,7 @@ GSP = Namespace('http://www.opengis.net/ont/geosparql#')
 OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SPDX = Namespace('http://spdx.org/rdf/terms#')
 XML = Namespace('http://www.w3.org/2001/XMLSchema')
-EUTHEMES = Namespace("http://publications.europa.eu/resource/authority/data-theme/")
+EUTHEMES = dh.EUTHEMES
 CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
 CHTHEMES = Namespace(CHTHEMES_URI)
 

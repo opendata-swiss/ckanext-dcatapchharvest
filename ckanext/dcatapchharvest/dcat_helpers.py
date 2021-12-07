@@ -3,14 +3,12 @@ import os
 from urlparse import urlparse
 from ckantoolkit import config
 from rdflib import URIRef, Graph
-from rdflib.namespace import Namespace
+from rdflib.namespace import Namespace, RDF, SKOS
 
 import logging
 log = logging.getLogger(__name__)
 
 DCT = Namespace("http://purl.org/dc/terms/")
-SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
-RDF = Namespace('http://www.w3.org/1999/02/22-rdf-syntax-ns#')
 EUTHEMES = \
     Namespace("http://publications.europa.eu/resource/authority/data-theme/")
 
