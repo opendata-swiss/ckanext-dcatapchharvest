@@ -13,9 +13,6 @@ from rdflib import URIRef
 import ckanext.dcatapchharvest.dcat_helpers as dh
 
 from ckanext.dcat.tests.test_euro_dcatap_profile_serialize import BaseSerializeTest
-import logging
-
-log = logging.getLogger(__name__)
 
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
@@ -192,7 +189,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
                 assert self._triple(g, dataset_ref, item[1], item[2](value))
 
     def test_graph_from_dataset_uri(self):
-        """"Tests that datasets with a uri from the test system
+        """"Tests that datasets (resources) with a uri from the test system
         have that uri changed to reference the prod system when they are output as a graph"""
 
         dataset = {
@@ -218,7 +215,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         dataset_uri = dh.dataset_uri(dataset, dataset_ref)
         dataset_ref_changed = URIRef(dataset_uri)
 
-        # To test that the distribution is present in the graph with the new resource uri
+        # Test that the distribution is present in the graph with the new resource uri
         for resource_dict in dataset.get("resources", []):
             distribution = URIRef(dh.resource_uri(resource_dict))
 
@@ -227,4 +224,3 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, dataset_ref_changed, SCHEMA.name, dataset['title'])
         assert self._triple(g, dataset_ref_changed, SCHEMA.version, dataset['version'])
         assert self._triple(g, distribution, RDF.type, SCHEMA.Distribution)
-
