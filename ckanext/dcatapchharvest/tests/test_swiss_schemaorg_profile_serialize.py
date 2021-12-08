@@ -204,7 +204,9 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
             'metadata_created': '2015-06-26T15:21:09.034694',
             'metadata_modified': '2015-06-26T15:21:09.075774',
             'resources': [
-                {'uri': 'https://test.example.com/dataset/foo', 'id': '5f2be71f-636c-4d3f-aac1-50830b97f853'},
+                {'uri': 'https://test.example.com/dataset/foo/resource/fxx',
+                 'id': '5f2be71f-636c-4d3f-aac1-50830b97f853',
+                 'package_id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6'},
             ]
         }
 
@@ -219,12 +221,10 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         # To test that the distribution is present in the graph with the new resource uri
         for resource_dict in dataset.get("resources", []):
             distribution = URIRef(dh.resource_uri(resource_dict))
-            # adding distribution (triples) to the graph
-            g.add((dataset_ref_changed, SCHEMA.distribution, distribution))
-            g.add((distribution, RDF.type, SCHEMA.Distribution))
 
         # Basic fields
         assert self._triple(g, dataset_ref_changed, RDF.type, SCHEMA.Dataset)
         assert self._triple(g, dataset_ref_changed, SCHEMA.name, dataset['title'])
         assert self._triple(g, dataset_ref_changed, SCHEMA.version, dataset['version'])
-        assert self._triple(g, dataset_ref_changed, SCHEMA.distribution, distribution)
+        assert self._triple(g, distribution, RDF.type, SCHEMA.Distribution)
+
