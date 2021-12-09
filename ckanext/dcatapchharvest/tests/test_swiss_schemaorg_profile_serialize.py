@@ -9,6 +9,9 @@ from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
 from ckanext.dcat.profiles import SCHEMA
 
+from rdflib import URIRef
+import ckanext.dcatapchharvest.dcat_helpers as dh
+
 from ckanext.dcat.tests.test_euro_dcatap_profile_serialize import BaseSerializeTest
 
 eq_ = nose.tools.eq_
@@ -184,3 +187,40 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
             eq_(len([t for t in g.triples((dataset_ref, item[1], None))]), len(values))
             for value in values:
                 assert self._triple(g, dataset_ref, item[1], item[2](value))
+
+    def test_graph_from_dataset_uri(self):
+        """"Tests that datasets (resources) with a uri from the test system
+        have that uri changed to reference the prod system when they are output as a graph"""
+
+        dataset = {
+            'id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6',
+            'name': 'test-dataset',
+            'title': 'Test DCAT dataset',
+            'uri': 'https://test.example.com/dataset/foo',
+            'version': '1.0b',
+            'metadata_created': '2015-06-26T15:21:09.034694',
+            'metadata_modified': '2015-06-26T15:21:09.075774',
+            'resources': [
+                {'uri': 'https://test.example.com/dataset/foo/resource/fxx',
+                 'id': '5f2be71f-636c-4d3f-aac1-50830b97f853',
+                 'package_id': '4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6'},
+            ]
+        }
+
+        s = RDFSerializer(profiles=['swiss_schemaorg'])
+        g = s.g
+        dataset_ref = s.graph_from_dataset(dataset)
+
+        # Change dataset uri that includes a test url
+        dataset_uri = dh.dataset_uri(dataset, dataset_ref)
+        dataset_ref_changed = URIRef(dataset_uri)
+
+        # Test that the distribution is present in the graph with the new resource uri
+        for resource_dict in dataset.get("resources", []):
+            distribution = URIRef(dh.resource_uri(resource_dict))
+
+        # Basic fields
+        assert self._triple(g, dataset_ref_changed, RDF.type, SCHEMA.Dataset)
+        assert self._triple(g, dataset_ref_changed, SCHEMA.name, dataset['title'])
+        assert self._triple(g, dataset_ref_changed, SCHEMA.version, dataset['version'])
+        assert self._triple(g, distribution, RDF.type, SCHEMA.Distribution)
