@@ -6,6 +6,7 @@ from datetime import datetime
 from ckantoolkit import config
 
 import re
+import json
 
 from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
 from ckanext.dcat.utils import publisher_uri_organization_fallback
@@ -39,6 +40,7 @@ CHTHEMES = Namespace(CHTHEMES_URI)
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
 EMAIL_MAILTO_PREFIX = 'mailto:'
+ORGANIZATION_BASE_URL = 'https://opendata.swiss/organization/'
 
 namespaces = {
     'dct': DCT,
@@ -525,16 +527,9 @@ class SwissDCATAPProfile(MultiLangProfile):
 
                 g.add((dataset_ref, DCAT.contactPoint, contact_details))
 
-        # Publisher
-        if dataset_dict.get('publishers'):
-            publishers = dataset_dict.get('publishers')
-            for publisher in publishers:
-                publisher_name = publisher['label']
-
-                publisher_details = BNode()
-                g.add((publisher_details, RDF.type, RDF.Description))
-                g.add((publisher_details, RDFS.label, Literal(publisher_name)))
-                g.add((dataset_ref, DCT.publisher, publisher_details))
+        self._publisher_to_graph(dataset_ref,
+                                 dataset_dict,
+                                 dataset_dict['organization'].get('name'))
 
         # Temporals
         temporals = dataset_dict.get('temporals')
@@ -675,6 +670,29 @@ class SwissDCATAPProfile(MultiLangProfile):
                 DCT.accrualPeriodicity,
                 URIRef(accrual_periodicity)
             ))
+
+    def _publisher_to_graph(self, dataset_ref, dataset_dict, organization_name):
+        g = self.g
+        publisher_uri, publisher_name = None, None
+        publisher = dataset_dict.get('publisher')
+        if publisher:
+            if not isinstance(publisher, dict):
+                publisher = json.loads(publisher)
+                publisher_uri = publisher.get('url')
+                publisher_name = publisher.get('name')
+        else:
+            publishers_deprecated = dataset_dict.get('publishers')
+            if publishers_deprecated:
+                publisher_name = publishers_deprecated[0].get('label')
+                publisher_uri = ORGANIZATION_BASE_URL + organization_name
+        if publisher_uri:
+            publisher_ref = URIRef(publisher_uri)
+        else:
+            publisher_ref = BNode()
+        g.add((publisher_ref, RDF.type, FOAF.Organization))
+        if publisher_name:
+            g.add((publisher_ref, FOAF.name, Literal(publisher_name)))
+        g.add((dataset_ref, DCT.publisher, publisher_ref))
 
 
 class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
