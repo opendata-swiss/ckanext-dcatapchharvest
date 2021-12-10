@@ -527,6 +527,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
                 g.add((dataset_ref, DCAT.contactPoint, contact_details))
 
+        # Publisher
         self._publisher_to_graph(dataset_ref,
                                  dataset_dict,
                                  dataset_dict['organization'].get('name'))
