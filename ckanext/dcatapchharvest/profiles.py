@@ -721,61 +721,43 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         self._add_list_triples_from_dict(dataset_dict, dataset_ref, items)
 
     def _publisher_graph(self, dataset_ref, dataset_dict):
-        if any([
-            self._get_dataset_value(dataset_dict, 'publisher_uri'),
-            self._get_dataset_value(dataset_dict, 'publisher_name'),
-            dataset_dict.get('organization'),
-        ]):
-            publisher_uri = self._get_dataset_value(
-                dataset_dict, 'publisher_uri')
-            publisher_uri_fallback = publisher_uri_organization_fallback(
-                dataset_dict)
-            publisher_name = self._get_dataset_value(
-                dataset_dict, 'publisher_name')
+        publisher = dataset_dict.get('publisher')
+        log.error(publisher)
+        if publisher:
+            if not isinstance(publisher, dict):
+                publisher = json.loads(publisher)
+            publisher_uri = publisher.get('url')
+            publisher_name = publisher.get('name')
             if publisher_uri:
+                log.error("publisher uri is set")
                 publisher_details = CleanedURIRef(publisher_uri)
-            elif not publisher_name and publisher_uri_fallback:
-                # neither URI nor name are available:
-                # use organization as fallback
-                publisher_details = CleanedURIRef(publisher_uri_fallback)
+                log.error(publisher_details)
             else:
-                # No organization nor publisher_uri
+                log.error("publisher uri is NOT set")
                 publisher_details = BNode()
-
-            self.g.add((publisher_details, RDF.type, SCHEMA.Organization))
+            log.error("====================== now set schema")
+            log.error(publisher_details)
             self.g.add((dataset_ref, SCHEMA.publisher, publisher_details))
-            self.g.add((dataset_ref, SCHEMA.sourceOrganization, publisher_details))  # noqa
+            self.g.add((dataset_ref, SCHEMA.sourceOrganization, publisher_details))
+            self.g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))
+            self.g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
 
-            publisher_name = self._get_dataset_value(
-                dataset_dict,
-                'publisher_name'
-            )
-            if not publisher_name and dataset_dict.get('organization'):
-                publisher_name = dataset_dict['organization']['title']
-                self._add_multilang_value(
-                    publisher_details,
-                    SCHEMA.name,
-                    multilang_values=publisher_name
-                )
-            else:
-                g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
+        contact_point = BNode()
+        self.g.add((publisher_details, SCHEMA.contactPoint, contact_point))
 
-            contact_point = BNode()
-            self.g.add((publisher_details, SCHEMA.contactPoint, contact_point))
+        self.g.add((contact_point, SCHEMA.contactType, Literal('customer service')))  # noqa
 
-            self.g.add((contact_point, SCHEMA.contactType, Literal('customer service')))  # noqa
+        publisher_url = self._get_dataset_value(dataset_dict, 'publisher_url')  # noqa
+        if not publisher_url and dataset_dict.get('organization'):
+            publisher_url = dataset_dict['organization'].get('url') or config.get('ckan.site_url', '')  # noqa
 
-            publisher_url = self._get_dataset_value(dataset_dict, 'publisher_url')  # noqa
-            if not publisher_url and dataset_dict.get('organization'):
-                publisher_url = dataset_dict['organization'].get('url') or config.get('ckan.site_url', '')  # noqa
+        self.g.add((contact_point, SCHEMA.url, Literal(publisher_url)))
+        items = [
+            ('publisher_email', SCHEMA.email, ['contact_email', 'maintainer_email', 'author_email'], Literal),  # noqa
+            ('publisher_name', SCHEMA.name, ['contact_name', 'maintainer', 'author'], Literal),  # noqa
+        ]
 
-            self.g.add((contact_point, SCHEMA.url, Literal(publisher_url)))
-            items = [
-                ('publisher_email', SCHEMA.email, ['contact_email', 'maintainer_email', 'author_email'], Literal),  # noqa
-                ('publisher_name', SCHEMA.name, ['contact_name', 'maintainer', 'author'], Literal),  # noqa
-            ]
-
-            self._add_triples_from_dict(dataset_dict, contact_point, items)
+        self._add_triples_from_dict(dataset_dict, contact_point, items)
 
     def _temporal_graph(self, dataset_ref, dataset_dict):
         # schema.org temporalCoverage only allows to specify one temporal
