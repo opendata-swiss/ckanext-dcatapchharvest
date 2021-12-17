@@ -146,15 +146,48 @@ class SwissDCATAPProfile(MultiLangProfile):
                     lang_dict[lang] = ''
         return lang_dict
 
-    def _publishers(self, subject, predicate):
+    def _publisher(self, subject, predicate):
+        """
+        Returns a dict with details about a dct:publisher entity, a foaf:Agent
 
-        publishers = []
+        Both subject and predicate must be rdflib URIRef or BNode objects
 
+        Examples:
+
+        <dct:publisher>
+            <foaf:Organization rdf:about="http://orgs.vocab.org/some-org">
+                <foaf:name>Publishing Organization for dataset 1</foaf:name>
+                <dct:type rdf:resource="http://purl.org/adms/publishertype/NonProfitOrganisation"/>
+            </foaf:Organization>
+        </dct:publisher>
+
+        {
+            'url': 'http://orgs.vocab.org/some-org',
+            'name': 'Publishing Organization for dataset 1',
+        }
+
+        <dct:publisher rdf:resource="http://publications.europa.eu/resource/authority/corporate-body/EURCOU" />
+
+        {
+            'url': 'http://publications.europa.eu/resource/authority/corporate-body/EURCOU'
+        }
+
+        Returns keys for url, name with the values set to
+        an empty string if they could not be found
+        """
+        publisher = {}
         for agent in self.g.objects(subject, predicate):
-            publisher = {'label': self._object_value(agent, RDFS.label)}
-            publishers.append(publisher)
-
-        return publishers
+            publisher['url'] = (str(agent) if isinstance(agent,
+                                URIRef) else '')
+            publisher_name = self._object_value(agent, FOAF.name)
+            publisher_deprecated = self._object_value(agent, RDFS.label)
+            if publisher_name:
+                publisher['name'] = publisher_name
+            elif publisher_deprecated:
+                publisher['name'] = publisher_deprecated
+            else:
+                publisher['name'] = ''
+            return publisher
 
     def _relations(self, subject, predicate):
 
@@ -300,7 +333,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         )
 
         # Publisher
-        dataset_dict['publishers'] = self._publishers(
+        dataset_dict['publishers'] = self._publisher(
             dataset_ref,
             DCT.publisher
         )
