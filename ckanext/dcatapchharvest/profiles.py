@@ -146,7 +146,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     lang_dict[lang] = ''
         return lang_dict
 
-    def _publisher(self, subject, predicate):
+    def _publisher(self, subject, predicate, identifier):
         """
         Returns a dict with details about a dct:publisher entity, a foaf:Agent
 
@@ -187,7 +187,10 @@ class SwissDCATAPProfile(MultiLangProfile):
                 publisher['name'] = publisher_deprecated
             else:
                 publisher['name'] = ''
-            return publisher
+
+        if not publisher.get('url'):
+            publisher['url'] = _get_publisher_url_from_identifier(identifier)
+        return json.dumps(publisher)
 
     def _relations(self, subject, predicate):
 
@@ -333,9 +336,10 @@ class SwissDCATAPProfile(MultiLangProfile):
         )
 
         # Publisher
-        dataset_dict['publishers'] = self._publisher(
+        dataset_dict['publisher'] = self._publisher(
             dataset_ref,
-            DCT.publisher
+            DCT.publisher,
+            dataset_dict['identifier']
         )
 
         # Relations
@@ -986,3 +990,8 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
     def parse_dataset(self, dataset_dict, dataset_ref):
         super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,
                                                          dataset_ref)
+
+
+def _get_publisher_url_from_identifier(identifier):
+    return ORGANIZATION_BASE_URL + identifier.split('@')[1]
+
