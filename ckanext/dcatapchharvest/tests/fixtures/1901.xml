@@ -47,9 +47,9 @@
     <dcat:keyword xml:lang="en">statistical-basis-and-overviews</dcat:keyword>
     <dct:identifier>346266@bundesamt-fur-statistik-bfs</dct:identifier>
     <dct:publisher>
-      <rdf:Description rdf:nodeID="Nbf23126c0a0a465e84fe90371a7b8d02">
-        <rdfs:label>BFS/OFS</rdfs:label>
-      </rdf:Description>
+      <foaf:organization rdf:about="http://orgs.vocab.org/some-org">
+        <foaf:name>BFS/OFS</foaf:name>
+      </foaf:organization>
     </dct:publisher>
     <dcat:landingPage>https://www.bfs.admin.ch/bfs/de/home/statistiken.html</dcat:landingPage>
     <dcat:keyword xml:lang="it">basi-statistiche-e-presentazioni-generali</dcat:keyword>

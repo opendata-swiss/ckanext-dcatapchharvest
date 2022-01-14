@@ -4,6 +4,7 @@ import os
 from datetime import datetime
 
 import nose
+import json
 
 from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import RDF
@@ -90,8 +91,9 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(start_date.date().isoformat(), '1901-01-01')
 
         # Publisher
-        publisher = dataset['publishers'][0]
-        eq_(publisher['label'], 'BFS/OFS')
+        publisher = json.loads(dataset['publisher'])
+        eq_(publisher['name'], 'BFS/OFS')
+        eq_(publisher['url'], 'http://orgs.vocab.org/some-org')
 
         # Contact points
         contact_point = dataset['contact_points'][0]
