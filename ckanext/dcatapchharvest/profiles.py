@@ -9,7 +9,6 @@ import re
 import json
 
 from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
-from ckanext.dcat.utils import publisher_uri_organization_fallback
 from ckan.lib.munge import munge_tag
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
@@ -157,19 +156,12 @@ class SwissDCATAPProfile(MultiLangProfile):
         <dct:publisher>
             <foaf:Organization rdf:about="http://orgs.vocab.org/some-org">
                 <foaf:name>Publishing Organization for dataset 1</foaf:name>
-                <dct:type rdf:resource="http://purl.org/adms/publishertype/NonProfitOrganisation"/>
             </foaf:Organization>
         </dct:publisher>
 
         {
             'url': 'http://orgs.vocab.org/some-org',
             'name': 'Publishing Organization for dataset 1',
-        }
-
-        <dct:publisher rdf:resource="http://publications.europa.eu/resource/authority/corporate-body/EURCOU" />
-
-        {
-            'url': 'http://publications.europa.eu/resource/authority/corporate-body/EURCOU'
         }
 
         Returns keys for url, name with the values set to
