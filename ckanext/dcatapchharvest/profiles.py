@@ -566,8 +566,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Publisher
         self._publisher_to_graph(dataset_ref,
-                                 dataset_dict,
-                                 dataset_dict['organization'].get('name'))
+                                 dataset_dict)
 
         # Temporals
         temporals = dataset_dict.get('temporals')
@@ -709,20 +708,12 @@ class SwissDCATAPProfile(MultiLangProfile):
                 URIRef(accrual_periodicity)
             ))
 
-    def _publisher_to_graph(self, dataset_ref, dataset_dict, organization_name):
+    def _publisher_to_graph(self, dataset_ref, dataset_dict):
         g = self.g
-        publisher_uri, publisher_name = None, None
-        publisher = dataset_dict.get('publisher')
-        if publisher:
-            if not isinstance(publisher, dict):
-                publisher = json.loads(publisher)
-                publisher_uri = publisher.get('url')
-                publisher_name = publisher.get('name')
-        else:
-            publishers_deprecated = dataset_dict.get('publishers')
-            if publishers_deprecated:
-                publisher_name = publishers_deprecated[0].get('label')
-                publisher_uri = ORGANIZATION_BASE_URL + organization_name
+        publisher_uri, publisher_name = \
+            _get_publisher_dict_from_dataset(
+                dataset_dict.get('publisher')
+            )
         if publisher_uri:
             publisher_ref = URIRef(publisher_uri)
         else:
@@ -763,30 +754,19 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             self._get_dataset_value(dataset_dict, 'publisher_name'),
             dataset_dict.get('organization'),
         ]):
-            publisher_uri = self._get_dataset_value(
-                dataset_dict, 'publisher_uri')
-            publisher_uri_fallback = publisher_uri_organization_fallback(
-                dataset_dict)
-            publisher_name = self._get_dataset_value(
-                dataset_dict, 'publisher_name')
+            publisher_uri, publisher_name = \
+                _get_publisher_dict_from_dataset(
+                    dataset_dict.get('publisher')
+                )
             if publisher_uri:
                 publisher_details = CleanedURIRef(publisher_uri)
-            elif not publisher_name and publisher_uri_fallback:
-                # neither URI nor name are available:
-                # use organization as fallback
-                publisher_details = CleanedURIRef(publisher_uri_fallback)
             else:
-                # No organization nor publisher_uri
                 publisher_details = BNode()
 
             self.g.add((publisher_details, RDF.type, SCHEMA.Organization))
             self.g.add((dataset_ref, SCHEMA.publisher, publisher_details))
             self.g.add((dataset_ref, SCHEMA.sourceOrganization, publisher_details))  # noqa
 
-            publisher_name = self._get_dataset_value(
-                dataset_dict,
-                'publisher_name'
-            )
             if not publisher_name and dataset_dict.get('organization'):
                 publisher_name = dataset_dict['organization']['title']
                 self._add_multilang_value(
@@ -795,7 +775,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                     multilang_values=publisher_name
                 )
             else:
-                g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
+                self.g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
 
             contact_point = BNode()
             self.g.add((publisher_details, SCHEMA.contactPoint, contact_point))
@@ -995,3 +975,10 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 def _get_publisher_url_from_identifier(identifier):
     return ORGANIZATION_BASE_URL + identifier.split('@')[1]
 
+
+def _get_publisher_dict_from_dataset(publisher):
+    if not publisher:
+        return None, None
+    if not isinstance(publisher, dict):
+        publisher = json.loads(publisher)
+    return publisher.get('url'), publisher.get('name')
