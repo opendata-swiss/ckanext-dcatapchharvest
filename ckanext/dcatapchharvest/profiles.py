@@ -9,7 +9,6 @@ import re
 import json
 
 from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
-from ckanext.dcat.utils import publisher_uri_organization_fallback
 from ckan.lib.munge import munge_tag
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
@@ -747,30 +746,19 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             self._get_dataset_value(dataset_dict, 'publisher_name'),
             dataset_dict.get('organization'),
         ]):
-            publisher_uri = self._get_dataset_value(
-                dataset_dict, 'publisher_uri')
-            publisher_uri_fallback = publisher_uri_organization_fallback(
-                dataset_dict)
-            publisher_name = self._get_dataset_value(
-                dataset_dict, 'publisher_name')
+            publisher_uri, publisher_name = \
+                _get_publisher_dict_from_dataset(
+                    dataset_dict.get('publisher')
+                )
             if publisher_uri:
                 publisher_details = CleanedURIRef(publisher_uri)
-            elif not publisher_name and publisher_uri_fallback:
-                # neither URI nor name are available:
-                # use organization as fallback
-                publisher_details = CleanedURIRef(publisher_uri_fallback)
             else:
-                # No organization nor publisher_uri
                 publisher_details = BNode()
 
             self.g.add((publisher_details, RDF.type, SCHEMA.Organization))
             self.g.add((dataset_ref, SCHEMA.publisher, publisher_details))
             self.g.add((dataset_ref, SCHEMA.sourceOrganization, publisher_details))  # noqa
 
-            publisher_name = self._get_dataset_value(
-                dataset_dict,
-                'publisher_name'
-            )
             if not publisher_name and dataset_dict.get('organization'):
                 publisher_name = dataset_dict['organization']['title']
                 self._add_multilang_value(
@@ -779,7 +767,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                     multilang_values=publisher_name
                 )
             else:
-                g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
+                self.g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
 
             contact_point = BNode()
             self.g.add((publisher_details, SCHEMA.contactPoint, contact_point))
