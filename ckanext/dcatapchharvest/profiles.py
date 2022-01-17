@@ -558,15 +558,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((dataset_ref, DCAT.contactPoint, contact_details))
 
         # Publisher
-        if dataset_dict.get('publishers'):
-            publishers = dataset_dict.get('publishers')
-            for publisher in publishers:
-                publisher_name = publisher['label']
-
-                publisher_details = BNode()
-                g.add((publisher_details, RDF.type, RDF.Description))
-                g.add((publisher_details, RDFS.label, Literal(publisher_name)))
-                g.add((dataset_ref, DCT.publisher, publisher_details))
+        self._publisher_to_graph(dataset_ref,
+                                 dataset_dict)
 
         # Temporals
         temporals = dataset_dict.get('temporals')
@@ -707,6 +700,21 @@ class SwissDCATAPProfile(MultiLangProfile):
                 DCT.accrualPeriodicity,
                 URIRef(accrual_periodicity)
             ))
+
+    def _publisher_to_graph(self, dataset_ref, dataset_dict):
+        g = self.g
+        publisher_uri, publisher_name = \
+            _get_publisher_dict_from_dataset(
+                dataset_dict.get('publisher')
+            )
+        if publisher_uri:
+            publisher_ref = URIRef(publisher_uri)
+        else:
+            publisher_ref = BNode()
+        g.add((publisher_ref, RDF.type, FOAF.Organization))
+        if publisher_name:
+            g.add((publisher_ref, FOAF.name, Literal(publisher_name)))
+        g.add((dataset_ref, DCT.publisher, publisher_ref))
 
 
 class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
@@ -970,3 +978,11 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
 def _get_publisher_url_from_identifier(identifier):
     return ORGANIZATION_BASE_URL + identifier.split('@')[1]
+
+
+def _get_publisher_dict_from_dataset(publisher):
+    if not publisher:
+        return None, None
+    if not isinstance(publisher, dict):
+        publisher = json.loads(publisher)
+    return publisher.get('url'), publisher.get('name')
