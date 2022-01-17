@@ -21,7 +21,11 @@
           </dcat:Distribution>
         </dcat:distribution>
         <dct:language>fr</dct:language>
-        <dct:publisher rdf:resource="https://www.bfs.admin.ch/"/>
+        <dct:publisher>
+          <foaf:organization rdf:about="http://orgs.vocab.org/some-org">
+            <foaf:name>BFS/OFS</foaf:name>
+          </foaf:organization>
+        </dct:publisher>
         <dcat:keyword xml:lang="it">Basi statistiche e presentazioni generali</dcat:keyword>
         <dcat:keyword xml:lang="it">Pubblicazione</dcat:keyword>
         <dcat:contactPoint>
