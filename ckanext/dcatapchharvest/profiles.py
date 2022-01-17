@@ -6,6 +6,7 @@ from datetime import datetime
 from ckantoolkit import config
 
 import re
+import json
 
 from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
 from ckanext.dcat.utils import publisher_uri_organization_fallback
@@ -39,6 +40,7 @@ CHTHEMES = Namespace(CHTHEMES_URI)
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
 EMAIL_MAILTO_PREFIX = 'mailto:'
+ORGANIZATION_BASE_URL = 'https://opendata.swiss/organization/'
 
 namespaces = {
     'dct': DCT,
@@ -144,15 +146,44 @@ class SwissDCATAPProfile(MultiLangProfile):
                     lang_dict[lang] = ''
         return lang_dict
 
-    def _publishers(self, subject, predicate):
+    def _publisher(self, subject, predicate, identifier):
+        """
+        Returns a dict with details about a dct:publisher entity, a foaf:Agent
 
-        publishers = []
+        Both subject and predicate must be rdflib URIRef or BNode objects
 
+        Examples:
+
+        <dct:publisher>
+            <foaf:Organization rdf:about="http://orgs.vocab.org/some-org">
+                <foaf:name>Publishing Organization for dataset 1</foaf:name>
+            </foaf:Organization>
+        </dct:publisher>
+
+        {
+            'url': 'http://orgs.vocab.org/some-org',
+            'name': 'Publishing Organization for dataset 1',
+        }
+
+        Returns keys for url, name with the values set to
+        an empty string if they could not be found
+        """
+        publisher = {}
         for agent in self.g.objects(subject, predicate):
-            publisher = {'label': self._object_value(agent, RDFS.label)}
-            publishers.append(publisher)
+            publisher['url'] = (str(agent) if isinstance(agent,
+                                URIRef) else '')
+            publisher_name = self._object_value(agent, FOAF.name)
+            publisher_deprecated = self._object_value(agent, RDFS.label)
+            if publisher_name:
+                publisher['name'] = publisher_name
+            elif publisher_deprecated:
+                publisher['name'] = publisher_deprecated
+            else:
+                publisher['name'] = ''
 
-        return publishers
+        if not publisher.get('url'):
+            publisher['url'] = _get_publisher_url_from_identifier(identifier)
+        return json.dumps(publisher)
 
     def _relations(self, subject, predicate):
 
@@ -298,9 +329,10 @@ class SwissDCATAPProfile(MultiLangProfile):
         )
 
         # Publisher
-        dataset_dict['publishers'] = self._publishers(
+        dataset_dict['publisher'] = self._publisher(
             dataset_ref,
-            DCT.publisher
+            DCT.publisher,
+            dataset_dict['identifier']
         )
 
         # Relations
@@ -934,3 +966,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
     def parse_dataset(self, dataset_dict, dataset_ref):
         super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,
                                                          dataset_ref)
+
+
+def _get_publisher_url_from_identifier(identifier):
+    return ORGANIZATION_BASE_URL + identifier.split('@')[1]
