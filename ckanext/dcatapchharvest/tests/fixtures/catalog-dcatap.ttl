@@ -1,0 +1,38 @@
+@prefix dcat: <http://www.w3.org/ns/dcat#> .
+@prefix dct: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://swisstopo/opendata/catalog>
+  a dcat:Catalog ;
+  dcat:dataset <https://swisstopo/opendata/dataset/01> ,
+               <https://swisstopo/opendata/dataset/02> .
+
+<https://swisstopo/opendata/dataset/01>
+  a dcat:Dataset ;
+  dct:identifier "123@swisstopo" ;
+  dct:publisher <https://swisstopo> ;
+  dcat:keyword "bases-statistiques-et-generalites"@fr ,
+               "publikation"@de ,
+               "basas-statisticas-e-survistas"@rm ,
+               "pubblicazione"@it ,
+               "publication"@en ,
+               "publication"@fr ,
+               "statistical-basis-and-overviews"@en ,
+               "basi-statistiche-e-presentazioni-generali"@it ,
+               "statistische-grundlagen-und-ubersichten"@de ;
+  dct:title "Statistisches Jahrbuch der Schweiz 1901"@de, "Annuaire statistique de la Suisse 1901"@fr ;
+  dct:description "In diesem Dataset finden Sie Daten zum Waldbestand Zürichs"@de ,
+                  "This dataset contains information regarding the forests in Canton Zurich"@en ;
+  dct:issued "2017-04-24T19:30:57.197374"^^xsd:dateTime ;
+  dct:modified "2018-04-24T19:30:57.197374"^^xsd:dateTime ;
+  dcat:landingPage <https://www.bfs.admin.ch/bfs/de/home/statistiken.html> .
+
+<https://swisstopo/opendata/dataset/02>
+  a dcat:Dataset ;
+  dct:issued "1893-12-31T00:00:00"^^xsd:dateTime ;
+  dct:identifier "before1900@swisstopo" .
+
+<https://swisstopo>
+  a foaf:Organization ;
+  foaf:name "Landesamt für Topographie Swisstopo"@de .
