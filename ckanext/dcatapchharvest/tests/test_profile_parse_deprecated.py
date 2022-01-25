@@ -12,10 +12,9 @@ assert_true = nose.tools.assert_true
 
 
 class DeprecatedProfileParseTest(unittest.TestCase):
-    """test parsing of datacatalog DCAT-AP CH Version 2 classes
+    """test parsing of datacatalog DCAT-AP CH Version 1 classes
     and properties"""
     def test_mapping_of_landing_page_from_string(self):
-        """"test the pick up of all landing page when given as string"""
         contents = get_file_contents('deprecated/dataset-landing-page.xml')
         p = RDFParser(profiles=['swiss_dcat_ap'])
         p.parse(contents)
