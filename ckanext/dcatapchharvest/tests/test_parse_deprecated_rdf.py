@@ -27,7 +27,7 @@ class DeprecatedProfileParseTest(BaseParseTest):
         eq_(dataset['url'], u"https://www.bfs.admin.ch/bfs/de/home/statistiken.html")
 
     def test_deprecated_publisher_import(self):
-        contents = self._get_file_contents('deprecated/dataset-landing-page.xml')
+        contents = self._get_file_contents('deprecated/dataset-publisher.xml')
         p = RDFParser(profiles=['swiss_dcat_ap'])
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
