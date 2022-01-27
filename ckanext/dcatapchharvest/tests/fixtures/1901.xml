@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rdf:RDF xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcat="http://www.w3.org/ns/dcat#" xmlns:dct="http://purl.org/dc/terms/" xmlns:vcard="http://www.w3.org/2006/vcard/ns#" xmlns:schema="http://schema.org/">
+<rdf:RDF xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dcat="http://www.w3.org/ns/dcat#" xmlns:dct="http://purl.org/dc/terms/" xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:vcard="http://www.w3.org/2006/vcard/ns#" xmlns:schema="http://schema.org/">
   <dcat:Dataset rdf:about="https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585">
     <dct:relation>
       <rdf:Description rdf:about="https://www.admin.ch/opc/de/classified-compilation/19920252/index.html">
@@ -47,9 +47,9 @@
     <dcat:keyword xml:lang="en">statistical-basis-and-overviews</dcat:keyword>
     <dct:identifier>346266@bundesamt-fur-statistik-bfs</dct:identifier>
     <dct:publisher>
-      <rdf:Description rdf:nodeID="Nbf23126c0a0a465e84fe90371a7b8d02">
-        <rdfs:label>BFS/OFS</rdfs:label>
-      </rdf:Description>
+      <foaf:Organization rdf:about="https://swisstopo">
+        <foaf:name xml:lang="de">Landesamt Topographie Swisstopo</foaf:name>
+      </foaf:Organization>
     </dct:publisher>
     <dcat:landingPage>https://www.bfs.admin.ch/bfs/de/home/statistiken.html</dcat:landingPage>
     <dcat:keyword xml:lang="it">basi-statistiche-e-presentazioni-generali</dcat:keyword>

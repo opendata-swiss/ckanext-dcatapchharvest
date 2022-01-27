@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import json
 from datetime import datetime
 
 import nose
@@ -90,8 +91,9 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(start_date.date().isoformat(), '1901-01-01')
 
         # Publisher
-        publisher = dataset['publishers'][0]
-        eq_(publisher['label'], 'BFS/OFS')
+        publisher = json.loads(dataset['publisher'])
+        eq_(publisher['name'], 'Landesamt Topographie Swisstopo')
+        eq_(publisher['url'], 'https://swisstopo')
 
         # Contact points
         contact_point = dataset['contact_points'][0]
@@ -172,6 +174,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         dataset1 = URIRef("http://example.org/datasets/1")
         g.add((dataset1, RDF.type, DCAT.Dataset))
+        g.add((dataset1, DCT.identifier, Literal('1234@swisstopo')))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
         g.add((distribution1_1, RDF.type, DCAT.Distribution))
@@ -194,6 +197,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         dataset1 = URIRef("http://example.org/datasets/1")
         g.add((dataset1, RDF.type, DCAT.Dataset))
+        g.add((dataset1, DCT.identifier, Literal('1234@swisstopo')))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
         g.add((distribution1_1, RDF.type, DCAT.Distribution))
@@ -216,6 +220,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         dataset1 = URIRef("http://example.org/datasets/1")
         g.add((dataset1, RDF.type, DCAT.Dataset))
+        g.add((dataset1, DCT.identifier, Literal('1234@swisstopo')))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
         g.add((distribution1_1, RDF.type, DCAT.Distribution))
@@ -239,6 +244,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         dataset1 = URIRef("http://example.org/datasets/1")
         g.add((dataset1, RDF.type, DCAT.Dataset))
+        g.add((dataset1, DCT.identifier, Literal('1234@swisstopo')))
 
         distribution1_1 = URIRef("http://example.org/datasets/1/ds/1")
         g.add((distribution1_1, RDF.type, DCAT.Distribution))
