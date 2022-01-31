@@ -229,6 +229,18 @@ class SwissDCATAPProfile(MultiLangProfile):
         except (ValueError, KeyError, TypeError, IndexError):
             return None
 
+    def _get_eu_ccrualPeriodicity(self, subject, predicate):
+        ogdch_value = self._object_value(subject, predicate)
+        ogdch_value = URIRef(ogdch_value)
+        for key, value in valid_frequencies.items():
+            if ogdch_value == value:
+                ogdch_value = key
+                return ogdch_value
+            elif ogdch_value == key:
+                log.info("EU frequencies are already used.")
+                return ogdch_value
+        return "There is no such frequency"
+
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
         log.debug("Parsing dataset '%r'" % dataset_ref)
 
@@ -242,12 +254,20 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Basic fields
         for key, predicate in (
                 ('identifier', DCT.identifier),
-                ('accrual_periodicity', DCT.accrualPeriodicity),
+                #('accrual_periodicity', DCT.accrualPeriodicity),
                 ('spatial_uri', DCT.spatial),
                 ('spatial', DCT.spatial),
                 ('url', DCAT.landingPage),
         ):
             value = self._object_value(dataset_ref, predicate)
+            if value:
+                dataset_dict[key] = value
+
+        # Accrual periodicity
+        for key, predicate in (
+                ('accrual_periodicity', DCT.accrualPeriodicity),
+        ):
+            value = self._get_eu_ccrualPeriodicity(dataset_ref, predicate)
             if value:
                 dataset_dict[key] = value
 
