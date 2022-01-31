@@ -254,7 +254,6 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Basic fields
         for key, predicate in (
                 ('identifier', DCT.identifier),
-                #('accrual_periodicity', DCT.accrualPeriodicity),
                 ('spatial_uri', DCT.spatial),
                 ('spatial', DCT.spatial),
                 ('url', DCAT.landingPage),
