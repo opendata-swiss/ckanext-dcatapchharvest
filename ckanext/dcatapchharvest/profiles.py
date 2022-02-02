@@ -266,7 +266,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         for key, predicate in (
                 ('accrual_periodicity', DCT.accrualPeriodicity),
         ):
-            value = self._get_eu_ccrualPeriodicity(dataset_ref, predicate)
+            value = self._get_eu_accrual_periodicity(dataset_ref, predicate)
             if value:
                 dataset_dict[key] = value
 
