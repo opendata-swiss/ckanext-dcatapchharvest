@@ -229,7 +229,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         except (ValueError, KeyError, TypeError, IndexError):
             return None
 
-    def _get_eu_ccrualPeriodicity(self, subject, predicate):
+    def _get_eu_accrual_periodicity(self, subject, predicate):
         ogdch_value = self._object_value(subject, predicate)
         ogdch_value = URIRef(ogdch_value)
         for key, value in valid_frequencies.items():
