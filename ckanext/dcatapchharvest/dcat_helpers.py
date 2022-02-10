@@ -131,6 +131,8 @@ def get_frequency_values():
     g.parse(file, format='turtle')
     for ogdch_frequency_ref in g.subjects(predicate=RDF.type,
                                           object=SKOS.Concept):
+        frequency_mapping[ogdch_frequency_ref] = None
+        
         for obj in g.objects(subject=ogdch_frequency_ref,
                              predicate=SKOS.exactMatch):
             frequency_mapping[ogdch_frequency_ref] = obj
