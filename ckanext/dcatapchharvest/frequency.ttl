@@ -113,6 +113,14 @@
   skos:prefLabel "irregular"@en ;
   skos:exactMatch <http://purl.org/cld/freq/irregular> .
 
+<http://publications.europa.eu/resource/authority/frequency/IRREG>
+  a skos:Concept ;
+  skos:inScheme <http://publications.europa.eu/resource/authority/frequency> ;
+  skos:topConceptOf <http://publications.europa.eu/resource/authority/frequency> ;
+  skos:definition "The event occurs at uneven intervals."@en ;
+  skos:prefLabel "irregular"@en ;
+  skos:exactMatch <http://purl.org/cld/freq/completelyIrregular> .
+
 <http://publications.europa.eu/resource/authority/frequency/MONTHLY>
   a skos:Concept ;
   skos:inScheme <http://publications.europa.eu/resource/authority/frequency> ;
