@@ -269,7 +269,9 @@ class SwissDCATAPProfile(MultiLangProfile):
             elif ogdch_value == key:
                 log.info("EU frequencies are already used.")
                 return ogdch_value
-        return "There is no such frequency"
+            else:
+                log.info("There is no such frequency as '%s' in the official list of frequencies" % ogdch_value)
+                return ""
 
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
         log.debug("Parsing dataset '%r'" % dataset_ref)
@@ -297,8 +299,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('accrual_periodicity', DCT.accrualPeriodicity),
         ):
             value = self._get_eu_accrual_periodicity(dataset_ref, predicate)
-            if value:
-                dataset_dict[key] = value
+            dataset_dict[key] = value
 
         # Timestamp fields
         for key, predicate in (
