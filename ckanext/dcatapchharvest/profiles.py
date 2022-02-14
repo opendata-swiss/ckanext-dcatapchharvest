@@ -270,7 +270,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 log.info("EU frequencies are already used.")
                 return ogdch_value
             else:
-                log.info("There is no such frequency as '%s' in the official list of frequencies" % ogdch_value)
+                log.info("There is no such frequency as '%s' "
+                         "in the official list of frequencies" % ogdch_value)
                 return ""
 
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
