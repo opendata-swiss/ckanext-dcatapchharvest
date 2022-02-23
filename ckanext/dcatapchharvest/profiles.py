@@ -6,9 +6,9 @@ from datetime import datetime
 from ckantoolkit import config
 
 import re
+import json
 
 from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
-from ckanext.dcat.utils import publisher_uri_organization_fallback
 from ckan.lib.munge import munge_tag
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
@@ -39,6 +39,7 @@ CHTHEMES = Namespace(CHTHEMES_URI)
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
 EMAIL_MAILTO_PREFIX = 'mailto:'
+ORGANIZATION_BASE_URL = 'https://opendata.swiss/organization/'
 
 namespaces = {
     'dct': DCT,
@@ -144,15 +145,44 @@ class SwissDCATAPProfile(MultiLangProfile):
                     lang_dict[lang] = ''
         return lang_dict
 
-    def _publishers(self, subject, predicate):
+    def _publisher(self, subject, predicate, identifier):
+        """
+        Returns a dict with details about a dct:publisher entity, a foaf:Agent
 
-        publishers = []
+        Both subject and predicate must be rdflib URIRef or BNode objects
 
+        Examples:
+
+        <dct:publisher>
+            <foaf:Organization rdf:about="http://orgs.vocab.org/some-org">
+                <foaf:name>Publishing Organization for dataset 1</foaf:name>
+            </foaf:Organization>
+        </dct:publisher>
+
+        {
+            'url': 'http://orgs.vocab.org/some-org',
+            'name': 'Publishing Organization for dataset 1',
+        }
+
+        Returns keys for url, name with the values set to
+        an empty string if they could not be found
+        """
+        publisher = {}
         for agent in self.g.objects(subject, predicate):
-            publisher = {'label': self._object_value(agent, RDFS.label)}
-            publishers.append(publisher)
+            publisher['url'] = (str(agent) if isinstance(agent,
+                                URIRef) else '')
+            publisher_name = self._object_value(agent, FOAF.name)
+            publisher_deprecated = self._object_value(agent, RDFS.label)
+            if publisher_name:
+                publisher['name'] = publisher_name
+            elif publisher_deprecated:
+                publisher['name'] = publisher_deprecated
+            else:
+                publisher['name'] = ''
 
-        return publishers
+        if not publisher.get('url'):
+            publisher['url'] = _get_publisher_url_from_identifier(identifier)
+        return json.dumps(publisher)
 
     def _relations(self, subject, predicate):
 
@@ -229,6 +259,21 @@ class SwissDCATAPProfile(MultiLangProfile):
         except (ValueError, KeyError, TypeError, IndexError):
             return None
 
+    def _get_eu_accrual_periodicity(self, subject, predicate):
+        ogdch_value = self._object_value(subject, predicate)
+        ogdch_value = URIRef(ogdch_value)
+        for key, value in valid_frequencies.items():
+            if ogdch_value == value:
+                ogdch_value = key
+                return ogdch_value
+            elif ogdch_value == key:
+                log.info("EU frequencies are already used.")
+                return ogdch_value
+
+        log.info("There is no such frequency as '%s' "
+                 "in the official list of frequencies" % ogdch_value)
+        return ""
+
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
         log.debug("Parsing dataset '%r'" % dataset_ref)
 
@@ -242,7 +287,6 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Basic fields
         for key, predicate in (
                 ('identifier', DCT.identifier),
-                ('accrual_periodicity', DCT.accrualPeriodicity),
                 ('spatial_uri', DCT.spatial),
                 ('spatial', DCT.spatial),
                 ('url', DCAT.landingPage),
@@ -250,6 +294,13 @@ class SwissDCATAPProfile(MultiLangProfile):
             value = self._object_value(dataset_ref, predicate)
             if value:
                 dataset_dict[key] = value
+
+        # Accrual periodicity
+        for key, predicate in (
+                ('accrual_periodicity', DCT.accrualPeriodicity),
+        ):
+            value = self._get_eu_accrual_periodicity(dataset_ref, predicate)
+            dataset_dict[key] = value
 
         # Timestamp fields
         for key, predicate in (
@@ -298,9 +349,10 @@ class SwissDCATAPProfile(MultiLangProfile):
         )
 
         # Publisher
-        dataset_dict['publishers'] = self._publishers(
+        dataset_dict['publisher'] = self._publisher(
             dataset_ref,
-            DCT.publisher
+            DCT.publisher,
+            dataset_dict['identifier']
         )
 
         # Relations
@@ -526,15 +578,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((dataset_ref, DCAT.contactPoint, contact_details))
 
         # Publisher
-        if dataset_dict.get('publishers'):
-            publishers = dataset_dict.get('publishers')
-            for publisher in publishers:
-                publisher_name = publisher['label']
-
-                publisher_details = BNode()
-                g.add((publisher_details, RDF.type, RDF.Description))
-                g.add((publisher_details, RDFS.label, Literal(publisher_name)))
-                g.add((dataset_ref, DCT.publisher, publisher_details))
+        self._publisher_to_graph(dataset_ref,
+                                 dataset_dict)
 
         # Temporals
         temporals = dataset_dict.get('temporals')
@@ -669,12 +714,28 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
         g = self.g
-        if URIRef(accrual_periodicity) in valid_frequencies:
+        if URIRef(accrual_periodicity) in list(valid_frequencies.keys()) \
+                or list(valid_frequencies.values()):
             g.add((
                 dataset_ref,
                 DCT.accrualPeriodicity,
                 URIRef(accrual_periodicity)
             ))
+
+    def _publisher_to_graph(self, dataset_ref, dataset_dict):
+        g = self.g
+        publisher_uri, publisher_name = \
+            _get_publisher_dict_from_dataset(
+                dataset_dict.get('publisher')
+            )
+        if publisher_uri:
+            publisher_ref = URIRef(publisher_uri)
+        else:
+            publisher_ref = BNode()
+        g.add((publisher_ref, RDF.type, FOAF.Organization))
+        if publisher_name:
+            g.add((publisher_ref, FOAF.name, Literal(publisher_name)))
+        g.add((dataset_ref, DCT.publisher, publisher_ref))
 
 
 class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
@@ -707,30 +768,19 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             self._get_dataset_value(dataset_dict, 'publisher_name'),
             dataset_dict.get('organization'),
         ]):
-            publisher_uri = self._get_dataset_value(
-                dataset_dict, 'publisher_uri')
-            publisher_uri_fallback = publisher_uri_organization_fallback(
-                dataset_dict)
-            publisher_name = self._get_dataset_value(
-                dataset_dict, 'publisher_name')
+            publisher_uri, publisher_name = \
+                _get_publisher_dict_from_dataset(
+                    dataset_dict.get('publisher')
+                )
             if publisher_uri:
                 publisher_details = CleanedURIRef(publisher_uri)
-            elif not publisher_name and publisher_uri_fallback:
-                # neither URI nor name are available:
-                # use organization as fallback
-                publisher_details = CleanedURIRef(publisher_uri_fallback)
             else:
-                # No organization nor publisher_uri
                 publisher_details = BNode()
 
             self.g.add((publisher_details, RDF.type, SCHEMA.Organization))
             self.g.add((dataset_ref, SCHEMA.publisher, publisher_details))
             self.g.add((dataset_ref, SCHEMA.sourceOrganization, publisher_details))  # noqa
 
-            publisher_name = self._get_dataset_value(
-                dataset_dict,
-                'publisher_name'
-            )
             if not publisher_name and dataset_dict.get('organization'):
                 publisher_name = dataset_dict['organization']['title']
                 self._add_multilang_value(
@@ -739,7 +789,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                     multilang_values=publisher_name
                 )
             else:
-                g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
+                self.g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
 
             contact_point = BNode()
             self.g.add((publisher_details, SCHEMA.contactPoint, contact_point))
@@ -934,3 +984,15 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
     def parse_dataset(self, dataset_dict, dataset_ref):
         super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,
                                                          dataset_ref)
+
+
+def _get_publisher_url_from_identifier(identifier):
+    return ORGANIZATION_BASE_URL + identifier.split('@')[1]
+
+
+def _get_publisher_dict_from_dataset(publisher):
+    if not publisher:
+        return None, None
+    if not isinstance(publisher, dict):
+        publisher = json.loads(publisher)
+    return publisher.get('url'), publisher.get('name')

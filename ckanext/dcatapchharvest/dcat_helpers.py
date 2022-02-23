@@ -124,11 +124,18 @@ def resource_uri(resource_dict, distribution=None):
 
 def get_frequency_values():
     g = Graph()
+    frequency_mapping = {}
     for prefix, namespace in frequency_namespaces.items():
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'frequency.ttl')
     g.parse(file, format='turtle')
-    return [item for item in g.subjects(object=SKOS.Concept)]
+    for ogdch_frequency_ref in g.subjects(predicate=RDF.type,
+                                          object=SKOS.Concept):
+        frequency_mapping[ogdch_frequency_ref] = None
+        for obj in g.objects(subject=ogdch_frequency_ref,
+                             predicate=SKOS.exactMatch):
+            frequency_mapping[ogdch_frequency_ref] = obj
+    return frequency_mapping
 
 
 def get_theme_mapping():
