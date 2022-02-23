@@ -714,7 +714,8 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
         g = self.g
-        if URIRef(accrual_periodicity) in valid_frequencies:
+        if URIRef(accrual_periodicity) in list(valid_frequencies.keys()) \
+                or list(valid_frequencies.values()):
             g.add((
                 dataset_ref,
                 DCT.accrualPeriodicity,
