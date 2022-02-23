@@ -714,8 +714,12 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
         g = self.g
-        if URIRef(accrual_periodicity) in list(valid_frequencies.keys()) \
-                or list(valid_frequencies.values()):
+        old_valid_frequencies = filter(
+            lambda i: i != URIRef(
+                "http://purl.org/cld/freq/completelyIrregular"),
+            list(valid_frequencies.values()))
+        if URIRef(accrual_periodicity) in \
+                old_valid_frequencies + list(valid_frequencies.keys()):
             g.add((
                 dataset_ref,
                 DCT.accrualPeriodicity,
