@@ -8,6 +8,7 @@ from rdflib.namespace import RDF
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
 from ckanext.dcat.profiles import SCHEMA
+from ckantoolkit import unicode
 
 from rdflib import URIRef
 import ckanext.dcatapchharvest.dcat_helpers as dh
