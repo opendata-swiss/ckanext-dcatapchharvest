@@ -3,7 +3,7 @@ import json
 import ckan.plugins as p
 import ckan.logic as logic
 import ckan.model as model
-from ckantoolkit import basestring, unicode
+from ckantoolkit import basestring
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
