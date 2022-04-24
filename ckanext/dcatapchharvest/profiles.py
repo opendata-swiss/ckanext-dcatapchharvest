@@ -355,9 +355,8 @@ class SwissDCATAPProfile(MultiLangProfile):
             dataset_dict['identifier']
         )
 
-        # Relations
+        # Relations_test
         dataset_dict['relations'] = self._relations(dataset_ref, DCT.relation)
-        
 
         # Temporal
         dataset_dict['temporals'] = self._temporals(dataset_ref, DCT.temporal)
