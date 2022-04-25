@@ -3,7 +3,7 @@ from rdflib.namespace import Namespace, RDFS, RDF, SKOS
 
 from datetime import datetime
 
-from ckantoolkit import config, unicode
+from ckantoolkit import config
 
 import re
 import json

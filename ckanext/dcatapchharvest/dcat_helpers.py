@@ -1,7 +1,7 @@
 import iribaker
 import os
 from urlparse import urlparse
-from ckantoolkit import config, unicode
+from ckantoolkit import config
 from rdflib import URIRef, Graph
 from rdflib.namespace import Namespace, RDF, SKOS
 
