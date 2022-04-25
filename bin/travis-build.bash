@@ -23,9 +23,9 @@ sudo apt-get install solr-jetty libcommons-fileupload-java
 echo "Installing CKAN and its Python dependencies..."
 git clone https://github.com/ckan/ckan
 cd ckan
-if [ $CKANVERSION == 'master' ]
+if [ $CKANVERSION == 'ckan-2.8.10a' ]
 then
-    echo "CKAN version: master"
+    echo "CKAN version: ckan-2.8.10a"
 else
     CKAN_TAG=$(git tag | grep ^ckan-$CKANVERSION | sort --version-sort | tail -n 1)
     git checkout $CKAN_TAG
