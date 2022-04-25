@@ -357,10 +357,9 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Relations
         dataset_dict['relations'] = self._relations(dataset_ref, DCT.relation)
-        for i in range(len(dataset_dict['relations'])):
-            if dataset_dict['relations'][i-1]['label'] == {}:
-                dataset_dict['relations'][i-1]['label'] = \
-                    str(dataset_dict['relations'][i-1].get('url'))
+        for relation in dataset_dict['relations']:
+            if relation['label'] == {}:
+                relation['label'] = str(relation.get('url', ''))
 
         # Temporal
         dataset_dict['temporals'] = self._temporals(dataset_ref, DCT.temporal)
