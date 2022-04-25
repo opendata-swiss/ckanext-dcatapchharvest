@@ -59,20 +59,20 @@ cd ckan
 paster db init -c test-core.ini
 cd -
 
-echo "Installing ckanext-harvest and its requirements..."
-git clone https://github.com/ckan/ckanext-harvest
-cd ckanext-harvest
-python setup.py develop
-pip install -r pip-requirements.txt
-paster harvester initdb -c ../ckan/test-core.ini
-cd -
-
 echo "Installing ckanext-dcat and its requirements..."
 git clone https://github.com/ckan/ckanext-dcat
 cd ckanext-dcat
 python setup.py develop
 pip install -r requirements.txt
 pip install -r dev-requirements.txt
+cd -
+
+echo "Installing ckanext-harvest and its requirements..."
+git clone https://github.com/ckan/ckanext-harvest
+cd ckanext-harvest
+python setup.py develop
+pip install -r pip-requirements.txt
+paster harvester initdb -c ../ckan/test-core.ini
 cd -
 
 echo "Installing ckanext-dcatapchharvest and its requirements..."
