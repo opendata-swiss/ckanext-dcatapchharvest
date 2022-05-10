@@ -1,4 +1,6 @@
 import json
+import traceback
+from rdflib.exceptions import ParserError
 
 import ckan.plugins as p
 import ckan.logic as logic
@@ -6,6 +8,7 @@ import ckan.model as model
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
+from ckanext.dcatapchharvest.logic import only_deletion_harvest_objects
 
 import logging
 log = logging.getLogger(__name__)
@@ -168,6 +171,45 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
             identifier = resource.get('identifier')
             if identifier and identifier in resource_mapping:
                 resource['id'] = resource_mapping[identifier]
+
+    def gather_stage(self, harvest_job):
+        """Override method to add additional checks in case of bad data
+        received from source.
+        """
+        object_ids = []
+
+        try:
+            object_ids = super(SwissDCATRDFHarvester, self)\
+                .gather_stage(harvest_job)
+        except ParserError as e:
+            self._save_gather_error(
+                "Error when processsing dataset: %r / %s"
+                % (e, traceback.format_exc()),
+                harvest_job,
+                )
+
+            return []
+
+        if len(object_ids) == 0:
+            self._save_gather_error(
+                "Could not parse datasets from source url. "
+                "This could be because no data was returned, or the data "
+                "could not be parsed as RDF.",
+                harvest_job,
+            )
+
+            return object_ids
+
+        if only_deletion_harvest_objects(object_ids):
+            self._save_gather_error(
+                "Received no datasets from the source: "
+                "all existing datasets would be deleted!",
+                harvest_job,
+            )
+
+            return []
+
+        return object_ids
 
 
 def _derive_flat_title(title_dict):
