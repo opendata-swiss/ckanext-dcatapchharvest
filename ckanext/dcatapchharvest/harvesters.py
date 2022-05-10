@@ -191,8 +191,19 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
             return []
 
         if len(object_ids) == 0:
+            # This doesn't necessarily mean we got no datasets from the
+            # source: if there are multiple pages of results, we might have
+            # been able to parse some of them before getting an error back for
+            # a later page. In this case, the parent method stops paging
+            # through results and returns []. The harvest objects from
+            # earlier pages have already been created. The next time the run
+            # command is run, these harvest objects will be added to the fetch
+            # queue.
+            #
+            # If we end up here, an error *should* have been logged earlier,
+            # but let's log one just in case.
             self._save_gather_error(
-                "Could not parse datasets from source url. "
+                "Error parsing datasets from source url. "
                 "This could be because no data was returned, or the data "
                 "could not be parsed as RDF.",
                 harvest_job,
