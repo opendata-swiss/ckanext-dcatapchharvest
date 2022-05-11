@@ -8,7 +8,8 @@ import ckan.model as model
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
-from ckanext.dcatapchharvest.logic import only_deletion_harvest_objects
+from ckanext.dcatapchharvest.logic import (only_deletion_harvest_objects,
+                                           mark_harvest_objects_errored)
 
 import logging
 log = logging.getLogger(__name__)
@@ -196,12 +197,12 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
             # been able to parse some of them before getting an error back for
             # a later page. In this case, the parent method stops paging
             # through results and returns []. The harvest objects from
-            # earlier pages have already been created. The next time the run
-            # command is run, these harvest objects will be added to the fetch
-            # queue.
+            # earlier pages have already been created, however. The next time
+            # the run command is run, these harvest objects will be added to
+            # the fetch queue.
             #
             # If we end up here, an error *should* have been logged earlier,
-            # but let's log one just in case.
+            # but let's log one in case it hasn't.
             self._save_gather_error(
                 "Error parsing datasets from source url. "
                 "This could be because no data was returned, or the data "
@@ -212,11 +213,24 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
             return object_ids
 
         if only_deletion_harvest_objects(object_ids):
+            # If we only got harvest objects to delete datasets, save an error
+            # and mark all the objects as errored.
+            #
+            # Again, this does not guarantee that no datasets at all will be
+            # deleted, because the harvest objects have been created in the
+            # parent method. If the harvest run command is run before they are
+            # marked as errored, it will add them to the fetch queue, and some
+            # might be processed before we can stop them. At least this logs
+            # the error so it is clear what happened.
             self._save_gather_error(
                 "Received no datasets from the source: "
-                "all existing datasets would be deleted!",
+                "all existing datasets would be deleted! "
+                "Removing the deletions from the queue, but it is possible "
+                "that some datasets have already been deleted. Please check.",
                 harvest_job,
             )
+
+            mark_harvest_objects_errored(object_ids)
 
             return []
 
