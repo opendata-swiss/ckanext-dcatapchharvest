@@ -1,6 +1,4 @@
 import json
-import traceback
-from rdflib.exceptions import ParserError
 
 import ckan.plugins as p
 import ckan.logic as logic
@@ -8,8 +6,7 @@ import ckan.model as model
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
-from ckanext.dcatapchharvest.logic import (only_deletion_harvest_objects,
-                                           mark_harvest_objects_errored)
+from ckanext.dcatapchharvest.dcat_helpers import get_pagination
 
 import logging
 log = logging.getLogger(__name__)
@@ -60,6 +57,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
     def before_download(self, url, harvest_job):
         # save the harvest_job on the instance
         self.harvest_job = harvest_job
+        self.current_page_url = url
 
         # fix broken URL for City of Zurich
         url = url.replace('ogd.global.szh.loc', 'data.stadt-zuerich.ch')
@@ -173,68 +171,31 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
             if identifier and identifier in resource_mapping:
                 resource['id'] = resource_mapping[identifier]
 
-    def gather_stage(self, harvest_job):
-        """Override method to add additional checks in case of bad data
-        received from source.
-        """
-        object_ids = []
-
-        try:
-            object_ids = super(SwissDCATRDFHarvester, self)\
-                .gather_stage(harvest_job)
-        except ParserError as e:
-            self._save_gather_error(
-                "Error when processsing dataset: %r / %s"
-                % (e, traceback.format_exc()),
-                harvest_job,
+    def after_download(self, content, harvest_job):
+        if not content:
+            after_download_error_msg = \
+                'The content of page-url {} could not be read'.format(
+                    self.current_page_url
                 )
+            log.error(after_download_error_msg)
+            return False, [after_download_error_msg]
+        return content, []
 
-            return []
-
-        if len(object_ids) == 0:
-            # This doesn't necessarily mean we got no datasets from the
-            # source: if there are multiple pages of results, we might have
-            # been able to parse some of them before getting an error back for
-            # a later page. In this case, the parent method stops paging
-            # through results and returns []. The harvest objects from
-            # earlier pages have already been created, however. The next time
-            # the run command is run, these harvest objects will be added to
-            # the fetch queue.
-            #
-            # If we end up here, an error *should* have been logged earlier,
-            # but let's log one in case it hasn't.
-            self._save_gather_error(
-                "Error parsing datasets from source url. "
-                "This could be because no data was returned, or the data "
-                "could not be parsed as RDF.",
-                harvest_job,
-            )
-
-            return object_ids
-
-        if only_deletion_harvest_objects(object_ids):
-            # If we only got harvest objects to delete datasets, save an error
-            # and mark all the objects as errored.
-            #
-            # Again, this does not guarantee that no datasets at all will be
-            # deleted, because the harvest objects have been created in the
-            # parent method. If the harvest run command is run before they are
-            # marked as errored, it will add them to the fetch queue, and some
-            # might be processed before we can stop them. At least this logs
-            # the error so it is clear what happened.
-            self._save_gather_error(
-                "Received no datasets from the source: "
-                "all existing datasets would be deleted! "
-                "Removing the deletions from the queue, but it is possible "
-                "that some datasets have already been deleted. Please check.",
-                harvest_job,
-            )
-
-            mark_harvest_objects_errored(object_ids)
-
-            return []
-
-        return object_ids
+    def after_parsing(self, rdf_parser, harvest_job):
+        parsed_content = rdf_parser.datasets()
+        dataset_identifiers = [dataset.get('identifier')
+                               for dataset in parsed_content]
+        pagination = get_pagination(rdf_parser.g)
+        log.debug("pagination-info: {}".format(pagination))
+        if not dataset_identifiers:
+            after_parsing_error_msg = \
+                'The content of page-url {} could not be parsed. ' \
+                'Therefore the harvesting was stopped.' \
+                'Pagination info: {}'.format(self.page_url, pagination)
+            log.error(after_parsing_error_msg)
+            return False, [after_parsing_error_msg]
+        log.debug("datasets parsed: {}".format(','.join(dataset_identifiers)))
+        return rdf_parser, []
 
 
 def _derive_flat_title(title_dict):

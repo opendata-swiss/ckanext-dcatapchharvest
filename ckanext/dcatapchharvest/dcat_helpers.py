@@ -11,6 +11,7 @@ log = logging.getLogger(__name__)
 DCT = Namespace("http://purl.org/dc/terms/")
 EUTHEMES = \
     Namespace("http://publications.europa.eu/resource/authority/data-theme/")
+HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 
 frequency_namespaces = {
   "skos": SKOS,
@@ -153,3 +154,23 @@ def get_theme_mapping():
                                  predicate=SKOS.mappingRelation)
             if g.namespace_manager.compute_qname(obj)[0] == 'euthemes']
     return theme_mapping
+
+
+def get_pagination(catalog_graph):
+    pagination = {}
+    for pagination_node in catalog_graph.subjects(
+            RDF.type, HYDRA.PagedCollection
+    ):
+        items = [
+            ('next', HYDRA.nextPage),
+            ('first', HYDRA.firstPage),
+            ('last', HYDRA.lastPage),
+            ('count', HYDRA.totalItems),
+            ('items_per_page', HYDRA.itemsPerPage),
+        ]
+        for key, ref in items:
+            for obj in catalog_graph.objects(pagination_node, ref):
+                pagination[key] = unicode(obj)
+                log.error("{} {}".format(key, unicode(obj)))
+    log.error(pagination)
+    return pagination
