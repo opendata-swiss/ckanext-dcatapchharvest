@@ -2,6 +2,7 @@ from rdflib import URIRef, BNode, Literal
 from rdflib.namespace import Namespace, RDFS, RDF, SKOS
 
 from datetime import datetime
+import isodate
 
 from ckantoolkit import config
 
@@ -236,27 +237,25 @@ class SwissDCATAPProfile(MultiLangProfile):
         for temporal_node in self.g.objects(subject, predicate):
             start_date = self._object_value(temporal_node, SCHEMA.startDate)
             end_date = self._object_value(temporal_node, SCHEMA.endDate)
-            if start_date or end_date:
-                temporals.append({
-                    'start_date': self._clean_datetime(start_date),
-                    'end_date': self._clean_datetime(end_date)
-                })
+            if not start_date or not end_date:
+                continue
+            cleaned_start_date = self._clean_datetime(start_date)
+            cleaned_end_date = self._clean_datetime(end_date)
+            if not cleaned_start_date or not cleaned_end_date:
+                continue
+            temporals.append({
+                'start_date': self._clean_datetime(start_date),
+                'end_date': self._clean_datetime(end_date)
+            })
 
         return temporals
 
     def _clean_datetime(self, datetime_value):
         try:
-            d = datetime.strptime(
-                datetime_value[0:len('YYYY-MM-DD')],
-                '%Y-%m-%d'
-            )
-            # we have to calculate this manually since the
-            # time library of Python 2.7 does not support
-            # years < 1900, see OGD-751 and the time docs
-            # https://docs.python.org/2.7/library/time.html
-            epoch = datetime(1970, 1, 1)
-            return int((d - epoch).total_seconds())
-        except (ValueError, KeyError, TypeError, IndexError):
+            dt = isodate.parse_datetime(datetime_value)
+            if isinstance(dt, datetime):
+                return datetime_value
+        except Exception:
             return None
 
     def _get_eu_accrual_periodicity(self, subject, predicate):
@@ -309,7 +308,9 @@ class SwissDCATAPProfile(MultiLangProfile):
         ):
             value = self._object_value(dataset_ref, predicate)
             if value:
-                dataset_dict[key] = self._clean_datetime(value)
+                cleaned_value = self._clean_datetime(value)
+                if cleaned_value:
+                    dataset_dict[key] = cleaned_value
 
         # Multilingual basic fields
         for key, predicate in (
@@ -409,7 +410,9 @@ class SwissDCATAPProfile(MultiLangProfile):
             ):
                 value = self._object_value(distribution, predicate)
                 if value:
-                    resource_dict[key] = self._clean_datetime(value)
+                    cleaned_value = self._clean_datetime(value)
+                    if cleaned_value:
+                        resource_dict[key] = cleaned_value
 
             # Multilingual fields
             for key, predicate in (
