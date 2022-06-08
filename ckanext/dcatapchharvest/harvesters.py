@@ -177,7 +177,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
                 'The content of page-url {} could not be read'.format(
                     self.current_page_url
                 )
-            log.error(after_download_error_msg)
+            log.info(after_download_error_msg)
             return False, [after_download_error_msg]
         return content, []
 
@@ -192,7 +192,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
                 'The content of page-url {} could not be parsed. ' \
                 'Therefore the harvesting was stopped.' \
                 'Pagination info: {}'.format(self.page_url, pagination)
-            log.error(after_parsing_error_msg)
+            log.info(after_parsing_error_msg)
             return False, [after_parsing_error_msg]
         log.debug("datasets parsed: {}".format(','.join(dataset_identifiers)))
         return rdf_parser, []
