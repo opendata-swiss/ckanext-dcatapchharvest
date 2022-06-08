@@ -75,20 +75,16 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
                                                                {'name': 'statistische-grundlagen-und-ubersichten'}])
 
         #  Simple values
-        eq_(dataset['issued'], -2177539200)
-        eq_(dataset['modified'], 1524528000)
+        eq_(dataset['issued'], u'1900-12-31T00:00:00')
+        eq_(dataset['modified'], u'2018-04-24T19:30:57.197374')
         eq_(dataset['identifier'], u'346266@bundesamt-fur-statistik-bfs')
         eq_(dataset['spatial'], 'Schweiz')
 
         # Temporals
         temporal = dataset['temporals'][0]
-        eq_(temporal['end_date'], -2146003200)
-        end_date = datetime.fromtimestamp(temporal['end_date'])
-        eq_(end_date.date().isoformat(), '1901-12-31')
+        eq_(temporal['end_date'], u'1901-12-31T00:00:00')
 
-        eq_(temporal['start_date'], -2177452800)
-        start_date = datetime.fromtimestamp(temporal['start_date'])
-        eq_(start_date.date().isoformat(), '1901-01-01')
+        eq_(temporal['start_date'], u'1901-01-01T00:00:00')
 
         # Publisher
         publisher = json.loads(dataset['publisher'])
@@ -127,7 +123,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['identifier'], u'346265-fr@bundesamt-fur-statistik-bfs')
         eq_(resource['rights'], u'NonCommercialAllowed-CommercialWithPermission-ReferenceRequired')
         eq_(resource['language'], [u'fr'])
-        eq_(resource['issued'], -2177539200)
+        eq_(resource['issued'], u'1900-12-31T00:00:00')
         eq_(resource['url'], u'https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901')
         assert 'download_url' not in resource, "download_url not available on resource"
 
@@ -149,13 +145,9 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         dataset = datasets[0]
 
         # Check date values
-        eq_(dataset['issued'], -2398377600)
-        issued = datetime.fromtimestamp(dataset['issued'])
-        eq_(issued.date().isoformat(), u'1893-12-31')
+        eq_(dataset['issued'], u'1893-12-31T00:00:00')
 
-        eq_(dataset['modified'], 1524528000)
-        modified = datetime.fromtimestamp(dataset['modified'])
-        eq_(modified.date().isoformat(), u'2018-04-24')
+        eq_(dataset['modified'], u'2018-04-24T19:30:57.197374')
 
     def test_catalog(self):
 
