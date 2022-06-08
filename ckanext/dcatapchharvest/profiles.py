@@ -240,7 +240,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             if not start_date or not end_date:
                 continue
             cleaned_start_date = self._clean_datetime(start_date)
-            cleaned_end_date = self._clean_datetime(start_date)
+            cleaned_end_date = self._clean_datetime(end_date)
             if not cleaned_start_date or not cleaned_end_date:
                 continue
             temporals.append({
