@@ -239,7 +239,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             end_date = self._object_value(temporal_node, SCHEMA.endDate)
             if not start_date or not end_date:
                 continue
-            cleaned_start_date = self._clean_datetime(end_date)
+            cleaned_start_date = self._clean_datetime(start_date)
             cleaned_end_date = self._clean_datetime(start_date)
             if not cleaned_start_date or not cleaned_end_date:
                 continue
