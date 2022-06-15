@@ -16,6 +16,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
     p.implements(IDCATRDFHarvester, inherit=True)
 
     harvest_job = None
+    current_page_url = None
 
     def info(self):
         return {
