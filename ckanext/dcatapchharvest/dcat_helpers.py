@@ -171,6 +171,4 @@ def get_pagination(catalog_graph):
         for key, ref in items:
             for obj in catalog_graph.objects(pagination_node, ref):
                 pagination[key] = unicode(obj)
-                log.error("{} {}".format(key, unicode(obj)))
-    log.error(pagination)
     return pagination
