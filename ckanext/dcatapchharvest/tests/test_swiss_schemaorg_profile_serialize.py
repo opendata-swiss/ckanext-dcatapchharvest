@@ -28,8 +28,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
             'title': 'Test DCAT dataset',
             'url': 'http://example.com/ds1',
             'version': '1.0b',
-            'metadata_created': '2015-06-26T15:21:09.034694',
-            'metadata_modified': '2015-06-26T15:21:09.075774',
+            'issued': '2015-06-26T15:21:09.034694',
             'keywords':
                 {
                     'fr': [],
@@ -164,8 +163,8 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, dataset_ref, SCHEMA.identifier, extras['identifier'])
 
         # Dates
-        assert self._triple(g, dataset_ref, SCHEMA.datePublished, dataset['metadata_created'])
-        assert self._triple(g, dataset_ref, SCHEMA.dateModified, dataset['metadata_modified'])
+        assert self._triple(g, dataset_ref, SCHEMA.datePublished, dataset['issued'])
+        assert len(list(g.objects(dataset_ref, SCHEMA.dateModified))) == 0
 
         for key, value in dataset['description'].iteritems():
             if dataset['description'].get(key):

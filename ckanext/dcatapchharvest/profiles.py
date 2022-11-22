@@ -513,8 +513,8 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Dates
         items = [
-            ('issued', DCT.issued, ['metadata_created'], Literal),
-            ('modified', DCT.modified, ['metadata_modified'], Literal),
+            ('issued', DCT.issued, None, Literal),
+            ('modified', DCT.modified, None, Literal),
         ]
         self._add_date_triples_from_dict(dataset_dict, dataset_ref, items)
 
@@ -753,8 +753,8 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         items = [
             ('identifier', SCHEMA.identifier, None, Literal),
             ('version', SCHEMA.version, ['dcat_version'], Literal),
-            ('issued', SCHEMA.datePublished, ['metadata_created'], Literal),
-            ('modified', SCHEMA.dateModified, ['metadata_modified'], Literal),
+            ('issued', SCHEMA.datePublished, None, Literal),
+            ('modified', SCHEMA.dateModified, None, Literal),
             ('author', SCHEMA.author, ['contact_name', 'maintainer'], Literal),
             ('url', SCHEMA.sameAs, None, Literal),
         ]
