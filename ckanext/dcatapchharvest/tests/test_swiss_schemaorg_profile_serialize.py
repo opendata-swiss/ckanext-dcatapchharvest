@@ -164,7 +164,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
 
         # Dates
         assert self._triple(g, dataset_ref, SCHEMA.datePublished, dataset['issued'])
-        assert not self._triple(g, dataset_ref, SCHEMA.dateModified, None)
+        assert len(list(g.objects(dataset_ref, SCHEMA.dateModified))) == 0
 
         for key, value in dataset['description'].iteritems():
             if dataset['description'].get(key):
