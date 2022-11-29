@@ -1,9 +1,7 @@
 import json
 
 import ckan.plugins as p
-import ckan.logic as logic
 import ckan.model as model
-import ckan.plugins.toolkit as tk
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester

@@ -1,13 +1,12 @@
 import ckan.plugins.toolkit as tk
 import ckan.model as model
 from dateutil.parser import parse as dateutil_parse
-import json
 
 import logging
 
 log = logging.getLogger(__name__)
 
-NOTIFICATION_USER = 'admin'
+NOTIFICATION_USER = 'harvest-notification'
 
 
 def map_resources_to_ids(pkg_dict, package_id):
@@ -28,7 +27,10 @@ def map_resources_to_ids(pkg_dict, package_id):
 
 
 def create_activity(package_id):
-    notification_user = tk.get_action('user_show')({}, {'id': NOTIFICATION_USER})
+    notification_user = tk.get_action('user_show')(
+        {},
+        {'id': NOTIFICATION_USER}
+    )
     activity_dict = {
         'user_id': notification_user['id'],
         'object_id': package_id,
@@ -47,19 +49,29 @@ def create_activity(package_id):
 def check_package_change(existing_pkg, dataset_dict):
     if _changes_in_date(existing_pkg['modified'], dataset_dict['modified']):
         return True
-    if len(existing_pkg.get('resources')) != len(dataset_dict.get('resources')):
+    resource_count_changed = len(existing_pkg.get('resources')) != \
+        len(dataset_dict.get('resources'))
+    if resource_count_changed:
         return True
     for resource in dataset_dict.get('resources'):
-        matching_existing_resource = [existing_resource for existing_resource in existing_pkg['resources']
-                                      if existing_resource['id'] == resource['id']]
+        matching_existing_resource = [
+            existing_resource
+            for existing_resource in existing_pkg['resources']
+            if existing_resource['id'] == resource['id']
+        ]
         if not matching_existing_resource:
             return True
-        matching_existing_resource = matching_existing_resource[0]
+        matching_existing_resource = \
+            matching_existing_resource[0]
         if matching_existing_resource.get('url') != resource.get('url'):
             return True
-        if matching_existing_resource.get('download_url') != resource.get('download_url'):
+        download_url_changed = \
+            matching_existing_resource.get('download_url') != \
+            resource.get('download_url')
+        if download_url_changed:
             return True
-        if _changes_in_date(matching_existing_resource.get('modified'), resource.get('modified')):
+        if _changes_in_date(matching_existing_resource.get('modified'),
+                            resource.get('modified')):
             return True
     return False
 

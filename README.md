@@ -66,3 +66,4 @@ rights.
 
 Both configurations only work on the first import. Once imported the harvest 
 source must be cleared in order to prevent the import.
+
