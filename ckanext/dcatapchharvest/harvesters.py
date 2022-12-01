@@ -1,12 +1,16 @@
 import json
 
 import ckan.plugins as p
-import ckan.logic as logic
 import ckan.model as model
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
 from ckanext.dcatapchharvest.dcat_helpers import get_pagination
+from ckanext.dcatapchharvest.harvest_helper import (
+    map_resources_to_ids,
+    check_package_change,
+    create_activity,
+)
 
 import logging
 log = logging.getLogger(__name__)
@@ -147,30 +151,9 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
             pass
 
     def before_update(self, harvest_object, dataset_dict, temp_dict):
-        # get existing pkg_dict with incoming pkg_name
-        site_user = logic.get_action('get_site_user')(
-            {'model': model, 'ignore_auth': True}, {})
-        context = {
-            'model': model,
-            'session': model.Session,
-            'ignore_auth': True,
-            'user': site_user['name'],
-        }
-        existing_pkg = p.toolkit.get_action('package_show')(context, {
-            'id': dataset_dict.get('name')})
-
-        # get existing resource-identifiers
-        existing_resources = existing_pkg.get('resources')
-        resource_mapping = {r.get('identifier'): r.get('id') for r in existing_resources if r.get('identifier')}  # noqa
-
-        # Try to match existing identifiers with new ones
-        # Note: in ckanext-dcat a mapping is already done based on the URI
-        #       which will be overwritten here, i.e. the mapping by identifier
-        #       has precedence
-        for resource in dataset_dict.get('resources'):
-            identifier = resource.get('identifier')
-            if identifier and identifier in resource_mapping:
-                resource['id'] = resource_mapping[identifier]
+        existing_pkg = map_resources_to_ids(dataset_dict, dataset_dict['name'])
+        if check_package_change(existing_pkg, dataset_dict):
+            create_activity(package_id=dataset_dict['id'])
 
     def after_download(self, content, harvest_job):
         if not content:
