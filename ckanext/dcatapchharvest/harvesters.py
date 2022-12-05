@@ -152,8 +152,9 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
 
     def before_update(self, harvest_object, dataset_dict, temp_dict):
         existing_pkg = map_resources_to_ids(dataset_dict, dataset_dict['name'])
-        if check_package_change(existing_pkg, dataset_dict):
-            create_activity(package_id=dataset_dict['id'])
+        package_changed, msg = check_package_change(existing_pkg, dataset_dict)
+        if package_changed:
+            create_activity(package_id=dataset_dict['id'], message=msg)
 
     def after_download(self, content, harvest_job):
         if not content:
