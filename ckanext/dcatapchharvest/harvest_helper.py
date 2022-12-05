@@ -26,7 +26,7 @@ def map_resources_to_ids(pkg_dict, package_id):
     return existing_package
 
 
-def create_activity(package_id):
+def create_activity(package_id, message):
     notification_user = tk.get_action('user_show')(
         {},
         {'id': NOTIFICATION_USER}
@@ -35,6 +35,7 @@ def create_activity(package_id):
         'user_id': notification_user['id'],
         'object_id': package_id,
         'activity_type': 'changed package',
+        'data': {'message': message}
     }
     activity_create_context = {
         'model': model,
@@ -48,32 +49,39 @@ def create_activity(package_id):
 
 def check_package_change(existing_pkg, dataset_dict):
     if _changes_in_date(existing_pkg['modified'], dataset_dict['modified']):
-        return True
-    resource_count_changed = len(existing_pkg.get('resources')) != \
-        len(dataset_dict.get('resources'))
+        msg = "dataset modified date changed: {}" \
+            .format(dataset_dict.get('modified'))
+        return True, msg
+    resources = dataset_dict.get('resources', [])
+    existing_resources = existing_pkg.get('resources', [])
+    resource_count_changed = len(existing_resources) != len(resources)
     if resource_count_changed:
-        return True
-    for resource in dataset_dict.get('resources'):
-        matching_existing_resource = [
+        msg = "resource count changed: {}".format(len(resources))
+        return True, msg
+    for resource in resources:
+        matching_existing_resource_with_same_url = [
             existing_resource
-            for existing_resource in existing_pkg['resources']
-            if existing_resource['id'] == resource['id']
+            for existing_resource in existing_resources
+            if existing_resource.get('url') == resource.get('url')
         ]
-        if not matching_existing_resource:
-            return True
+        if not matching_existing_resource_with_same_url:
+            msg = "resource access url changed: {}".format(resource.get('url'))
+            return True, msg
         matching_existing_resource = \
-            matching_existing_resource[0]
-        if matching_existing_resource.get('url') != resource.get('url'):
-            return True
+            matching_existing_resource_with_same_url[0]
         download_url_changed = \
             matching_existing_resource.get('download_url') != \
             resource.get('download_url')
         if download_url_changed:
-            return True
+            msg = "resource download url changed: {}" \
+                .format(resource.get('download_url'))
+            return True, msg
         if _changes_in_date(matching_existing_resource.get('modified'),
                             resource.get('modified')):
-            return True
-    return False
+            msg = "resource modified date changed: {}" \
+                .format(resource.get('modified'))
+            return True, msg
+    return False, None
 
 
 def _get_resource_id_string(resource):
