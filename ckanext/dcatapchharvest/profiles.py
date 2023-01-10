@@ -1,7 +1,7 @@
 from rdflib import URIRef, BNode, Literal
 from rdflib.namespace import Namespace, RDFS, RDF, SKOS
 
-from datetime import datetime
+from datetime import date, datetime
 import isodate
 
 from ckantoolkit import config
@@ -260,12 +260,29 @@ class SwissDCATAPProfile(MultiLangProfile):
         return temporals
 
     def _clean_datetime(self, datetime_value):
+        """Convert a literal in one of the accepted formats (xsd:date,
+        xsd:dateTime, xsd:gYear, or xsd:gYearMonth) into an isoformat datetime
+        string.
+        """
         try:
             dt = isodate.parse_datetime(datetime_value)
             if isinstance(dt, datetime):
+                # We get an xsd:dateTime literal, check it, and return it.
                 return datetime_value
-        except Exception:
-            return None
+        except isodate.isoerror.ISO8601Error:
+            # The datetime_value couldn't be parsed as a datetime.
+            # Try parsing it as an xsd:date, xsd:gYear or xsd:gYearMonth.
+            try:
+                d = isodate.parse_date(datetime_value)
+                if isinstance(d, date):
+                    # We get back a datetime.date object. Transform it into a
+                    # datetime (00:00:00 on that date) and return an isoformat
+                    # datetime string.
+                    t = datetime.min.time()
+                    dt = datetime.combine(d, t)
+                    return dt.isoformat()
+            except isodate.isoerror.ISO8601Error:
+                return None
 
     def _get_eu_accrual_periodicity(self, subject, predicate):
         ogdch_value = self._object_value(subject, predicate)
