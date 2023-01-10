@@ -277,7 +277,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     t = datetime.min.time()
                     dt = datetime.combine(d, t)
                     return dt.isoformat()
-            except isodate.isoerror.ISO8601Error:
+            except isodate.isoerror.ISO8601Error or ValueError:
                 return None
 
     def _get_eu_accrual_periodicity(self, subject, predicate):
