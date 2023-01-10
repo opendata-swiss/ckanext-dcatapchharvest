@@ -32,7 +32,7 @@ LOCN = Namespace('http://www.w3.org/ns/locn#')
 GSP = Namespace('http://www.opengis.net/ont/geosparql#')
 OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SPDX = Namespace('http://spdx.org/rdf/terms#')
-XML = Namespace('http://www.w3.org/2001/XMLSchema')
+XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
 CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
 CHTHEMES = Namespace(CHTHEMES_URI)
@@ -54,7 +54,7 @@ namespaces = {
     'locn': LOCN,
     'gsp': GSP,
     'owl': OWL,
-    'xml': XML,
+    'xsd': XSD,
     'euthemes': EUTHEMES,
 }
 
