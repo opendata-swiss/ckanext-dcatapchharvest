@@ -1,20 +1,16 @@
-from rdflib import URIRef, BNode, Literal
-from rdflib.namespace import Namespace, RDFS, RDF, SKOS
-
-from datetime import date, datetime
-import isodate
-
-from ckantoolkit import config
-
-import re
 import json
+import logging
+import re
+from datetime import date, datetime
 
-from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
+import isodate
 from ckan.lib.munge import munge_tag
+from ckantoolkit import config
+from rdflib import BNode, Literal, URIRef
+from rdflib.namespace import RDF, RDFS, SKOS, Namespace
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
-
-import logging
+from ckanext.dcat.profiles import CleanedURIRef, RDFProfile, SchemaOrgProfile
 
 log = logging.getLogger(__name__)
 
