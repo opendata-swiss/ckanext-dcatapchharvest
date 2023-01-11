@@ -7,15 +7,28 @@
 
   <dcat:Dataset rdf:about="https://swisstopo/123">
     <dct:identifier>346265-fr@bundesamt-fur-statistik-bfs</dct:identifier>
-    <dct:publisher>
-      <foaf:Organization rdf:about="https://swisstopo">
-        <foaf:name xml:lang="de">Landesamt Topographie Swisstopo</foaf:name>
-      </foaf:Organization>
-    </dct:publisher>
     <dct:temporal>
       <dct:PeriodOfTime>
-        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1990</schema:startDate>
-        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2022</schema:endDate>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-01-01T00:00:00</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-04-04T12:30:30</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1992-01-02</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1993-12-03</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">1994-04</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">1995-06</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1996</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1997</schema:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
   </dcat:Dataset>
