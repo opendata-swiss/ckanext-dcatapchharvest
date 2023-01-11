@@ -142,6 +142,18 @@ class SwissDCATAPProfile(MultiLangProfile):
                     lang_dict[lang] = ''
         return lang_dict
 
+    def _object_value_and_datatype(self, subject, predicate):
+        """Given a subject and a predicate, returns the unicode representation
+        of the object and its datatype, if the object is an rdflib Literal.
+
+        If the object is not a Literal, the datatype returned is None.
+        """
+        for o in self.g.objects(subject, predicate):
+            if isinstance(o, Literal):
+                return unicode(o), o.datatype
+            return unicode(o), None
+        return None, None
+
     def _publisher(self, subject, predicate, identifier):
         """
         Returns a dict with details about a dct:publisher entity, a foaf:Agent
@@ -233,19 +245,21 @@ class SwissDCATAPProfile(MultiLangProfile):
         for temporal_node in self.g.objects(subject, predicate):
             # Currently specified formats in DCAT-AP.
             start_date = self._object_value(temporal_node, DCAT.startDate)
-            end_date = self._object_value(temporal_node, DCAT.endDate)
+            end_date, end_date_type = self._object_value_and_datatype(
+                temporal_node, DCAT.endDate)
             if not start_date or not end_date:
                 # Previously specified formats in DCAT-AP. Should still be
                 # accepted.
                 start_date = self._object_value(
                     temporal_node, SCHEMA.startDate)
-                end_date = self._object_value(
+                end_date, end_date_type = self._object_value_and_datatype(
                     temporal_node, SCHEMA.endDate)
             if not start_date or not end_date:
                 continue
 
             cleaned_start_date = self._clean_datetime(start_date)
-            cleaned_end_date = self._clean_datetime(end_date)
+            cleaned_end_date = self._clean_end_datetime(
+                end_date, end_date_type)
             if not cleaned_start_date or not cleaned_end_date:
                 continue
             temporals.append({
@@ -279,6 +293,37 @@ class SwissDCATAPProfile(MultiLangProfile):
                     return dt.isoformat()
             except isodate.isoerror.ISO8601Error or ValueError:
                 return None
+
+    def _clean_end_datetime(self, datetime_value, data_type):
+        """Convert a literal in one of the accepted formats (xsd:date,
+        xsd:dateTime, xsd:gYear, or xsd:gYearMonth) into the latest possible
+        date for that value, and then return it as an isoformat datetime
+        string.
+
+        E.g. if the datetime_value is in xsd:gYear format, return the isoformat
+        datetime string for the end of that year.
+        """
+        try:
+            dt = isodate.parse_datetime(datetime_value)
+            if isinstance(dt, datetime):
+                # We already have a full datetime, no need to change it.
+                return datetime_value
+        except isodate.isoerror.ISO8601Error:
+            pass
+
+        try:
+            d = isodate.parse_date(datetime_value)
+            if data_type == XSD.date:
+                end_datetime = datetime.max.replace(
+                    year=d.year, month=d.month, day=d.day)
+            elif data_type == XSD.gYearMonth:
+                end_datetime = datetime.max.replace(year=d.year, month=d.month)
+            else:
+                end_datetime = datetime.max.replace(year=d.year)
+
+            return end_datetime.isoformat()
+        except isodate.isoerror.ISO8601Error or ValueError:
+            return None
 
     def _get_eu_accrual_periodicity(self, subject, predicate):
         ogdch_value = self._object_value(subject, predicate)
