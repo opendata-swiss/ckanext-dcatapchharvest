@@ -254,7 +254,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['format'], u'CSV')
 
     def test_temporals_accepted_formats(self):
-        contents = self._get_file_contents('dataset-temporals.xml')
+        contents = self._get_file_contents('dataset-datetimes.xml')
         p = RDFParser(profiles=['swiss_dcat_ap'])
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
@@ -267,5 +267,60 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
                 {'start_date': '1992-01-02T00:00:00', 'end_date': '1993-12-03T23:59:59.999999'},
                 {'start_date': '1994-04-01T00:00:00', 'end_date': '1995-06-30T23:59:59.999999'},
                 {'start_date': '1996-01-01T00:00:00', 'end_date': '1997-12-31T23:59:59.999999'}
+            ]
+        )
+
+    def test_resource_issued_modified_accepted_formats(self):
+        contents = self._get_file_contents('dataset-datetimes.xml')
+        p = RDFParser(profiles=['swiss_dcat_ap'])
+        p.parse(contents)
+        dataset = [d for d in p.datasets()][0]
+
+        issued_dates = [distribution["issued"] for distribution in dataset["resources"]]
+        eq_(
+            sorted(issued_dates),
+            [
+                u'1990-01-01T00:00:00',
+                '1992-01-02T00:00:00',
+                '1994-04-01T00:00:00',
+                '1996-01-01T00:00:00'
+            ]
+        )
+        modified_dates = [distribution["modified"] for distribution in dataset["resources"]]
+        eq_(
+            sorted(modified_dates),
+            [
+                u'1991-04-04T12:30:30',
+                '1993-12-03T00:00:00',
+                '1995-06-01T00:00:00',
+                '1997-01-01T00:00:00'
+            ]
+        )
+
+    def test_dataset_issued_modified_accepted_formats(self):
+        contents = self._get_file_contents('catalog-datetimes.xml')
+        p = RDFParser(profiles=['swiss_dcat_ap'])
+        p.parse(contents)
+        datasets = [d for d in p.datasets()]
+
+        eq_(len(datasets), 4)
+        issued_dates = [dataset["issued"] for dataset in datasets]
+        eq_(
+            sorted(issued_dates),
+            [
+                u'1990-12-31T23:00:00+00:00',
+                '1992-12-31T00:00:00',
+                '1994-12-01T00:00:00',
+                '1996-01-01T00:00:00'
+            ]
+        )
+        modified_dates = [dataset["modified"] for dataset in datasets]
+        eq_(
+            sorted(modified_dates),
+            [
+                u'1991-02-19T23:00:00+00:00',
+                '1993-02-19T00:00:00',
+                '1995-02-01T00:00:00',
+                '1997-01-01T00:00:00'
             ]
         )
