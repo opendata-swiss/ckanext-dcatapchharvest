@@ -599,13 +599,13 @@ class SwissDCATAPProfile(MultiLangProfile):
                     if start:
                         self._add_date_triple(
                             temporal_extent,
-                            SCHEMA.startDate,
+                            DCAT.startDate,
                             start
                         )
                     if end:
                         self._add_date_triple(
                             temporal_extent,
-                            SCHEMA.endDate,
+                            DCAT.endDate,
                             end
                         )
                     g.add((dataset_ref, DCT.temporal, temporal_extent))
