@@ -1,7 +1,7 @@
 import json
 import logging
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 import isodate
 from ckan.lib.munge import munge_tag
@@ -317,7 +317,12 @@ class SwissDCATAPProfile(MultiLangProfile):
                 end_datetime = datetime.max.replace(
                     year=d.year, month=d.month, day=d.day)
             elif data_type == XSD.gYearMonth:
-                end_datetime = datetime.max.replace(year=d.year, month=d.month)
+                # isodate.parse_date() gives us the first day of the month.
+                # We need the last day of the month, which varies.
+                d = d.replace(month=d.month + 1) + timedelta(days=-1)
+
+                end_datetime = datetime.max.replace(
+                    year=d.year, month=d.month, day=d.day)
             else:
                 end_datetime = datetime.max.replace(year=d.year)
 
