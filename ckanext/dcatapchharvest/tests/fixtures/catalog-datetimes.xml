@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:foaf="http://xmlns.com/foaf/0.1/" xmlns:hydra="http://www.w3.org/ns/hydra/core#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:dcat="http://www.w3.org/ns/dcat#" xmlns:schema="http://schema.org/" xmlns:vcard="http://www.w3.org/2006/vcard/ns#" xmlns:odrs="http://schema.theodi.org/odrs#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dct="http://purl.org/dc/terms/">
+  <dcat:Catalog>
+    <dct:description>BFS - OGD Collection</dct:description>
+    <dct:title>BFS - OGD Collection</dct:title>
+    <dcat:dataset>
+      <dcat:Dataset>
+        <dct:identifier>346252@bundesamt-fur-statistik-bfs</dct:identifier>
+        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-12-31T23:00:00Z</dct:issued>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1991-02-19T23:00:00Z</dct:modified>
+      </dcat:Dataset>
+    </dcat:dataset>
+    <dcat:dataset>
+      <dcat:Dataset>
+        <dct:identifier>346252@bundesamt-fur-statistik-bfs</dct:identifier>
+        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1992-12-31</dct:issued>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1993-02-19</dct:modified>
+      </dcat:Dataset>
+    </dcat:dataset>
+    <dcat:dataset>
+      <dcat:Dataset>
+        <dct:identifier>346252@bundesamt-fur-statistik-bfs</dct:identifier>
+        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1994-12</dct:issued>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1995-02</dct:modified>
+      </dcat:Dataset>
+    </dcat:dataset>
+    <dcat:dataset>
+      <dcat:Dataset>
+        <dct:identifier>346252@bundesamt-fur-statistik-bfs</dct:identifier>
+        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1996</dct:issued>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1997</dct:modified>
+      </dcat:Dataset>
+    </dcat:dataset>
+  </dcat:Catalog>
+</rdf:RDF>

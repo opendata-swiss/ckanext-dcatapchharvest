@@ -1,20 +1,16 @@
-from rdflib import URIRef, BNode, Literal
-from rdflib.namespace import Namespace, RDFS, RDF, SKOS
-
-from datetime import datetime
-import isodate
-
-from ckantoolkit import config
-
-import re
 import json
+import logging
+import re
+from datetime import date, datetime, timedelta
 
-from ckanext.dcat.profiles import RDFProfile, SchemaOrgProfile, CleanedURIRef
+import isodate
 from ckan.lib.munge import munge_tag
+from ckantoolkit import config
+from rdflib import BNode, Literal, URIRef
+from rdflib.namespace import RDF, RDFS, SKOS, Namespace
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
-
-import logging
+from ckanext.dcat.profiles import CleanedURIRef, RDFProfile, SchemaOrgProfile
 
 log = logging.getLogger(__name__)
 
@@ -32,7 +28,7 @@ LOCN = Namespace('http://www.w3.org/ns/locn#')
 GSP = Namespace('http://www.opengis.net/ont/geosparql#')
 OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SPDX = Namespace('http://spdx.org/rdf/terms#')
-XML = Namespace('http://www.w3.org/2001/XMLSchema')
+XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
 CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
 CHTHEMES = Namespace(CHTHEMES_URI)
@@ -54,7 +50,7 @@ namespaces = {
     'locn': LOCN,
     'gsp': GSP,
     'owl': OWL,
-    'xml': XML,
+    'xsd': XSD,
     'euthemes': EUTHEMES,
 }
 
@@ -146,6 +142,18 @@ class SwissDCATAPProfile(MultiLangProfile):
                     lang_dict[lang] = ''
         return lang_dict
 
+    def _object_value_and_datatype(self, subject, predicate):
+        """Given a subject and a predicate, returns the unicode representation
+        of the object and its datatype, if the object is an rdflib Literal.
+
+        If the object is not a Literal, the datatype returned is None.
+        """
+        for o in self.g.objects(subject, predicate):
+            if isinstance(o, Literal):
+                return unicode(o), o.datatype
+            return unicode(o), None
+        return None, None
+
     def _publisher(self, subject, predicate, identifier):
         """
         Returns a dict with details about a dct:publisher entity, a foaf:Agent
@@ -235,27 +243,98 @@ class SwissDCATAPProfile(MultiLangProfile):
         temporals = []
 
         for temporal_node in self.g.objects(subject, predicate):
-            start_date = self._object_value(temporal_node, SCHEMA.startDate)
-            end_date = self._object_value(temporal_node, SCHEMA.endDate)
+            # Currently specified properties in DCAT-AP.
+            start_date = self._object_value(temporal_node, DCAT.startDate)
+            end_date, end_date_type = self._object_value_and_datatype(
+                temporal_node, DCAT.endDate)
+            if not start_date or not end_date:
+                # Previously specified properties in DCAT-AP. Should still be
+                # accepted.
+                start_date = self._object_value(
+                    temporal_node, SCHEMA.startDate)
+                end_date, end_date_type = self._object_value_and_datatype(
+                    temporal_node, SCHEMA.endDate)
             if not start_date or not end_date:
                 continue
+
             cleaned_start_date = self._clean_datetime(start_date)
-            cleaned_end_date = self._clean_datetime(end_date)
+            cleaned_end_date = self._clean_end_datetime(
+                end_date, end_date_type)
             if not cleaned_start_date or not cleaned_end_date:
                 continue
             temporals.append({
-                'start_date': self._clean_datetime(start_date),
-                'end_date': self._clean_datetime(end_date)
+                'start_date': cleaned_start_date,
+                'end_date': cleaned_end_date,
             })
 
         return temporals
 
     def _clean_datetime(self, datetime_value):
+        """Convert a literal in one of the accepted data types into an isoformat
+        datetime string.
+
+        Accepted types are: xsd:date, xsd:dateTime, xsd:gYear, or
+        xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
+        specified as schema:startDate and schema:endDate.
+        """
         try:
             dt = isodate.parse_datetime(datetime_value)
             if isinstance(dt, datetime):
+                # We get an xsd:dateTime or schema:DateTime literal, check it,
+                # and return it.
                 return datetime_value
-        except Exception:
+        except isodate.isoerror.ISO8601Error:
+            # The datetime_value couldn't be parsed as a datetime.
+            # Try parsing it as an xsd:date, xsd:gYear or xsd:gYearMonth.
+            try:
+                d = isodate.parse_date(datetime_value)
+                if isinstance(d, date):
+                    # We get back a datetime.date object. Transform it into a
+                    # datetime (00:00:00 on that date) and return an isoformat
+                    # datetime string.
+                    t = datetime.min.time()
+                    dt = datetime.combine(d, t)
+                    return dt.isoformat()
+            except isodate.isoerror.ISO8601Error or ValueError:
+                return None
+
+    def _clean_end_datetime(self, datetime_value, data_type):
+        """Convert a literal in one of the accepted types into the latest
+        possible date for that value, and then return it as an isoformat
+        datetime string.
+
+        E.g. if the datetime_value has a xsd:gYear type, return the isoformat
+        datetime string for the end of that year.
+
+        Accepted types are: xsd:date, xsd:dateTime, xsd:gYear, or
+        xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
+        specified as schema:startDate and schema:endDate.
+        """
+        try:
+            dt = isodate.parse_datetime(datetime_value)
+            if isinstance(dt, datetime):
+                # We already have a full datetime, no need to change it.
+                return datetime_value
+        except isodate.isoerror.ISO8601Error:
+            pass
+
+        try:
+            d = isodate.parse_date(datetime_value)
+            if data_type == XSD.date or data_type == SCHEMA.Date:
+                end_datetime = datetime.max.replace(
+                    year=d.year, month=d.month, day=d.day)
+            elif data_type == XSD.gYearMonth:
+                # isodate.parse_date() gives us the first day of the month.
+                # We need the last day of the month, which varies.
+                d = d.replace(month=d.month + 1) + timedelta(days=-1)
+
+                end_datetime = datetime.max.replace(
+                    year=d.year, month=d.month, day=d.day)
+            else:
+                end_datetime = datetime.max.replace(year=d.year)
+
+            return end_datetime.isoformat()
+        except isodate.isoerror.ISO8601Error or ValueError:
             return None
 
     def _get_eu_accrual_periodicity(self, subject, predicate):
