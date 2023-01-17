@@ -243,12 +243,12 @@ class SwissDCATAPProfile(MultiLangProfile):
         temporals = []
 
         for temporal_node in self.g.objects(subject, predicate):
-            # Currently specified formats in DCAT-AP.
+            # Currently specified properties in DCAT-AP.
             start_date = self._object_value(temporal_node, DCAT.startDate)
             end_date, end_date_type = self._object_value_and_datatype(
                 temporal_node, DCAT.endDate)
             if not start_date or not end_date:
-                # Previously specified formats in DCAT-AP. Should still be
+                # Previously specified properties in DCAT-AP. Should still be
                 # accepted.
                 start_date = self._object_value(
                     temporal_node, SCHEMA.startDate)
@@ -270,14 +270,18 @@ class SwissDCATAPProfile(MultiLangProfile):
         return temporals
 
     def _clean_datetime(self, datetime_value):
-        """Convert a literal in one of the accepted formats (xsd:date,
-        xsd:dateTime, xsd:gYear, or xsd:gYearMonth) into an isoformat datetime
-        string.
+        """Convert a literal in one of the accepted data types into an isoformat
+        datetime string.
+
+        Accepted types are: xsd:date, xsd:dateTime, xsd:gYear, or
+        xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
+        specified as schema:startDate and schema:endDate.
         """
         try:
             dt = isodate.parse_datetime(datetime_value)
             if isinstance(dt, datetime):
-                # We get an xsd:dateTime literal, check it, and return it.
+                # We get an xsd:dateTime or schema:DateTime literal, check it,
+                # and return it.
                 return datetime_value
         except isodate.isoerror.ISO8601Error:
             # The datetime_value couldn't be parsed as a datetime.
@@ -295,13 +299,16 @@ class SwissDCATAPProfile(MultiLangProfile):
                 return None
 
     def _clean_end_datetime(self, datetime_value, data_type):
-        """Convert a literal in one of the accepted formats (xsd:date,
-        xsd:dateTime, xsd:gYear, or xsd:gYearMonth) into the latest possible
-        date for that value, and then return it as an isoformat datetime
-        string.
+        """Convert a literal in one of the accepted types into the latest
+        possible date for that value, and then return it as an isoformat
+        datetime string.
 
-        E.g. if the datetime_value is in xsd:gYear format, return the isoformat
+        E.g. if the datetime_value has a xsd:gYear type, return the isoformat
         datetime string for the end of that year.
+
+        Accepted types are: xsd:date, xsd:dateTime, xsd:gYear, or
+        xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
+        specified as schema:startDate and schema:endDate.
         """
         try:
             dt = isodate.parse_datetime(datetime_value)
@@ -313,7 +320,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         try:
             d = isodate.parse_date(datetime_value)
-            if data_type == XSD.date:
+            if data_type == XSD.date or data_type == SCHEMA.Date:
                 end_datetime = datetime.max.replace(
                     year=d.year, month=d.month, day=d.day)
             elif data_type == XSD.gYearMonth:
