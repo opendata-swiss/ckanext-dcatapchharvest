@@ -258,15 +258,21 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         p = RDFParser(profiles=['swiss_dcat_ap'])
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
-        eq_(len(dataset['temporals']), 4)
+        eq_(len(dataset['temporals']), 10)
 
         eq_(
             sorted(dataset['temporals']),
             [
                 {'start_date': u'1990-01-01T00:00:00', 'end_date': u'1991-04-04T12:30:30'},
                 {'start_date': '1992-01-02T00:00:00', 'end_date': '1993-12-03T23:59:59.999999'},
-                {'start_date': '1994-04-01T00:00:00', 'end_date': '1995-06-30T23:59:59.999999'},
-                {'start_date': '1996-01-01T00:00:00', 'end_date': '1997-12-31T23:59:59.999999'}
+                {'start_date': u'1994-01-01T00:00:00', 'end_date': u'1995-04-04T12:30:30'},
+                {'start_date': '1996-01-02T00:00:00', 'end_date': '1997-12-03T23:59:59.999999'},
+                {'start_date': '1998-04-01T00:00:00', 'end_date': '1999-06-30T23:59:59.999999'},
+                {'start_date': '2000-01-01T00:00:00', 'end_date': '2001-12-31T23:59:59.999999'},
+                {'start_date': u'2002-01-01T00:00:00', 'end_date': u'2003-04-04T12:30:30'},
+                {'start_date': '2004-01-02T00:00:00', 'end_date': '2005-12-03T23:59:59.999999'},
+                {'start_date': '2006-04-01T00:00:00', 'end_date': '2007-06-30T23:59:59.999999'},
+                {'start_date': '2008-01-01T00:00:00', 'end_date': '2009-12-31T23:59:59.999999'}
             ]
         )
 
