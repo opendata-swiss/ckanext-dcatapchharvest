@@ -318,24 +318,18 @@ class SwissDCATAPProfile(MultiLangProfile):
         If the datetime_value is not in the appropriate format for the datatype
         (e.g. an xsd:dateTime with a value of "2020-01-01"), return None.
         """
-        if data_type == XSD.dateTime or data_type == SCHEMA.DateTime:
-            try:
+        try:
+            if data_type == XSD.dateTime or data_type == SCHEMA.DateTime:
                 datetime.strptime(datetime_value, DATETIME_FORMAT)
                 # We already have a full datetime, no need to change it.
                 return datetime_value
-            except ValueError:
-                return None
-        elif data_type == XSD.date or data_type == SCHEMA.Date:
-            try:
+            elif data_type == XSD.date or data_type == SCHEMA.Date:
                 dt = datetime.strptime(datetime_value, DATE_FORMAT)
                 end_datetime = datetime.max.replace(
                     year=dt.year, month=dt.month, day=dt.day)
 
                 return end_datetime.isoformat()
-            except ValueError:
-                return None
-        elif data_type == XSD.gYearMonth:
-            try:
+            elif data_type == XSD.gYearMonth:
                 datetime_value = datetime_value[:len('YYYY-MM')]
                 dt = datetime.strptime(datetime_value, YEAR_MONTH_FORMAT)
                 # We need to calculate the last day of the month, which varies.
@@ -345,17 +339,14 @@ class SwissDCATAPProfile(MultiLangProfile):
                     year=d.year, month=d.month, day=d.day)
 
                 return end_datetime.isoformat()
-            except ValueError:
-                return None
-        elif data_type == XSD.gYear:
-            datetime_value = datetime_value[:len('YYYY')]
-            try:
+            elif data_type == XSD.gYear:
+                datetime_value = datetime_value[:len('YYYY')]
                 dt = datetime.strptime(datetime_value, YEAR_FORMAT)
                 end_datetime = datetime.max.replace(year=dt.year)
 
                 return end_datetime.isoformat()
-            except ValueError:
-                return None
+        except ValueError:
+            return None
 
     def _get_eu_accrual_periodicity(self, subject, predicate):
         ogdch_value = self._object_value(subject, predicate)
