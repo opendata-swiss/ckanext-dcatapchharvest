@@ -38,6 +38,11 @@ GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+
 EMAIL_MAILTO_PREFIX = 'mailto:'
 ORGANIZATION_BASE_URL = 'https://opendata.swiss/organization/'
 
+DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
+DATE_FORMAT = "%Y-%m-%d"
+YEAR_MONTH_FORMAT = "%Y-%m"
+YEAR_FORMAT = "%Y"
+
 namespaces = {
     'dct': DCT,
     'dcat': DCAT,
@@ -309,33 +314,48 @@ class SwissDCATAPProfile(MultiLangProfile):
         Accepted types are: xsd:date, xsd:dateTime, xsd:gYear, or
         xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
         specified as schema:startDate and schema:endDate.
+
+        If the datetime_value is not in the appropriate format for the datatype
+        (e.g. an xsd:dateTime with a value of "2020-01-01"), return None.
         """
-        try:
-            dt = isodate.parse_datetime(datetime_value)
-            if isinstance(dt, datetime):
+        if data_type == XSD.dateTime or data_type == SCHEMA.DateTime:
+            try:
+                datetime.strptime(datetime_value, DATETIME_FORMAT)
                 # We already have a full datetime, no need to change it.
                 return datetime_value
-        except isodate.isoerror.ISO8601Error:
-            pass
+            except ValueError:
+                return None
+        elif data_type == XSD.date or data_type == SCHEMA.Date:
+            try:
+                dt = datetime.strptime(datetime_value, DATE_FORMAT)
+                end_datetime = datetime.max.replace(
+                    year=dt.year, month=dt.month, day=dt.day)
 
-        try:
-            d = isodate.parse_date(datetime_value)
-            if data_type == XSD.date or data_type == SCHEMA.Date:
+                return end_datetime.isoformat()
+            except ValueError:
+                return None
+        elif data_type == XSD.gYearMonth:
+            try:
+                datetime_value = datetime_value[:len('YYYY-MM')]
+                dt = datetime.strptime(datetime_value, YEAR_MONTH_FORMAT)
+                # We need to calculate the last day of the month, which varies.
+                d = dt.replace(month=dt.month + 1) + timedelta(days=-1)
+
                 end_datetime = datetime.max.replace(
                     year=d.year, month=d.month, day=d.day)
-            elif data_type == XSD.gYearMonth:
-                # isodate.parse_date() gives us the first day of the month.
-                # We need the last day of the month, which varies.
-                d = d.replace(month=d.month + 1) + timedelta(days=-1)
 
-                end_datetime = datetime.max.replace(
-                    year=d.year, month=d.month, day=d.day)
-            else:
-                end_datetime = datetime.max.replace(year=d.year)
+                return end_datetime.isoformat()
+            except ValueError:
+                return None
+        elif data_type == XSD.gYear:
+            datetime_value = datetime_value[:len('YYYY')]
+            try:
+                dt = datetime.strptime(datetime_value, YEAR_FORMAT)
+                end_datetime = datetime.max.replace(year=dt.year)
 
-            return end_datetime.isoformat()
-        except isodate.isoerror.ISO8601Error or ValueError:
-            return None
+                return end_datetime.isoformat()
+            except ValueError:
+                return None
 
     def _get_eu_accrual_periodicity(self, subject, predicate):
         ogdch_value = self._object_value(subject, predicate)
