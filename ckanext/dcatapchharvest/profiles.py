@@ -1,9 +1,8 @@
 import json
 import logging
 import re
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 
-import isodate
 from ckan.lib.munge import munge_tag
 from ckantoolkit import config
 from rdflib import BNode, Literal, URIRef
@@ -249,20 +248,22 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         for temporal_node in self.g.objects(subject, predicate):
             # Currently specified properties in DCAT-AP.
-            start_date = self._object_value(temporal_node, DCAT.startDate)
+            start_date, start_date_type = self._object_value_and_datatype(
+                temporal_node, DCAT.startDate)
             end_date, end_date_type = self._object_value_and_datatype(
                 temporal_node, DCAT.endDate)
             if not start_date or not end_date:
                 # Previously specified properties in DCAT-AP. Should still be
                 # accepted.
-                start_date = self._object_value(
+                start_date, start_date_type = self._object_value_and_datatype(
                     temporal_node, SCHEMA.startDate)
                 end_date, end_date_type = self._object_value_and_datatype(
                     temporal_node, SCHEMA.endDate)
             if not start_date or not end_date:
                 continue
 
-            cleaned_start_date = self._clean_datetime(start_date)
+            cleaned_start_date = self._clean_datetime(
+                start_date, start_date_type)
             cleaned_end_date = self._clean_end_datetime(
                 end_date, end_date_type)
             if not cleaned_start_date or not cleaned_end_date:
@@ -274,34 +275,37 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return temporals
 
-    def _clean_datetime(self, datetime_value):
+    def _clean_datetime(self, datetime_value, data_type):
         """Convert a literal in one of the accepted data types into an isoformat
         datetime string.
 
         Accepted types are: xsd:date, xsd:dateTime, xsd:gYear, or
         xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
         specified as schema:startDate and schema:endDate.
+
+        If the datetime_value is not in the appropriate format for the datatype
+        (e.g. an xsd:dateTime with a value of "2020-01-01"), return None.
         """
         try:
-            dt = isodate.parse_datetime(datetime_value)
-            if isinstance(dt, datetime):
-                # We get an xsd:dateTime or schema:DateTime literal, check it,
-                # and return it.
+            if data_type == XSD.dateTime or data_type == SCHEMA.DateTime:
+                datetime.strptime(datetime_value, DATETIME_FORMAT)
+                # We already have a full datetime, no need to change it.
                 return datetime_value
-        except isodate.isoerror.ISO8601Error:
-            # The datetime_value couldn't be parsed as a datetime.
-            # Try parsing it as an xsd:date, xsd:gYear or xsd:gYearMonth.
-            try:
-                d = isodate.parse_date(datetime_value)
-                if isinstance(d, date):
-                    # We get back a datetime.date object. Transform it into a
-                    # datetime (00:00:00 on that date) and return an isoformat
-                    # datetime string.
-                    t = datetime.min.time()
-                    dt = datetime.combine(d, t)
-                    return dt.isoformat()
-            except isodate.isoerror.ISO8601Error or ValueError:
-                return None
+            elif data_type == XSD.date or data_type == SCHEMA.Date:
+                dt = datetime.strptime(datetime_value, DATE_FORMAT)
+
+                return dt.isoformat()
+            elif data_type == XSD.gYearMonth:
+                datetime_value = datetime_value[:len('YYYY-MM')]
+                dt = datetime.strptime(datetime_value, YEAR_MONTH_FORMAT)
+
+                return dt.isoformat()
+            elif data_type == XSD.gYear:
+                datetime_value = datetime_value[:len('YYYY')]
+                dt = datetime.strptime(datetime_value, YEAR_FORMAT)
+                return dt.isoformat()
+        except ValueError:
+            return None
 
     def _clean_end_datetime(self, datetime_value, data_type):
         """Convert a literal in one of the accepted types into the latest
@@ -396,9 +400,10 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('issued', DCT.issued),
                 ('modified', DCT.modified),
         ):
-            value = self._object_value(dataset_ref, predicate)
+            value, datatype = self._object_value_and_datatype(
+                dataset_ref, predicate)
             if value:
-                cleaned_value = self._clean_datetime(value)
+                cleaned_value = self._clean_datetime(value, datatype)
                 if cleaned_value:
                     dataset_dict[key] = cleaned_value
 
@@ -498,9 +503,10 @@ class SwissDCATAPProfile(MultiLangProfile):
                     ('issued', DCT.issued),
                     ('modified', DCT.modified),
             ):
-                value = self._object_value(distribution, predicate)
+                value, datatype = self._object_value_and_datatype(
+                    distribution, predicate)
                 if value:
-                    cleaned_value = self._clean_datetime(value)
+                    cleaned_value = self._clean_datetime(value, datatype)
                     if cleaned_value:
                         resource_dict[key] = cleaned_value
 
