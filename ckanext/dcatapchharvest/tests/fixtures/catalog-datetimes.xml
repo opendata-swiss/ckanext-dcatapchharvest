@@ -20,15 +20,15 @@
     <dcat:dataset>
       <dcat:Dataset>
         <dct:identifier>346252@bundesamt-fur-statistik-bfs</dct:identifier>
-        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1994-12</dct:issued>
-        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1995-02</dct:modified>
+        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">1994-12</dct:issued>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">1995-02</dct:modified>
       </dcat:Dataset>
     </dcat:dataset>
     <dcat:dataset>
       <dcat:Dataset>
         <dct:identifier>346252@bundesamt-fur-statistik-bfs</dct:identifier>
-        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1996</dct:issued>
-        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1997</dct:modified>
+        <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1996</dct:issued>
+        <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">1997</dct:modified>
       </dcat:Dataset>
     </dcat:dataset>
   </dcat:Catalog>

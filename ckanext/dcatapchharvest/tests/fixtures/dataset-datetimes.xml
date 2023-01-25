@@ -21,7 +21,7 @@
         <schema:endDate rdf:datatype="http://schema.org/Date">1993-12-03</schema:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
-    <!--  schema:startDate and schema:endDate with DCAT data types: shown in handbook examples, not technically correct but still accepted  -->
+    <!--  schema:startDate and schema:endDate with XSD data types: shown in handbook examples, not technically correct but still accepted  -->
     <dct:temporal>
       <dct:PeriodOfTime>
         <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1994-01-01T00:00:00</schema:startDate>
@@ -46,7 +46,7 @@
         <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2001</schema:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
-    <!--  DCAT:startDate and DCAT:endDate with DCAT data types: as specified in DCAT-AP  -->
+    <!--  DCAT:startDate and DCAT:endDate with XSD data types: as specified in DCAT-AP  -->
     <dct:temporal>
       <dct:PeriodOfTime>
         <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2002-01-01T00:00:00</dcat:startDate>
@@ -71,6 +71,7 @@
         <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2009</dcat:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
+    <!--  DCAT:issued and DCAT:modified with XSD data types: as specified in DCAT-AP  -->
     <dcat:distribution>
       <dcat:Distribution rdf:about="https://opendata.swiss/dataset/01/resource/01">
         <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1990-01-01T00:00:00</dct:issued>
