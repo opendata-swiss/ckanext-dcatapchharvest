@@ -62,15 +62,15 @@ xsd:dateTime or schema:DateTime does not contain time information, we discard it
 
 In general, if a date is given without time data, we map it as the earliest possible point in that date.
 
-   xsd:date       "2020-03-05"   => "2020-03-05T00:00:00"
-   xsd:gYearMonth "2020-03"      => "2020-03-01T00:00:00"
-   xsd:gYear      "2020"         => "2020-01-01T00:00:00"
+   xsd:date       "2020-03-05"   => "2020-03-05T00:00:00"  
+   xsd:gYearMonth "2020-03"      => "2020-03-01T00:00:00"  
+   xsd:gYear      "2020"         => "2020-01-01T00:00:00"  
 
 Temporal end dates are a special case: they are mapped as the latest possible point in that date.
 
-   xsd:date       "2020-03-05"   => "2020-03-05T23:59:59"
-   xsd:gYearMonth "2020-03"      => "2020-03-31T23:59:59"
-   xsd:gYear      "2020"         => "2020-12-31T23:59:59"
+   xsd:date       "2020-03-05"   => "2020-03-05T23:59:59"  
+   xsd:gYearMonth "2020-03"      => "2020-03-31T23:59:59"  
+   xsd:gYear      "2020"         => "2020-12-31T23:59:59"  
 
 If malformed datetime values can be parsed somehow as ISO-compatible datetimes or dates, this is done automatically
 by rdflib. If not (e.g. "2020-15-35"), they are not mapped at all.
