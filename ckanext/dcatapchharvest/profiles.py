@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 
 from ckan.lib.munge import munge_tag
 from ckantoolkit import config
+import isodate
 from rdflib import BNode, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, SKOS, Namespace
 
@@ -283,14 +284,17 @@ class SwissDCATAPProfile(MultiLangProfile):
         xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
         specified as schema:startDate and schema:endDate.
 
-        If the datetime_value is not in the appropriate format for the datatype
-        (e.g. an xsd:dateTime with a value of "2020-01-01"), return None.
+        We only consider the parts of the date that are expected from the given
+        data_type, e.g. the year of an xsd:gYear, even if the month and day
+        have been included in the datetime_value. If a datetime_value with
+        data_type of xsd:dateTime or schema:DateTime does not contain time
+        information, we discard it.
         """
         try:
             if data_type == XSD.dateTime or data_type == SCHEMA.DateTime:
-                datetime.strptime(datetime_value, DATETIME_FORMAT)
-                # We already have a full datetime, no need to change it.
-                return datetime_value
+                dt = isodate.parse_datetime(datetime_value)
+
+                return dt.isoformat()
             elif data_type == XSD.date or data_type == SCHEMA.Date:
                 dt = datetime.strptime(datetime_value, DATE_FORMAT)
 
@@ -303,6 +307,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             elif data_type == XSD.gYear:
                 datetime_value = datetime_value[:len('YYYY')]
                 dt = datetime.strptime(datetime_value, YEAR_FORMAT)
+
                 return dt.isoformat()
         except ValueError:
             return None
@@ -319,14 +324,17 @@ class SwissDCATAPProfile(MultiLangProfile):
         xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
         specified as schema:startDate and schema:endDate.
 
-        If the datetime_value is not in the appropriate format for the datatype
-        (e.g. an xsd:dateTime with a value of "2020-01-01"), return None.
+        We only consider the parts of the date that are expected from the given
+        data_type, e.g. the year of an xsd:gYear, even if the month and day
+        have been included in the datetime_value. If a datetime_value with
+        data_type of xsd:dateTime or schema:DateTime does not contain time
+        information, we discard it.
         """
         try:
             if data_type == XSD.dateTime or data_type == SCHEMA.DateTime:
-                datetime.strptime(datetime_value, DATETIME_FORMAT)
-                # We already have a full datetime, no need to change it.
-                return datetime_value
+                dt = isodate.parse_datetime(datetime_value)
+
+                return dt.isoformat()
             elif data_type == XSD.date or data_type == SCHEMA.Date:
                 dt = datetime.strptime(datetime_value, DATE_FORMAT)
                 end_datetime = datetime.max.replace(
