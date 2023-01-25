@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#"
+         xmlns:dct="http://purl.org/dc/terms/"
+         xmlns:schema="http://schema.org/">
+
+  <dcat:Dataset rdf:about="https://swisstopo/123">
+    <dct:identifier>346265-fr@bundesamt-fur-statistik-bfs</dct:identifier>
+    <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1900-12-31T00:00:00</dct:issued>
+    <dct:modified rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2018-04-24T19:30:57.197374</dct:modified>
+    <!--  using SCHEMA Date and DateTime, but incorrectly specifying the date or datetime: should not be mapped  -->
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://schema.org/DateTime">1990-01-01</schema:startDate>
+        <schema:endDate rdf:datatype="http://schema.org/DateTime">1991-04</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://schema.org/Date">1992-01-04T12:20:00</schema:startDate>
+        <schema:endDate rdf:datatype="http://schema.org/Date">1993</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <!--  using xsd:datetime, but incorrectly specifying datetime: should not be mapped  -->
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1994-01-01 00:00:00</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1995-04-04</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1996-03</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1997</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <!--  using xsd:date, xsd:gYearMonth or xsd:gYear, but incorrectly specifying date: will be parsed as isodate as
+    far as possible when rdflib creates the graph and will be mapped, but values might not be what the data publisher
+    expected.  -->
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1998-04</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1999</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2000-11-21T01:02:03</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2001T01:02:03</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2002-01-01T00:00:00</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2003</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2004-01-02</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2005-12</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2006-4</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2007-6-6</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <!--  using XSD datatypes, with an invalid date or datetime: should not be mapped  -->
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2008-01-01T00:00:75</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2009-01-35T00:00:00</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2010-01-35</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-15-01</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2012-15</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">-2014-02</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">-2015</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">16</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+  </dcat:Dataset>
+</rdf:RDF>

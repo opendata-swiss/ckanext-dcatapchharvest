@@ -276,6 +276,27 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
             ]
         )
 
+    def test_temporals_incorrect_formats(self):
+        # See comments in dataset-datetimes-bad.xml for reasons why temporals
+        # are mapped/not mapped.
+        contents = self._get_file_contents('dataset-datetimes-bad.xml')
+        p = RDFParser(profiles=['swiss_dcat_ap'])
+        p.parse(contents)
+        dataset = [d for d in p.datasets()][0]
+        print(sorted(dataset["temporals"]))
+        eq_(len(dataset['temporals']), 5)
+
+        eq_(
+            sorted(dataset['temporals']),
+            [
+                {'start_date': '1998-04-01T00:00:00', 'end_date': '1999-01-01T23:59:59.999999'},
+                {'start_date': '2000-11-21T00:00:00', 'end_date': '2001-01-01T23:59:59.999999'},
+                {'start_date': '2002-01-01T00:00:00', 'end_date': '2003-01-31T23:59:59.999999'},
+                {'start_date': '2004-01-01T00:00:00', 'end_date': '2005-12-31T23:59:59.999999'},
+                {'start_date': '2006-01-01T00:00:00', 'end_date': '2007-01-31T23:59:59.999999'}
+            ],
+        )
+
     def test_resource_issued_modified_accepted_formats(self):
         contents = self._get_file_contents('dataset-datetimes.xml')
         p = RDFParser(profiles=['swiss_dcat_ap'])
