@@ -38,7 +38,6 @@ GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+
 EMAIL_MAILTO_PREFIX = 'mailto:'
 ORGANIZATION_BASE_URL = 'https://opendata.swiss/organization/'
 
-DATETIME_FORMAT = "%Y-%m-%dT%H:%M:%S"
 DATE_FORMAT = "%Y-%m-%d"
 YEAR_MONTH_FORMAT = "%Y-%m"
 YEAR_FORMAT = "%Y"
