@@ -35,6 +35,9 @@ def uri_to_iri(uri):
     this function also validates the URI and throws a ValueError if the
     provided URI is invalid
     """
+    if not uri:
+        raise ValueError("Provided URI is empty or None")
+
     result = urlparse(uri)
     if not result.scheme or not result.netloc or result.netloc == '-':
         raise ValueError("Provided URI does not have a valid schema or netloc")
