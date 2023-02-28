@@ -82,8 +82,8 @@ def dataset_uri(dataset_dict, dataset_ref=None):
                 break
     if not uri:
         site_url = config.get('ckan.site_url')
-        uri = '{0}/perma/{1}'.format(site_url,
-                                     dataset_dict.get('identifier'))
+        uri = u'{0}/perma/{1}'.format(site_url,
+                                      dataset_dict.get('identifier'))
 
     return uri
 
