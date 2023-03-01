@@ -32,6 +32,7 @@ XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
 CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
 CHTHEMES = Namespace(CHTHEMES_URI)
+ODRS = Namespace("http://schema.theodi.org/odrs#")
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
@@ -56,6 +57,7 @@ namespaces = {
     'owl': OWL,
     'xsd': XSD,
     'euthemes': EUTHEMES,
+    'odrs': ODRS,
 }
 
 ogd_theme_base_url = 'http://opendata.swiss/themes'
