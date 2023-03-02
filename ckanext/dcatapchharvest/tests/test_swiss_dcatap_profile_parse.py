@@ -351,3 +351,15 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
                 '1997-01-01T00:00:00'
             ]
         )
+
+    def test_multiple_rights_statements(self):
+        """Even if there are multiple dct:rights nodes on a distribution, only
+        the DCAT-AP CH v1-compatible one should be mapped onto the resource.
+        """
+        contents = self._get_file_contents("dataset-multiple-rights.xml")
+        p = RDFParser(profiles=["swiss_dcat_ap"])
+        p.parse(contents)
+        dataset = [d for d in p.datasets()][0]
+        resource = dataset["resources"][0]
+
+        eq_(resource['rights'], u"NonCommercialAllowed-CommercialWithPermission-ReferenceRequired")

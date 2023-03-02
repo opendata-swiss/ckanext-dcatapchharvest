@@ -32,6 +32,7 @@ XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
 CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
 CHTHEMES = Namespace(CHTHEMES_URI)
+ODRS = Namespace("http://schema.theodi.org/odrs#")
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
@@ -56,6 +57,7 @@ namespaces = {
     'owl': OWL,
     'xsd': XSD,
     'euthemes': EUTHEMES,
+    'odrs': ODRS,
 }
 
 ogd_theme_base_url = 'http://opendata.swiss/themes'
@@ -209,6 +211,15 @@ class SwissDCATAPProfile(MultiLangProfile):
             relations.append(relation)
 
         return relations
+
+    def _rights(self, subject, predicate):
+        for rights_node in self.g.objects(subject, predicate):
+            if isinstance(rights_node, Literal):
+                # DCAT-AP CH v1: the rights statement as a literal (should be
+                # the code for one of the DCAT-AP CH licenses)
+                return unicode(rights_node)
+        # Todo: parse DCAT-AP CH v2 compatible rights data if we get it.
+        return None
 
     def _keywords(self, subject, predicate):
         keywords = {}
@@ -478,7 +489,6 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Resources
         for distribution in self._distributions(dataset_ref):
-
             resource_dict = {
                 'media_type': '',
                 'language': [],
@@ -493,12 +503,14 @@ class SwissDCATAPProfile(MultiLangProfile):
                     ('download_url', DCAT.downloadURL),
                     ('url', DCAT.accessURL),
                     ('coverage', DCT.coverage),
-                    ('rights', DCT.rights),
                     ('license', DCT.license),
             ):
                 value = self._object_value(distribution, predicate)
                 if value:
                     resource_dict[key] = value
+
+            # Rights
+            resource_dict['rights'] = self._rights(distribution, DCT.rights)
 
             # if media type is not set, use format as fallback
             if (not resource_dict.get('media_type') and
