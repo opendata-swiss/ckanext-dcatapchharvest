@@ -60,7 +60,7 @@ paster db init -c test-core.ini
 cd -
 
 echo "Installing ckanext-harvest and its requirements..."
-git clone https://github.com/ckan/ckanext-harvest
+git clone --depth 1 --branch v1.4.2 https://github.com/ckan/ckanext-harvest
 cd ckanext-harvest
 python setup.py develop
 pip install -r pip-requirements.txt
