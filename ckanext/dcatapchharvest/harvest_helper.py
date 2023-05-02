@@ -89,13 +89,11 @@ def _get_resource_id_string(resource):
     return resource.get('url')
 
 
-def _changes_in_date(ogdch_date, isodate_date):
-    if not ogdch_date and not isodate_date:
+def _changes_in_date(existing_datetime, new_datetime):
+    if not existing_datetime and not new_datetime:
         return False
-    if not ogdch_date or not isodate_date:
+    if not existing_datetime or not new_datetime:
         return True
-    datetime_from_ogdch_date = dateutil_parse(ogdch_date, dayfirst=True)
-    datetime_from_isodate_date = dateutil_parse(isodate_date)
-    if datetime_from_ogdch_date.date() == datetime_from_isodate_date.date():
+    if dateutil_parse(existing_datetime) == dateutil_parse(new_datetime):
         return False
     return True
