@@ -133,9 +133,9 @@ class TestHarvestHelpersUnit(object):
         )
 
     def test_check_package_change_multiple_resources_changed(self):
-        """The number of resources have changed and so have all the urls,
-        download urls and modified dates, but we should only get a message
-        about the first resource that is different.
+        """All the urls, download urls and modified dates of the resources
+        have changed, but we should only get a message about the first
+        resource that is different.
         """
         existing_package = {
             "resources": [
