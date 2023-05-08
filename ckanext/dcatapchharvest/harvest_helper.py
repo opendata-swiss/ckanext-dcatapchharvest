@@ -1,6 +1,6 @@
 import ckan.plugins.toolkit as tk
 import ckan.model as model
-from dateutil.parser import parse as dateutil_parse
+from dateutil.parser import parse as dateutil_parse, ParserError
 
 import logging
 
@@ -94,6 +94,15 @@ def _changes_in_date(existing_datetime, new_datetime):
         return False
     if not existing_datetime or not new_datetime:
         return True
-    if dateutil_parse(existing_datetime) == dateutil_parse(new_datetime):
+    try:
+        if dateutil_parse(existing_datetime) == dateutil_parse(new_datetime):
+            return False
+    except (ParserError, OverflowError) as e:
+        log.info(
+            "Error when parsing dates {}, {}: {}".format(
+                existing_datetime, new_datetime, e
+            )
+        )
+
         return False
     return True
