@@ -466,7 +466,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         dataset_dict['publisher'] = self._publisher(
             dataset_ref,
             DCT.publisher,
-            dataset_dict['identifier']
+            dataset_dict.get('identifier', '')
         )
 
         # Relations
