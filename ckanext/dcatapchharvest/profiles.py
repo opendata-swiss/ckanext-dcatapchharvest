@@ -15,6 +15,7 @@ from ckanext.dcat.profiles import CleanedURIRef, RDFProfile, SchemaOrgProfile
 log = logging.getLogger(__name__)
 
 valid_frequencies = dh.get_frequency_values()
+#valid_licences = dh.get_license_values()
 eu_theme_mapping = dh.get_theme_mapping()
 
 DCT = dh.DCT

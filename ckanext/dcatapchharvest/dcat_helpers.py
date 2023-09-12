@@ -18,6 +18,14 @@ frequency_namespaces = {
   "dct": DCT,
 }
 
+
+license_namespaces = {
+  "skos": SKOS,
+  "dct": DCT,
+  "rdf": RDF,
+}
+
+
 theme_namespaces = {
     "euthemes": EUTHEMES,
     "skos": SKOS,
@@ -141,6 +149,21 @@ def get_frequency_values():
             frequency_mapping[ogdch_frequency_ref] = obj
     return frequency_mapping
 
+
+def get_license_values():
+    g = Graph()
+    license_mapping = {}
+    for prefix, namespace in license_namespaces.items():
+        g.bind(prefix, namespace)
+    file = os.path.join(__location__, 'license.ttl')
+    g.parse(file, format='turtle')
+    for ogdch_license_ref in g.subjects(predicate=RDF.type,
+                                          object=SKOS.Concept):
+        license_mapping[ogdch_license_ref] = None
+        for obj in g.objects(subject=ogdch_license_ref,
+                             predicate=SKOS.exactMatch):
+            license_mapping[ogdch_license_ref] = obj
+    return license_mapping
 
 def get_theme_mapping():
     g = Graph()
