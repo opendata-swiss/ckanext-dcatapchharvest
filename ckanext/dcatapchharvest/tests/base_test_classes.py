@@ -18,12 +18,7 @@ class BaseParseTest(object):
             return f.read()
 
 
-class BaseSerializeTest(object):
-    def _extras(self, dataset):
-        extras = {}
-        for extra in dataset.get('extras'):
-            extras[extra['key']] = extra['value']
-        return extras
+class BaseSerializeTest(BaseParseTest):
 
     def _triples(self, graph, subject, predicate, _object, data_type=None):
 
