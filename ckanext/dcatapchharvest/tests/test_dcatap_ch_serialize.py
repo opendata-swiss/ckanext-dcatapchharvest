@@ -7,7 +7,7 @@ from rdflib.namespace import RDF
 
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
-from ckanext.dcat.profiles import FOAF, SCHEMA
+from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA
 
 from rdflib import URIRef
 import ckanext.dcatapchharvest.dcat_helpers as dh
@@ -71,8 +71,10 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
                 assert self._triple(g, dataset_ref, item[1], item[2](value))
 
     def test_graph_from_dataset_uri(self):
-        """"Tests that datasets (resources) with a uri from the test system
-        have that uri changed to reference the prod system when they are output as a graph"""
+        """Tests that datasets (resources) with a uri from the test system
+        have that uri changed to reference the prod system when they are output
+        as a graph
+        """
 
         dataset = json.loads(
             self._get_file_contents('dataset-test-uri.json')
@@ -91,7 +93,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
             distribution = URIRef(dh.resource_uri(resource_dict))
 
         # Basic fields
-        assert self._triple(g, dataset_ref_changed, RDF.type, SCHEMA.Dataset)
-        assert self._triple(g, dataset_ref_changed, SCHEMA.name, dataset['title'])
-        assert self._triple(g, dataset_ref_changed, SCHEMA.version, dataset['version'])
-        assert self._triple(g, distribution, RDF.type, SCHEMA.Distribution)
+        assert self._triple(g, dataset_ref_changed, RDF.type, DCAT.Dataset)
+        assert self._triple(g, dataset_ref_changed, DCT.title, dataset['title'])
+        assert self._triple(g, dataset_ref_changed, OWL.versionInfo, dataset['version'])
+        assert self._triple(g, distribution, RDF.type, DCAT.Distribution)
