@@ -7,21 +7,18 @@ from rdflib.namespace import RDF
 
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
-from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA
+from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, XSD
 
 from rdflib import URIRef
 import ckanext.dcatapchharvest.dcat_helpers as dh
 
 from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
 
-import logging
-log = logging.getLogger(__name__)
-
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
 
 
-class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
+class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
     def test_graph_from_dataset(self):
 
@@ -30,7 +27,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         )
         extras = self._extras(dataset)
 
-        s = RDFSerializer(profiles=['swiss_schemaorg'])
+        s = RDFSerializer(profiles=['swiss_dcat_ap'])
         g = s.g
 
         dataset_ref = s.graph_from_dataset(dataset)
@@ -38,34 +35,33 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         eq_(unicode(dataset_ref), utils.dataset_uri(dataset))
 
         # Basic fields
-        assert self._triple(g, dataset_ref, RDF.type, SCHEMA.Dataset)
-        assert self._triple(g, dataset_ref, SCHEMA.name, dataset['title'])
-        assert self._triple(g, dataset_ref, SCHEMA.version, dataset['version'])
-        assert self._triple(g, dataset_ref, SCHEMA.identifier, extras['identifier'])
+        assert self._triple(g, dataset_ref, RDF.type, DCAT.Dataset)
+        assert self._triple(g, dataset_ref, DCT.title, dataset['title'])
+        assert self._triple(g, dataset_ref, OWL.versionInfo, dataset['version'])
+        assert self._triple(g, dataset_ref, DCT.identifier, extras['identifier'])
 
         # Dates
-        assert self._triple(g, dataset_ref, SCHEMA.datePublished, dataset['issued'])
-        assert len(list(g.objects(dataset_ref, SCHEMA.dateModified))) == 0
+        assert self._triple(g, dataset_ref, DCT.issued, dataset['issued'], XSD.dateTime)
+        assert len(list(g.objects(dataset_ref, DCT.modified))) == 0
 
         for key, value in dataset['description'].iteritems():
             if dataset['description'].get(key):
-                assert self._triple(g, dataset_ref, SCHEMA.description, Literal(value, lang=key))
-        eq_(len([t for t in g.triples((dataset_ref, SCHEMA.description, None))]), 2)
+                assert self._triple(g, dataset_ref, DCT.description, Literal(value, lang=key))
+        eq_(len([t for t in g.triples((dataset_ref, DCT.description, None))]), 2)
 
         # Tags
-        eq_(len([t for t in g.triples((dataset_ref, SCHEMA.keywords, None))]), 3)
+        eq_(len([t for t in g.triples((dataset_ref, DCAT.keyword, None))]), 3)
         for key, keywords in dataset['keywords'].iteritems():
             if dataset['keywords'].get(key):
                 for keyword in keywords:
-                    assert self._triple(g, dataset_ref, SCHEMA.keywords, Literal(keyword, lang=key))
+                    assert self._triple(g, dataset_ref, DCAT.keyword, Literal(keyword, lang=key))
 
         # List
         for item in [
-            ('language', SCHEMA.inLanguage, Literal),
+            ('language', DCT.language, Literal),
             # ('documentation', FOAF.page, URIRef, FOAF.Document),
         ]:
             values = json.loads(extras[item[0]])
-            log.warning(values)
             eq_(len([t for t in g.triples((dataset_ref, item[1], None))]), len(values))
             for value in values:
                 assert self._triple(g, dataset_ref, item[1], item[2](value))
