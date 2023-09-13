@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import json
 
 import nose
@@ -10,25 +9,10 @@ from rdflib.namespace import RDF
 
 from ckanext.dcat.processors import RDFParser
 from ckanext.dcatapchharvest.profiles import (DCAT, DCT)
+from ckanext.dcatapchharvest.tests.base_test_classes import BaseParseTest
 
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
-
-
-class BaseParseTest(object):
-
-    def _extras(self, dataset):
-        extras = {}
-        for extra in dataset.get('extras'):
-            extras[extra['key']] = extra['value']
-        return extras
-
-    def _get_file_contents(self, file_name):
-        path = os.path.join(os.path.dirname(__file__),
-                            'fixtures',
-                            file_name)
-        with open(path, 'r') as f:
-            return f.read()
 
 
 class TestSwissDCATAPProfileParsing(BaseParseTest):
