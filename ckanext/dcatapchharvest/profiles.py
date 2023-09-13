@@ -487,6 +487,11 @@ class SwissDCATAPProfile(MultiLangProfile):
         dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
         dataset_dict['extras'].append({'key': 'uri', 'value': dataset_uri})
 
+        # Documentation
+        dataset_dict['documentation'] = self._object_value_list(
+            dataset_ref, FOAF.page
+        )
+
         # Resources
         for distribution in self._distributions(dataset_ref):
             resource_dict = {
