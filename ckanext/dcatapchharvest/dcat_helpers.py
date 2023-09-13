@@ -45,8 +45,8 @@ def uri_to_iri(uri):
     try:
         iri = iribaker.to_iri(uri)
         return iri
-    except:
-        raise ValueError("Provided URI can't be converted to IRI")
+    except Exception as e:
+        raise ValueError("Provided URI can't be converted to IRI: %s" % e)
 
 
 def get_langs():
