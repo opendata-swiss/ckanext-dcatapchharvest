@@ -58,6 +58,7 @@ jobs:
         # Last commit before support for Python 2 was dropped
         pip install -e git+https://github.com/ckan/ckanext-dcat.git@0c26bed5b7a3a7fca8e7b78e338aace096e0ebf6#egg=ckanext-dcat
         pip install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/0c26bed5b7a3a7fca8e7b78e338aace096e0ebf6/requirements-py2.txt
+        pip install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/0c26bed5b7a3a7fca8e7b78e338aace096e0ebf6/dev-requirements-py2.txt
 
     - name: Setup extension
       run: |
