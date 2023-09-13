@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import os
 import nose
 import json
 from ckanext.dcat.processors import RDFParser
