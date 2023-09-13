@@ -107,8 +107,8 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
                         log.error(error_msg)
                         self._save_gather_error(error_msg, self.harvest_job)
                         return None
-            except:
-                log.exception("An error occured")
+            except Exception as e:
+                log.exception("Error when getting identifier: %s" % e)
                 return None
             return dataset_dict['identifier']
 
