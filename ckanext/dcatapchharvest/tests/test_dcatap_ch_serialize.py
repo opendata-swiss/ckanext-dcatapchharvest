@@ -56,10 +56,14 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
                 for keyword in keywords:
                     assert self._triple(g, dataset_ref, DCAT.keyword, Literal(keyword, lang=key))
 
+        # Documentation
+        eq_(len([t for t in g.triples((dataset_ref, FOAF.page, None))]), 2)
+        for documentation_link in dataset['documentation']:
+            assert self._triple(g, dataset_ref, FOAF.page, URIRef(documentation_link))
+
         # List
         for item in [
             ('language', DCT.language, Literal),
-            # ('documentation', FOAF.page, URIRef, FOAF.Document),
         ]:
             values = json.loads(extras[item[0]])
             eq_(len([t for t in g.triples((dataset_ref, item[1], None))]), len(values))
