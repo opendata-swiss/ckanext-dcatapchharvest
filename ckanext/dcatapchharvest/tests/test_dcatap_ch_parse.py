@@ -86,6 +86,10 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         #  Lists
         eq_(sorted(dataset['language']), [u'de', u'fr'])
         eq_(sorted(dataset['groups']), [{'name': u'statistical-basis'}])
+        eq_(
+            sorted(dataset['documentation']),
+            ['https://example.com/documentation-dataset-1', 'https://example.com/documentation-dataset-2']
+        )
 
         # Dataset URI
         eq_(extras['uri'], u'https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585')

@@ -55,5 +55,11 @@
     <dcat:keyword xml:lang="it">basi-statistiche-e-presentazioni-generali</dcat:keyword>
     <dct:title xml:lang="fr">Annuaire statistique de la Suisse 1901</dct:title>
     <dcat:keyword xml:lang="de">statistische-grundlagen-und-ubersichten</dcat:keyword>
+    <foaf:page>
+      <foaf:Document rdf:about="https://example.com/documentation-dataset-1"/>
+    </foaf:page>
+    <foaf:page>
+      <foaf:Document rdf:about="https://example.com/documentation-dataset-2"/>
+    </foaf:page>
   </dcat:Dataset>
 </rdf:RDF>
