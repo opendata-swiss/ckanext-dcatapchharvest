@@ -1,0 +1,16 @@
+{
+  "id": "4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6",
+  "name": "test-dataset",
+  "title": "Test DCAT dataset",
+  "uri": "https://test.example.com/dataset/foo",
+  "version": "1.0b",
+  "metadata_created": "2015-06-26T15:21:09.034694",
+  "metadata_modified": "2015-06-26T15:21:09.075774",
+  "resources": [
+    {
+      "uri": "https://test.example.com/dataset/foo/resource/fxx",
+      "id": "5f2be71f-636c-4d3f-aac1-50830b97f853",
+      "package_id": "4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6"
+    }
+  ]
+}
