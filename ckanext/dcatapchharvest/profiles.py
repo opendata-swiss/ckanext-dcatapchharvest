@@ -1112,7 +1112,10 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
 
 def _get_publisher_url_from_identifier(identifier):
-    return ORGANIZATION_BASE_URL + identifier.split('@')[1]
+    identifier_split = identifier.split('@')
+    if len(identifier_split) > 1:
+        return ORGANIZATION_BASE_URL + identifier_split[1]
+    return ''
 
 
 def _get_publisher_dict_from_dataset(publisher):
