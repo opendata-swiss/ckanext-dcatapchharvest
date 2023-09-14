@@ -13,6 +13,10 @@ EUTHEMES = \
     Namespace("http://publications.europa.eu/resource/authority/data-theme/")
 HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 
+SKOSXL = Namespace("http://www.w3.org/2008/05/skos-xl#")
+RDFS = Namespace("http://www.w3.org/2000/01/rdf-schema#")
+        
+
 frequency_namespaces = {
   "skos": SKOS,
   "dct": DCT,
@@ -22,7 +26,9 @@ frequency_namespaces = {
 license_namespaces = {
   "skos": SKOS,
   "dct": DCT,
+  "skosxl": SKOSXL,
   "rdf": RDF,
+  "rdfs": RDFS,
 }
 
 
@@ -158,12 +164,15 @@ def get_license_values():
     file = os.path.join(__location__, 'license.ttl')
     g.parse(file, format='turtle')
     for ogdch_license_ref in g.subjects(predicate=RDF.type,
-                                          object=SKOS.Concept):
+                          object=SKOS.Concept):
         license_mapping[ogdch_license_ref] = None
-        for obj in g.objects(subject=ogdch_license_ref,
-                             predicate=SKOS.exactMatch):
-            license_mapping[ogdch_license_ref] = obj
+        for license_pref_label in g.objects(subject=ogdch_license_ref,
+                         predicate=SKOSXL.prefLabel):
+            for license_literal in g.objects(subject=license_pref_label,
+                         predicate=SKOSXL.literalForm):
+                license_mapping[ogdch_license_ref] = license_literal             
     return license_mapping
+
 
 def get_theme_mapping():
     g = Graph()
