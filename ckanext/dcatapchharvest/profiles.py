@@ -15,7 +15,7 @@ from ckanext.dcat.profiles import CleanedURIRef, RDFProfile, SchemaOrgProfile
 log = logging.getLogger(__name__)
 
 valid_frequencies = dh.get_frequency_values()
-#valid_licences = dh.get_license_values()
+valid_licenses = dh.get_license_values()
 eu_theme_mapping = dh.get_theme_mapping()
 
 DCT = dh.DCT
@@ -213,14 +213,29 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return relations
 
+
+    def _license(self, subject, predicate):
+          # DCAT-AP CH v2 compatible license has to be a URI.
+        for license_node in self.g.objects(subject, predicate):
+            if isinstance(license_node, URIRef) & (valid_licenses.get(license_node) is not None):
+                return license_node
+        return None
+
+
     def _rights(self, subject, predicate):
         for rights_node in self.g.objects(subject, predicate):
             if isinstance(rights_node, Literal):
-                # DCAT-AP CH v1: the rights statement as a literal (should be
-                # the code for one of the DCAT-AP CH licenses)
-                return unicode(rights_node)
-        # Todo: parse DCAT-AP CH v2 compatible rights data if we get it.
+                # DCAT-AP CH v2 compatible rights data if we get it.
+                for key, value in valid_licenses.items():
+                    if unicode(rights_node) == unicode(value):
+                        return key
+            if isinstance(rights_node, URIRef):
+                return rights_node
+            # DCAT-AP CH v1: the rights statement as a literal (should be
+            # the code for one of the DCAT-AP CH licenses)
+            return unicode(rights_node)
         return None
+
 
     def _keywords(self, subject, predicate):
         keywords = {}
@@ -517,7 +532,10 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             # Rights
             resource_dict['rights'] = self._rights(distribution, DCT.rights)
-
+            
+            #License
+            resource_dict['license'] = self._license(distribution, DCT.license)
+            
             # if media type is not set, use format as fallback
             if (not resource_dict.get('media_type') and
                     resource_dict.get('format')):
@@ -1069,9 +1087,8 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             #  Simple values
             items = [
-                ("status", ADMS.status, None, Literal),
-                ("rights", DCT.rights, None, Literal),
-                ("coverage", DCT.coverage, None, Literal),
+                ("status", ADMS.status, None, Literal)
+,               ("coverage", DCT.coverage, None, Literal),
                 ("license", DCT.license, None, Literal),
                 ("identifier", DCT.identifier, None, Literal),
                 ("media_type", SCHEMA.mediaType, None, Literal),
