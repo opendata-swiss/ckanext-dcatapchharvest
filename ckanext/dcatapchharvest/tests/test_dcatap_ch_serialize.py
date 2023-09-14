@@ -1,0 +1,95 @@
+import json
+
+import nose
+
+from rdflib import Literal
+from rdflib.namespace import RDF
+
+from ckanext.dcat import utils
+from ckanext.dcat.processors import RDFSerializer
+from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, XSD
+
+from rdflib import URIRef
+import ckanext.dcatapchharvest.dcat_helpers as dh
+
+from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
+
+eq_ = nose.tools.eq_
+assert_true = nose.tools.assert_true
+
+
+class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
+
+    def test_graph_from_dataset(self):
+
+        dataset = json.loads(
+            self._get_file_contents('dataset.json')
+        )
+        extras = self._extras(dataset)
+
+        s = RDFSerializer(profiles=['swiss_dcat_ap'])
+        g = s.g
+
+        dataset_ref = s.graph_from_dataset(dataset)
+
+        eq_(unicode(dataset_ref), utils.dataset_uri(dataset))
+
+        # Basic fields
+        assert self._triple(g, dataset_ref, RDF.type, DCAT.Dataset)
+        assert self._triple(g, dataset_ref, DCT.title, dataset['title'])
+        assert self._triple(g, dataset_ref, OWL.versionInfo, dataset['version'])
+        assert self._triple(g, dataset_ref, DCT.identifier, extras['identifier'])
+
+        # Dates
+        assert self._triple(g, dataset_ref, DCT.issued, dataset['issued'], XSD.dateTime)
+        assert len(list(g.objects(dataset_ref, DCT.modified))) == 0
+
+        for key, value in dataset['description'].iteritems():
+            if dataset['description'].get(key):
+                assert self._triple(g, dataset_ref, DCT.description, Literal(value, lang=key))
+        eq_(len([t for t in g.triples((dataset_ref, DCT.description, None))]), 2)
+
+        # Tags
+        eq_(len([t for t in g.triples((dataset_ref, DCAT.keyword, None))]), 3)
+        for key, keywords in dataset['keywords'].iteritems():
+            if dataset['keywords'].get(key):
+                for keyword in keywords:
+                    assert self._triple(g, dataset_ref, DCAT.keyword, Literal(keyword, lang=key))
+
+        # List
+        for item in [
+            ('language', DCT.language, Literal),
+            # ('documentation', FOAF.page, URIRef, FOAF.Document),
+        ]:
+            values = json.loads(extras[item[0]])
+            eq_(len([t for t in g.triples((dataset_ref, item[1], None))]), len(values))
+            for value in values:
+                assert self._triple(g, dataset_ref, item[1], item[2](value))
+
+    def test_graph_from_dataset_uri(self):
+        """Tests that datasets (resources) with a uri from the test system
+        have that uri changed to reference the prod system when they are output
+        as a graph
+        """
+
+        dataset = json.loads(
+            self._get_file_contents('dataset-test-uri.json')
+        )
+
+        s = RDFSerializer(profiles=['swiss_dcat_ap'])
+        g = s.g
+        dataset_ref = s.graph_from_dataset(dataset)
+
+        # Change dataset uri that includes a test url
+        dataset_uri = dh.dataset_uri(dataset, dataset_ref)
+        dataset_ref_changed = URIRef(dataset_uri)
+
+        # Test that the distribution is present in the graph with the new resource uri
+        for resource_dict in dataset.get("resources", []):
+            distribution = URIRef(dh.resource_uri(resource_dict))
+
+        # Basic fields
+        assert self._triple(g, dataset_ref_changed, RDF.type, DCAT.Dataset)
+        assert self._triple(g, dataset_ref_changed, DCT.title, dataset['title'])
+        assert self._triple(g, dataset_ref_changed, OWL.versionInfo, dataset['version'])
+        assert self._triple(g, distribution, RDF.type, DCAT.Distribution)

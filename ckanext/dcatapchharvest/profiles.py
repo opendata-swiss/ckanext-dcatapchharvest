@@ -726,7 +726,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     g.add((dataset_ref, DCT.temporal, temporal_extent))
 
         # Themes
-        groups = self._get_dataset_value(dataset_dict, 'groups')
+        groups = self._get_dataset_value(dataset_dict, 'groups', [])
         for group_name in groups:
             ogdch_theme_ref = URIRef(CHTHEMES_URI + group_name.get('name'))
             eu_theme_ref_list = eu_theme_mapping.get(ogdch_theme_ref)

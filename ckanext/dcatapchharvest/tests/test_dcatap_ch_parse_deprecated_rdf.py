@@ -1,21 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import os
 import nose
 import json
 from ckanext.dcat.processors import RDFParser
+from ckanext.dcatapchharvest.tests.base_test_classes import BaseParseTest
 
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
-
-
-class BaseParseTest(object):
-    def _get_file_contents(self, file_name):
-        path = os.path.join(os.path.dirname(__file__),
-                            'fixtures',
-                            file_name)
-        with open(path, 'r') as f:
-            return f.read()
 
 
 class DeprecatedProfileParseTest(BaseParseTest):
