@@ -213,14 +213,12 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return relations
 
-
     def _license(self, subject, predicate):
           # DCAT-AP CH v2 compatible license has to be a URI.
         for license_node in self.g.objects(subject, predicate):
             if isinstance(license_node, URIRef) & (valid_licenses.get(license_node) is not None):
-                return license_node
+                return unicode(license_node)
         return None
-
 
     def _rights(self, subject, predicate):
         for rights_node in self.g.objects(subject, predicate):
@@ -228,14 +226,13 @@ class SwissDCATAPProfile(MultiLangProfile):
                 # DCAT-AP CH v2 compatible rights data if we get it.
                 for key, value in valid_licenses.items():
                     if unicode(rights_node) == unicode(value):
-                        return key
+                        return unicode(key)
             if isinstance(rights_node, URIRef):
-                return rights_node
+                return unicode(rights_node)
             # DCAT-AP CH v1: the rights statement as a literal (should be
             # the code for one of the DCAT-AP CH licenses)
             return unicode(rights_node)
         return None
-
 
     def _keywords(self, subject, predicate):
         keywords = {}
@@ -524,7 +521,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                     ('download_url', DCAT.downloadURL),
                     ('url', DCAT.accessURL),
                     ('coverage', DCT.coverage),
-                    ('license', DCT.license),
             ):
                 value = self._object_value(distribution, predicate)
                 if value:
@@ -783,18 +779,26 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             g.add((dataset_ref, DCAT.distribution, distribution))
             g.add((distribution, RDF.type, DCAT.Distribution))
-
+            
             #  Simple values
             items = [
                 ('status', ADMS.status, None, Literal),
-                ('rights', DCT.rights, None, Literal),
                 ('coverage', DCT.coverage, None, Literal),
-                ('license', DCT.license, None, Literal),
                 ('identifier', DCT.identifier, None, Literal),
                 ('media_type', DCAT.mediaType, None, Literal),
                 ('spatial', DCT.spatial, None, Literal),
             ]
 
+            resource_rights = resource_dict.get('rights')
+            rights_uri = URIRef(resource_rights)
+            g.add((rights_uri, RDF.type, DCT.RightsStatement))
+            g.add((dataset_ref, DCT.rights, rights_uri))
+            
+            resource_license = resource_dict.get('license')
+            license_uri = URIRef(resource_license)
+            g.add((license_uri, RDF.type, DCT.LicenseDocument))
+            g.add((dataset_ref, DCT.license, license_uri))
+            
             self._add_triples_from_dict(resource_dict, distribution, items)
 
             self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
@@ -1089,12 +1093,16 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             items = [
                 ("status", ADMS.status, None, Literal)
 ,               ("coverage", DCT.coverage, None, Literal),
-                ("license", DCT.license, None, Literal),
                 ("identifier", DCT.identifier, None, Literal),
                 ("media_type", SCHEMA.mediaType, None, Literal),
                 ("spatial", DCT.spatial, None, Literal),
             ]
 
+            resource_license = resource_dict.get('license')
+            license_uri = URIRef(resource_license)
+            g.add((license_uri, RDF.type, DCT.LicenseDocument))
+            g.add((dataset_ref, DCT.license, license_uri))
+            
             self._add_triples_from_dict(resource_dict, distribution, items)
 
             self._add_multilang_value(
