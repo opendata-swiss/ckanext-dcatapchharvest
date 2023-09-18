@@ -93,6 +93,10 @@
     "en": "English Description",
     "it": ""
   },
+  "documentation": [
+    "http://dataset.info.org/doc1",
+    "http://dataset.info.org/doc2"
+  ],
   "extras": [
     {
       "key": "alternate_identifier",
@@ -125,10 +129,6 @@
     {
       "key": "access_rights",
       "value": "public"
-    },
-    {
-      "key": "documentation",
-      "value": "[\"http://dataset.info.org/doc1\", \"http://dataset.info.org/doc2\"]"
     },
     {
       "key": "provenance",

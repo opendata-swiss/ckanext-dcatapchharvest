@@ -487,6 +487,11 @@ class SwissDCATAPProfile(MultiLangProfile):
         dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
         dataset_dict['extras'].append({'key': 'uri', 'value': dataset_uri})
 
+        # Documentation
+        dataset_dict['documentation'] = self._object_value_list(
+            dataset_ref, FOAF.page
+        )
+
         # Resources
         for distribution in self._distributions(dataset_ref):
             resource_dict = {
@@ -645,7 +650,6 @@ class SwissDCATAPProfile(MultiLangProfile):
             ('theme', DCAT.theme, None, URIRef),
             ('conforms_to', DCT.conformsTo, None, Literal),
             ('alternate_identifier', ADMS.identifier, None, Literal),
-            ('documentation', FOAF.page, None, Literal),
             ('has_version', DCT.hasVersion, None, Literal),
             ('is_version_of', DCT.isVersionOf, None, Literal),
             ('source', DCT.source, None, Literal),
@@ -724,6 +728,13 @@ class SwissDCATAPProfile(MultiLangProfile):
                             end
                         )
                     g.add((dataset_ref, DCT.temporal, temporal_extent))
+
+        # Documentation
+        documentation = dataset_dict.get('documentation', [])
+        for link in documentation:
+            doc = URIRef(link)
+            g.add((doc, RDF.type, FOAF.Document))
+            g.add((dataset_ref, FOAF.page, doc))
 
         # Themes
         groups = self._get_dataset_value(dataset_dict, 'groups', [])
@@ -1066,7 +1077,6 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             #  Lists
             items = [
-                ("documentation", FOAF.page, None, Literal),
                 ("language", DCT.language, None, Literal),
                 ("conforms_to", DCT.conformsTo, None, Literal),
             ]
