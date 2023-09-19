@@ -530,19 +530,16 @@ class SwissDCATAPProfile(MultiLangProfile):
             rights = self._license_rights_name(distribution, DCT.rights)
             license = self._license_rights_name(distribution, DCT.license)
             if rights is None and license is not None:
-                resource_dict['license'] = license
-               
+                resource_dict['license'] = license            
             if rights is not None and license is None:
-                resource_dict['license'] = rights
-               
+                resource_dict['license'] = rights            
             if license is not None and rights is not None:
                 resource_dict['license'] = license
                 resource_dict['rights'] = rights
                 if ('cc' in rights):
                     resource_dict['license'] = rights
                     resource_dict['rights'] = license
- 
-            # if media type is not set, use format as fallback
+                    # if media type is not set, use format as fallback
             if (not resource_dict.get('media_type') and
                     resource_dict.get('format')):
                 resource_dict['media_type'] = resource_dict['format']
