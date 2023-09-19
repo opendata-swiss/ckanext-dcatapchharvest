@@ -114,6 +114,12 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['url'], u'https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901')
         assert 'download_url' not in resource, "download_url not available on resource"
 
+        # Lists
+        eq_(
+            sorted(resource['documentation']),
+            ['https://example.com/documentation-distribution-1', 'https://example.com/documentation-distribution-2']
+        )
+
         # Distribution URI
         eq_(resource['uri'], u'https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585/resource/c8ec6ca0-6923-4cf3-92f2-95a10e6f8e25')
 
