@@ -536,10 +536,11 @@ class SwissDCATAPProfile(MultiLangProfile):
             if license is not None and rights is not None:
                 resource_dict['license'] = license
                 resource_dict['rights'] = rights
-                if ('cc' in rights):
+                if 'cc' in rights:
                     resource_dict['license'] = rights
                     resource_dict['rights'] = license
-                    # if media type is not set, use format as fallback
+
+            # if media type is not set, use format as fallback
             if (not resource_dict.get('media_type') and
                     resource_dict.get('format')):
                 resource_dict['media_type'] = resource_dict['format']
@@ -796,14 +797,18 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('spatial', DCT.spatial, None, Literal),
             ]
 
-            rights_uri = dh.get_license_uri_by_name(resource_dict.get('rights')) # noqa
+            rights_uri = dh.get_license_uri_by_name(
+                resource_dict.get('rights')
+                )
             g.add((rights_uri, RDF.type, DCT.RightsStatement))
             g.add((dataset_ref, DCT.rights, rights_uri))
-            license_uri = dh.get_license_uri_by_name(resource_dict.get('license')) # noqa
+            license_uri = dh.get_license_uri_by_name(
+                resource_dict.get('license')
+                )
             g.add((license_uri, RDF.type, DCT.LicenseDocument))
             g.add((dataset_ref, DCT.license, license_uri))
             # noqa
-            self._add_triples_from_dict(resource_dict, distribution, items) # noqa
+            self._add_triples_from_dict(resource_dict, distribution, items)
             self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
             self._add_multilang_value(distribution, DCT.description, 'description', resource_dict)  # noqa
 

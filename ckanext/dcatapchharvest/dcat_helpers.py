@@ -156,16 +156,16 @@ def get_frequency_values():
 
 
 def get_license_uri_by_name(vocabulary_name):
-    license_vovcabulary = get_license_values()
-    for key, value in license_vovcabulary.items():
+    license_vocabulary = get_license_values()
+    for key, value in license_vocabulary.items():
         if unicode(vocabulary_name) == unicode(value):
             return key
     return None
 
 
 def get_license_name_by_uri(vocabulary_uri):
-    license_vovcabulary = get_license_values()
-    for key, value in license_vovcabulary.items():
+    license_vocabulary = get_license_values()
+    for key, value in license_vocabulary.items():
         if unicode(vocabulary_uri) == unicode(key):
             return value
     return None
