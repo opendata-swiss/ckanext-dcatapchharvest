@@ -222,8 +222,8 @@ class SwissDCATAPProfile(MultiLangProfile):
             if isinstance(node, URIRef):
                 return dh.get_license_name_by_uri(node)
         return None
-    
-    def _license_rights_uri(self, subject, predicate):
+
+    def _license_rights_uri(self, subject, predicate): # noqa
         for node in self.g.objects(subject, predicate):
             # DCAT-AP CH v2 compatible license has to be a URI.
             if isinstance(node, Literal):
@@ -334,7 +334,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             return None
 
 
-    def _clean_end_datetime(self, datetime_value, data_type):
+    def _clean_end_datetime(self, datetime_value, data_type):  # noqa
         """Convert a literal in one of the accepted types into the latest
         possible date for that value, and then return it as an isoformat
         datetime string.
@@ -383,7 +383,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             return None
 
 
-    def _get_eu_accrual_periodicity(self, subject, predicate):
+    def _get_eu_accrual_periodicity(self, subject, predicate): # noqa
         ogdch_value = self._object_value(subject, predicate)
         ogdch_value = URIRef(ogdch_value)
         for key, value in valid_frequencies.items():
@@ -530,9 +530,9 @@ class SwissDCATAPProfile(MultiLangProfile):
             rights = self._license_rights_name(distribution, DCT.rights)
             license = self._license_rights_name(distribution, DCT.license)
             if rights is None and license is not None:
-                resource_dict['license'] = license            
+                resource_dict['license'] = license
             if rights is not None and license is None:
-                resource_dict['license'] = rights            
+                resource_dict['license'] = rights
             if license is not None and rights is not None:
                 resource_dict['license'] = license
                 resource_dict['rights'] = rights
@@ -785,8 +785,8 @@ class SwissDCATAPProfile(MultiLangProfile):
             distribution = URIRef(dh.resource_uri(resource_dict))
 
             g.add((dataset_ref, DCAT.distribution, distribution))
-            g.add((distribution, RDF.type, DCAT.Distribution))
-            
+            g.add((distribution, RDF.type, DCAT.Distribution))  # noqa
+
             #  Simple values
             items = [
                 ('status', ADMS.status, None, Literal),
@@ -799,13 +799,11 @@ class SwissDCATAPProfile(MultiLangProfile):
             rights_uri = dh.get_license_uri_by_name(resource_dict.get('rights')) # noqa
             g.add((rights_uri, RDF.type, DCT.RightsStatement))
             g.add((dataset_ref, DCT.rights, rights_uri))
-            
             license_uri = dh.get_license_uri_by_name(resource_dict.get('license')) # noqa
             g.add((license_uri, RDF.type, DCT.LicenseDocument))
             g.add((dataset_ref, DCT.license, license_uri))
-            
-            self._add_triples_from_dict(resource_dict, distribution, items)
-
+            # noqa
+            self._add_triples_from_dict(resource_dict, distribution, items) # noqa
             self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
             self._add_multilang_value(distribution, DCT.description, 'description', resource_dict)  # noqa
 
@@ -1107,11 +1105,10 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             rights_uri = dh.get_license_uri_by_name(resource_dict.get('rights')) # noqa
             g.add((rights_uri, RDF.type, DCT.RightsStatement))
             g.add((dataset_ref, DCT.rights, rights_uri))
-            
             license_uri = dh.get_license_uri_by_name(resource_dict.get('license')) # noqa
             g.add((license_uri, RDF.type, DCT.LicenseDocument))
             g.add((dataset_ref, DCT.license, license_uri))
-            
+
             self._add_triples_from_dict(resource_dict, distribution, items)
 
             self._add_multilang_value(

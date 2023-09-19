@@ -15,7 +15,6 @@ HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 
 SKOSXL = Namespace("http://www.w3.org/2008/05/skos-xl#")
 RDFS = Namespace("http://www.w3.org/2000/01/rdf-schema#")
-        
 
 frequency_namespaces = {
   "skos": SKOS,
@@ -205,6 +204,7 @@ def get_theme_mapping():
                                  predicate=SKOS.mappingRelation)
             if g.namespace_manager.compute_qname(obj)[0] == 'euthemes']
     return theme_mapping
+
 
 def get_pagination(catalog_graph):
     pagination = {}
