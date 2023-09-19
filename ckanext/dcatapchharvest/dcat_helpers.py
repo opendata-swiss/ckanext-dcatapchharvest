@@ -156,6 +156,22 @@ def get_frequency_values():
     return frequency_mapping
 
 
+def get_license_uri_by_name(vocabulary_name):
+    license_vovcabulary = get_license_values()
+    for key, value in license_vovcabulary.items():
+        if unicode(vocabulary_name) == unicode(value):
+            return key
+    return None
+
+
+def get_license_name_by_uri(vocabulary_uri):
+    license_vovcabulary = get_license_values()
+    for key, value in license_vovcabulary.items():
+        if unicode(vocabulary_uri) == unicode(key):
+            return value
+    return None
+
+
 def get_license_values():
     g = Graph()
     license_mapping = {}
@@ -164,13 +180,13 @@ def get_license_values():
     file = os.path.join(__location__, 'license.ttl')
     g.parse(file, format='turtle')
     for ogdch_license_ref in g.subjects(predicate=RDF.type,
-                          object=SKOS.Concept):
+                                        object=SKOS.Concept):
         license_mapping[ogdch_license_ref] = None
         for license_pref_label in g.objects(subject=ogdch_license_ref,
-                         predicate=SKOSXL.prefLabel):
+                                            predicate=SKOSXL.prefLabel):
             for license_literal in g.objects(subject=license_pref_label,
-                         predicate=SKOSXL.literalForm):
-                license_mapping[ogdch_license_ref] = license_literal             
+                                             predicate=SKOSXL.literalForm):
+                license_mapping[ogdch_license_ref] = license_literal
     return license_mapping
 
 
@@ -189,7 +205,6 @@ def get_theme_mapping():
                                  predicate=SKOS.mappingRelation)
             if g.namespace_manager.compute_qname(obj)[0] == 'euthemes']
     return theme_mapping
-
 
 def get_pagination(catalog_graph):
     pagination = {}
