@@ -16,6 +16,12 @@
         <dct:identifier>346265-fr@bundesamt-fur-statistik-bfs</dct:identifier>
         <dct:format>HTML</dct:format>
         <dct:rights>NonCommercialAllowed-CommercialWithPermission-ReferenceRequired</dct:rights>
+        <foaf:page>
+          <foaf:Document rdf:about="https://example.com/documentation-distribution-1"/>
+        </foaf:page>
+        <foaf:page>
+          <foaf:Document rdf:about="https://example.com/documentation-distribution-2"/>
+        </foaf:page>
       </dcat:Distribution>
     </dcat:distribution>
     <dct:language>de</dct:language>

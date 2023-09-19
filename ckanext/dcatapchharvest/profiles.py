@@ -522,6 +522,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                     resource_dict.get('format')):
                 resource_dict['media_type'] = resource_dict['format']
 
+            # Documentation
+            resource_dict['documentation'] = self._object_value_list(
+                distribution, FOAF.page
+            )
+
             # Timestamp fields
             for key, predicate in (
                     ('issued', DCT.issued),
@@ -778,7 +783,6 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             #  Lists
             items = [
-                ('documentation', FOAF.page, None, Literal),
                 ('language', DCT.language, None, Literal),
                 ('conforms_to', DCT.conformsTo, None, Literal),
             ]
@@ -809,6 +813,13 @@ class SwissDCATAPProfile(MultiLangProfile):
                     pass
             elif download_url:
                 g.add((distribution, DCAT.accessURL, URIRef(download_url)))
+
+            # Documentation
+            documentation = resource_dict.get('documentation', [])
+            for link in documentation:
+                doc = URIRef(link)
+                g.add((doc, RDF.type, FOAF.Document))
+                g.add((distribution, FOAF.page, doc))
 
             # Format
             if resource_dict.get('format'):
