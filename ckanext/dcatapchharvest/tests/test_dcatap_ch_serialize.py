@@ -70,6 +70,14 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             for value in values:
                 assert self._triple(g, dataset_ref, item[1], item[2](value))
 
+        # Resources
+        eq_(len([t for t in g.triples((dataset_ref, DCAT.distribution, None))]), len(dataset["resources"]))
+        for resource_dict in dataset.get("resources", []):
+            distribution = URIRef(dh.resource_uri(resource_dict))
+            assert self._triple(g, distribution, RDF.type, DCAT.Distribution)
+            for link in resource_dict.get("documentation", []):
+                assert self._triple(g, distribution, FOAF.page, URIRef(link))
+
     def test_graph_from_dataset_uri(self):
         """Tests that datasets (resources) with a uri from the test system
         have that uri changed to reference the prod system when they are output
