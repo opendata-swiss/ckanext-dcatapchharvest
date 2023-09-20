@@ -167,7 +167,7 @@ def get_license_name_by_uri(vocabulary_uri):
     license_vocabulary = get_license_values()
     for key, value in license_vocabulary.items():
         if unicode(vocabulary_uri) == unicode(key):
-            return value
+            return unicode(value)
     return None
 
 

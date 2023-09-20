@@ -108,7 +108,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['mimetype'], u'text/html')
         eq_(resource['media_type'], u'text/html')
         eq_(resource['identifier'], u'346265-fr@bundesamt-fur-statistik-bfs')
-        eq_(resource['rights'], u'NonCommercialAllowed-CommercialWithPermission-ReferenceRequired')
+        eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
+        eq_(resource['license'], u'Creative Commons CC Zero License (cc-zero)')
         eq_(resource['language'], [u'fr'])
         eq_(resource['issued'], u'1900-12-31T00:00:00')
         eq_(resource['url'], u'https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901')
@@ -354,5 +355,3 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
         resource = dataset["resources"][0]
-
-        eq_(resource['rights'], u"NonCommercialAllowed-CommercialWithPermission-ReferenceRequired")

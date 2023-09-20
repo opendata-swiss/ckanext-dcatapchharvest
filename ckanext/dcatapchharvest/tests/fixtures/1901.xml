@@ -15,7 +15,12 @@
         <dct:language>fr</dct:language>
         <dct:identifier>346265-fr@bundesamt-fur-statistik-bfs</dct:identifier>
         <dct:format>HTML</dct:format>
-        <dct:rights>NonCommercialAllowed-CommercialWithPermission-ReferenceRequired</dct:rights>
+        <dct:rights>
+          <dct:RightsStatement rdf:about="http://dcat-ap.ch/vocabulary/licenses/terms_by"/>
+        </dct:rights>
+        <dct:license>
+          <dct:LicenseDocument rdf:about="http://dcat-ap.de/def/licenses/cc-zero"/>
+        </dct:license>
         <foaf:page>
           <foaf:Document rdf:about="https://example.com/documentation-distribution-1"/>
         </foaf:page>
@@ -61,6 +66,12 @@
     <dcat:keyword xml:lang="it">basi-statistiche-e-presentazioni-generali</dcat:keyword>
     <dct:title xml:lang="fr">Annuaire statistique de la Suisse 1901</dct:title>
     <dcat:keyword xml:lang="de">statistische-grundlagen-und-ubersichten</dcat:keyword>
+    <dct:rights>
+      <dct:RightsStatement rdf:about="http://dcat-ap.ch/vocabulary/licenses/terms_by"/>
+    </dct:rights>
+    <dct:license>
+      <dct:LicenseDocument rdf:about="http://dcat-ap.de/def/licenses/cc-zero"/>
+    </dct:license>
     <foaf:page>
       <foaf:Document rdf:about="https://example.com/documentation-dataset-1"/>
     </foaf:page>

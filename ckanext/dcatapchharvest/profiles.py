@@ -218,12 +218,12 @@ class SwissDCATAPProfile(MultiLangProfile):
             # DCAT-AP CH v1: the license as a literal (should be
             # the code for one of the DCAT-AP CH licenses)
             if isinstance(node, Literal):
-                return node
+                return unicode(node)
             if isinstance(node, URIRef):
                 return dh.get_license_name_by_uri(node)
         return None
 
-    def _license_rights_uri(self, subject, predicate): # noqa
+    def _license_rights_uri(self, subject, predicate):
         for node in self.g.objects(subject, predicate):
             # DCAT-AP CH v2 compatible license has to be a URI.
             if isinstance(node, Literal):
@@ -333,8 +333,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         except ValueError:
             return None
 
-
-    def _clean_end_datetime(self, datetime_value, data_type):  # noqa
+    def _clean_end_datetime(self, datetime_value, data_type):
         """Convert a literal in one of the accepted types into the latest
         possible date for that value, and then return it as an isoformat
         datetime string.
@@ -382,8 +381,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         except ValueError:
             return None
 
-
-    def _get_eu_accrual_periodicity(self, subject, predicate): # noqa
+    def _get_eu_accrual_periodicity(self, subject, predicate):
         ogdch_value = self._object_value(subject, predicate)
         ogdch_value = URIRef(ogdch_value)
         for key, value in valid_frequencies.items():
@@ -786,7 +784,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             distribution = URIRef(dh.resource_uri(resource_dict))
 
             g.add((dataset_ref, DCAT.distribution, distribution))
-            g.add((distribution, RDF.type, DCAT.Distribution))  # noqa
+            g.add((distribution, RDF.type, DCAT.Distribution))
 
             #  Simple values
             items = [
@@ -796,18 +794,27 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('media_type', DCAT.mediaType, None, Literal),
                 ('spatial', DCT.spatial, None, Literal),
             ]
-
             rights_uri = dh.get_license_uri_by_name(
                 resource_dict.get('rights')
+            )
+            if rights_uri is not None:
+                rights_ref = URIRef(rights_uri)
+                g.add((rights_ref, RDF.type, DCT.RightsStatement))
+                g.add((distribution, DCT.rights, rights_ref))
+            if rights_uri is None:
+                rights_name = dh.get_license_name_by_uri(
+                    resource_dict.get('rights')
                 )
-            g.add((rights_uri, RDF.type, DCT.RightsStatement))
-            g.add((dataset_ref, DCT.rights, rights_uri))
+            if rights_uri is None and rights_name is not None:
+                g.add((Literal(rights_name), RDF.type, DCT.RightsStatement))
+                g.add((distribution, DCT.rights, Literal(rights_name)))
             license_uri = dh.get_license_uri_by_name(
                 resource_dict.get('license')
                 )
-            g.add((license_uri, RDF.type, DCT.LicenseDocument))
-            g.add((dataset_ref, DCT.license, license_uri))
-            # noqa
+            if license_uri:
+                license_ref = URIRef(license_uri)
+                g.add((license_ref, RDF.type, DCT.LicenseDocument))
+                g.add((distribution, DCT.license, license_ref))
             self._add_triples_from_dict(resource_dict, distribution, items)
             self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
             self._add_multilang_value(distribution, DCT.description, 'description', resource_dict)  # noqa
