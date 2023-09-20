@@ -805,9 +805,9 @@ class SwissDCATAPProfile(MultiLangProfile):
                 rights_name = dh.get_license_name_by_uri(
                     resource_dict.get('rights')
                 )
-            if rights_uri is None and rights_name is not None:
-                g.add((Literal(rights_name), RDF.type, DCT.RightsStatement))
-                g.add((distribution, DCT.rights, Literal(rights_name)))
+                if rights_name is not None:
+                    g.add((Literal(rights_name), RDF.type, DCT.RightsStatement))
+                    g.add((distribution, DCT.rights, Literal(rights_name)))
             license_uri = dh.get_license_uri_by_name(
                 resource_dict.get('license')
                 )
