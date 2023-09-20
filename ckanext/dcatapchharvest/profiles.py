@@ -1100,19 +1100,13 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             #  Simple values
             items = [
                 ("status", ADMS.status, None, Literal),
+                ("rights", DCT.rights, None, Literal),
                 ("coverage", DCT.coverage, None, Literal),
+                ("license", DCT.license, None, Literal),
                 ("identifier", DCT.identifier, None, Literal),
                 ("media_type", SCHEMA.mediaType, None, Literal),
                 ("spatial", DCT.spatial, None, Literal),
             ]
-
-
-            rights_uri = dh.get_license_uri_by_name(resource_dict.get('rights')) # noqa
-            g.add((rights_uri, RDF.type, DCT.RightsStatement))
-            g.add((dataset_ref, DCT.rights, rights_uri))
-            license_uri = dh.get_license_uri_by_name(resource_dict.get('license')) # noqa
-            g.add((license_uri, RDF.type, DCT.LicenseDocument))
-            g.add((dataset_ref, DCT.license, license_uri))
 
             self._add_triples_from_dict(resource_dict, distribution, items)
 
