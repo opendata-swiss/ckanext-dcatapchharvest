@@ -804,9 +804,19 @@ class SwissDCATAPProfile(MultiLangProfile):
                     g.add((rights_ref, RDF.type, DCT.RightsStatement))
                     g.add((distribution, DCT.rights, rights_ref))
                 if rights_uri is None:
-                    resource_rights_ref = URIRef(resource_dict.get('rights'))
-                    g.add((resource_rights_ref, RDF.type, DCT.RightsStatement))
-                    g.add((distribution, DCT.rights, resource_rights_ref))
+                    rights_name = dh.get_license_name_by_uri(
+                        resource_dict.get('rights')
+                        )
+                    if rights_name is not None:
+                        resource_rights_ref = URIRef(
+                            resource_dict.get('rights')
+                            )
+                        g.add((
+                            resource_rights_ref,
+                            RDF.type,
+                            DCT.RightsStatement)
+                            )
+                        g.add((distribution, DCT.rights, resource_rights_ref))
 
             if resource_dict.get('license'):
                 license_uri = dh.get_license_uri_by_name(
@@ -817,11 +827,21 @@ class SwissDCATAPProfile(MultiLangProfile):
                     g.add((license_ref, RDF.type, DCT.LicenseDocument))
                     g.add((distribution, DCT.license, license_ref))
                 if license_uri is None:
-                    resource_license_ref = URIRef(resource_dict.get('license'))
-                    g.add(
-                        (resource_license_ref, RDF.type, DCT.LicenseDocument)
+                    license_name = dh.get_license_name_by_uri(
+                        resource_dict.get('license')
                         )
-                    g.add((distribution, DCT.license, resource_license_ref))
+                    if license_name is not None:
+                        resource_license_ref = URIRef(
+                            resource_dict.get('license')
+                            )
+                        g.add((
+                            resource_license_ref,
+                            RDF.type,
+                            DCT.LicenseDocument)
+                            )
+                        g.add(
+                            (distribution, DCT.license, resource_license_ref)
+                            )
 
             self._add_triples_from_dict(resource_dict, distribution, items)
             self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
