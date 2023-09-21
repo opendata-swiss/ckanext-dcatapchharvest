@@ -17,6 +17,24 @@ assert_true = nose.tools.assert_true
 
 class TestSwissDCATAPProfileParsing(BaseParseTest):
 
+    def test_rights_license(self):
+            
+            contents = self._get_file_contents('dataset-rights.xml')
+            p = RDFParser(profiles=['swiss_dcat_ap'])
+            p.parse(contents)
+    
+            datasets = [d for d in p.datasets()]
+    
+            # Dataset
+            eq_(len(datasets), 1)
+            dataset = datasets[0]
+            
+             # Resources
+            eq_(len(dataset['resources']), 1)
+            resource = dataset['resources'][0]
+            eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
+            eq_(resource['license'], u'NonCommercialAllowed-CommercialWithPermission-ReferenceRequired')
+            
     def test_dataset_all_fields(self):
 
         contents = self._get_file_contents('1901.xml')

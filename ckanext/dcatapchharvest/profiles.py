@@ -794,28 +794,35 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('media_type', DCAT.mediaType, None, Literal),
                 ('spatial', DCT.spatial, None, Literal),
             ]
-            rights_uri = dh.get_license_uri_by_name(
-                resource_dict.get('rights')
-            )
-            if rights_uri is not None:
-                rights_ref = URIRef(rights_uri)
-                g.add((rights_ref, RDF.type, DCT.RightsStatement))
-                g.add((distribution, DCT.rights, rights_ref))
-            if rights_uri is None:
-                rights_name = dh.get_license_name_by_uri(
+
+            if resource_dict.get('rights'):
+                rights_uri = dh.get_license_uri_by_name(
                     resource_dict.get('rights')
                 )
-                if rights_name is not None:
-                    g.add((Literal(rights_name),
-                           RDF.type, DCT.RightsStatement))
-                    g.add((distribution, DCT.rights, Literal(rights_name)))
-            license_uri = dh.get_license_uri_by_name(
-                resource_dict.get('license')
+                if rights_uri is not None:
+                    rights_ref = URIRef(rights_uri)
+                    g.add((rights_ref, RDF.type, DCT.RightsStatement))
+                    g.add((distribution, DCT.rights, rights_ref))
+                if rights_uri is None:
+                    resource_rights_ref = URIRef(resource_dict.get('rights'))
+                    g.add((resource_rights_ref, RDF.type, DCT.RightsStatement))
+                    g.add((distribution, DCT.rights, resource_rights_ref))
+
+            if resource_dict.get('license'):
+                license_uri = dh.get_license_uri_by_name(
+                    resource_dict.get('license')
                 )
-            if license_uri:
-                license_ref = URIRef(license_uri)
-                g.add((license_ref, RDF.type, DCT.LicenseDocument))
-                g.add((distribution, DCT.license, license_ref))
+                if license_uri is not None:
+                    license_ref = URIRef(license_uri)
+                    g.add((license_ref, RDF.type, DCT.LicenseDocument))
+                    g.add((distribution, DCT.license, license_ref))
+                if license_uri is None:
+                    resource_license_ref = URIRef(resource_dict.get('license'))
+                    g.add(
+                        (resource_license_ref, RDF.type, DCT.LicenseDocument)
+                        )
+                    g.add((distribution, DCT.license, resource_license_ref))
+
             self._add_triples_from_dict(resource_dict, distribution, items)
             self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
             self._add_multilang_value(distribution, DCT.description, 'description', resource_dict)  # noqa
@@ -1108,9 +1115,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             #  Simple values
             items = [
                 ("status", ADMS.status, None, Literal),
-                ("rights", DCT.rights, None, Literal),
                 ("coverage", DCT.coverage, None, Literal),
-                ("license", DCT.license, None, Literal),
                 ("identifier", DCT.identifier, None, Literal),
                 ("media_type", SCHEMA.mediaType, None, Literal),
                 ("spatial", DCT.spatial, None, Literal),
