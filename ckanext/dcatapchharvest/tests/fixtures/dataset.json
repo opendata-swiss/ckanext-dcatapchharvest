@@ -104,7 +104,29 @@
       "documentation": [
         "https://example.com/documentation-resource-1",
         "https://example.com/documentation-resource-2"
-      ]
+      ],
+      "rights": "Creative Commons CC Zero License (cc-zero)",
+      "license": "NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired"
+    },
+    {
+      "id": "28e75e40-e1a1-497b-a1b9-8c1834d60201",
+      "package_id": "008de135-8755-4c1d-a866-081dcfc32658",
+      "documentation": [
+        "https://example.com/documentation-resource-1",
+        "https://example.com/documentation-resource-2"
+      ],
+      "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by",
+      "license": "NonCommercialAllowed-CommercialAllowed-ReferenceRequired"
+    },
+    {
+      "id": "0cfce6ba-28f4-4229-b733-f6492c650395",
+      "package_id": "e2a8b9fd-b00e-461a-9e99-686b7c2d146a",
+      "documentation": [
+        "https://example.com/documentation-resource-1",
+        "https://example.com/documentation-resource-2"
+      ],
+      "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask",
+      "license": "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0"
     }
   ],
   "extras": [

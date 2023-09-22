@@ -13,7 +13,6 @@
             <dct:language>fr</dct:language>
             <dct:identifier>346251-master@bundesamt-fur-statistik-bfs</dct:identifier>
             <dct:title xml:lang="fr">Annuaire statistique de la Suisse 1894</dct:title>
-            <dct:rights>NonCommercialAllowed-CommercialAllowed-ReferenceRequired</dct:rights>
             <dcat:downloadURL>https://www.bfs.admin.ch/bfsstatic/dam/assets/346251/master</dcat:downloadURL>
             <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1893-12-31T23:00:00Z</dct:issued>
             <dct:language>de</dct:language>
@@ -34,7 +33,12 @@
         <dcat:keyword xml:lang="rm">Basas statisticas e survistas</dcat:keyword>
         <dcat:keyword xml:lang="de">Statistische Grundlagen und Übersichten</dcat:keyword>
         <dct:title xml:lang="fr">Annuaire statistique de la Suisse 1894</dct:title>
-        <dct:rights>NonCommercialAllowed-CommercialAllowed-ReferenceRequired</dct:rights>
+        <dct:rights>
+            <dct:RightsStatement rdf:about="http://dcat-ap.ch/vocabulary/licenses/terms_by"/>
+        </dct:rights>
+        <dct:license>
+          <dct:LicenseDocument rdf:about="http://dcat-ap.de/def/licenses/cc-zero"/>
+        </dct:license>
         <dcat:keyword xml:lang="de">Publikation</dcat:keyword>
         <dcat:distribution>
           <dcat:Distribution>
@@ -42,7 +46,6 @@
             <dct:title xml:lang="fr">Annuaire statistique de la Suisse 1894</dct:title>
             <dct:language>fr</dct:language>
             <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1893-12-31T23:00:00Z</dct:issued>
-            <dct:rights>NonCommercialAllowed-CommercialAllowed-ReferenceRequired</dct:rights>
             <dcat:accessURL rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1894</dcat:accessURL>
             <dct:identifier>346251-fr@bundesamt-fur-statistik-bfs</dct:identifier>
           </dcat:Distribution>
@@ -61,13 +64,18 @@
         <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1893-12-31T23:00:00Z</dct:issued>
         <dcat:keyword xml:lang="fr">Bases statistiques et généralités</dcat:keyword>
         <dct:title xml:lang="de">Statistisches Jahrbuch der Schweiz 1894</dct:title>
+        <dct:rights>
+          <dct:RightsStatement rdf:about="http://dcat-ap.ch/vocabulary/licenses/terms_by"/>
+        </dct:rights>
+        <dct:license>
+          <dct:LicenseDocument rdf:about="http://dcat-ap.de/def/licenses/cc-zero"/>
+        </dct:license>
         <dcat:distribution>
           <dcat:Distribution>
             <dcat:mediaType>text/html</dcat:mediaType>
             <dct:title xml:lang="de">Statistisches Jahrbuch der Schweiz 1894</dct:title>
             <dct:language>de</dct:language>
             <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1893-12-31T23:00:00Z</dct:issued>
-            <dct:rights>NonCommercialAllowed-CommercialAllowed-ReferenceRequired</dct:rights>
             <dcat:accessURL rdf:datatype="http://www.w3.org/2001/XMLSchema#anyURI">https://www.bfs.admin.ch/asset/de/hs-b-00.01-jb-1894</dcat:accessURL>
             <dct:identifier>346251-de@bundesamt-fur-statistik-bfs</dct:identifier>
           </dcat:Distribution>
@@ -88,7 +96,6 @@
         <dct:spatial>Schweiz</dct:spatial>
         <dcat:keyword xml:lang="it">Pubblicazione</dcat:keyword>
         <dcat:keyword xml:lang="de">Statistische Grundlagen und Übersichten</dcat:keyword>
-        <dct:rights>NonCommercialAllowed-CommercialAllowed-ReferenceRequired</dct:rights>
         <dcat:keyword xml:lang="rm">Basas statisticas e survistas</dcat:keyword>
         <dcat:contactPoint>
           <vcard:Organization>

@@ -13,10 +13,23 @@ EUTHEMES = \
     Namespace("http://publications.europa.eu/resource/authority/data-theme/")
 HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 
+SKOSXL = Namespace("http://www.w3.org/2008/05/skos-xl#")
+RDFS = Namespace("http://www.w3.org/2000/01/rdf-schema#")
+
 frequency_namespaces = {
   "skos": SKOS,
   "dct": DCT,
 }
+
+
+license_namespaces = {
+  "skos": SKOS,
+  "dct": DCT,
+  "skosxl": SKOSXL,
+  "rdf": RDF,
+  "rdfs": RDFS,
+}
+
 
 theme_namespaces = {
     "euthemes": EUTHEMES,
@@ -140,6 +153,40 @@ def get_frequency_values():
                              predicate=SKOS.exactMatch):
             frequency_mapping[ogdch_frequency_ref] = obj
     return frequency_mapping
+
+
+def get_license_uri_by_name(vocabulary_name):
+    license_vocabulary = get_license_values()
+    for key, value in license_vocabulary.items():
+        if unicode(vocabulary_name) == unicode(value):
+            return key
+    return None
+
+
+def get_license_name_by_uri(vocabulary_uri):
+    license_vocabulary = get_license_values()
+    for key, value in license_vocabulary.items():
+        if unicode(vocabulary_uri) == unicode(key):
+            return unicode(value)
+    return None
+
+
+def get_license_values():
+    g = Graph()
+    license_mapping = {}
+    for prefix, namespace in license_namespaces.items():
+        g.bind(prefix, namespace)
+    file = os.path.join(__location__, 'license.ttl')
+    g.parse(file, format='turtle')
+    for ogdch_license_ref in g.subjects(predicate=RDF.type,
+                                        object=SKOS.Concept):
+        license_mapping[ogdch_license_ref] = None
+        for license_pref_label in g.objects(subject=ogdch_license_ref,
+                                            predicate=SKOSXL.prefLabel):
+            for license_literal in g.objects(subject=license_pref_label,
+                                             predicate=SKOSXL.literalForm):
+                license_mapping[ogdch_license_ref] = license_literal
+    return license_mapping
 
 
 def get_theme_mapping():

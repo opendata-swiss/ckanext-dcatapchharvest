@@ -1,5 +1,7 @@
 import json
 
+import logging
+
 import nose
 
 from rdflib import Literal
@@ -16,7 +18,7 @@ from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
 
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
-
+log = logging.getLogger(__name__)
 
 class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
@@ -76,8 +78,34 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             distribution = URIRef(dh.resource_uri(resource_dict))
             assert self._triple(g, distribution, RDF.type, DCAT.Distribution)
             for link in resource_dict.get("documentation", []):
-                assert self._triple(g, distribution, FOAF.page, URIRef(link))
+                assert self._triple(g, distribution, FOAF.page, URIRef(link))       
+            
+            #e2c50e70-67ad-4f86-bb1b-3f93867eadaa    
+            if resource_dict.get('rights') == 'Creative Commons CC Zero License (cc-zero)':
+                assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.de/def/licenses/cc-zero"))
+                
+            if resource_dict.get('license') == 'NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired':
+                assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_open"))
+                
+                
+            #28e75e40-e1a1-497b-a1b9-8c1834d60201
+            if resource_dict.get('rights') == "http://dcat-ap.ch/vocabulary/licenses/terms_by":
+                assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"))    
+                
+            if resource_dict.get('license') == "NonCommercialAllowed-CommercialAllowed-ReferenceRequired":
+                assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"))
+        
+        
+            #0cfce6ba-28f4-4229-b733-f6492c650395
+            if resource_dict.get('rights') == "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask":
+                assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by_ask"))
+                
+            if resource_dict.get('license') == "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0":
+                assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0"))    
+            
+                
 
+                
     def test_graph_from_dataset_uri(self):
         """Tests that datasets (resources) with a uri from the test system
         have that uri changed to reference the prod system when they are output
