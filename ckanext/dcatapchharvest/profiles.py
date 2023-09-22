@@ -17,6 +17,7 @@ log = logging.getLogger(__name__)
 valid_frequencies = dh.get_frequency_values()
 valid_licenses = dh.get_license_values()
 eu_theme_mapping = dh.get_theme_mapping()
+valid_formats = dh.get_format_values()
 
 DCT = dh.DCT
 DCAT = Namespace("http://www.w3.org/ns/dcat#")
@@ -398,7 +399,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
         log.debug("Parsing dataset '%r'" % dataset_ref)
-
+        
         dataset_dict['temporals'] = []
         dataset_dict['tags'] = []
         dataset_dict['extras'] = []
@@ -889,12 +890,15 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             # Format
             if resource_dict.get('format'):
-                g.add((
-                    distribution,
-                    DCT['format'],
-                    Literal(resource_dict['format'])
-                ))
-
+                for key, value in valid_formats.items():
+                    if resource_dict.get('format') == key:
+                        format_uri = value
+                        g.add((
+                            distribution,
+                            URIRef(format_uri),
+                            value
+                        ))
+                        
             # Mime-Type
             if resource_dict.get('mimetype'):
                 g.add((
