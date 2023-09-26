@@ -4,7 +4,6 @@ from urlparse import urlparse
 from ckantoolkit import config
 from rdflib import URIRef, Graph
 from rdflib.namespace import Namespace, RDF, SKOS
-import rdflib
 
 import logging
 log = logging.getLogger(__name__)
@@ -230,7 +229,7 @@ def get_pagination(catalog_graph):
 
 
 def get_format_values():
-    g = rdflib.Graph()
+    g = Graph()
     for prefix, namespace in format_namespaces.items():
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'formats.xml')
