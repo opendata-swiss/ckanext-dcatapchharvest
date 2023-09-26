@@ -21,6 +21,10 @@ frequency_namespaces = {
   "dct": DCT,
 }
 
+format_namespaces = {
+  "skos": SKOS,
+  "rdf": RDF,
+}
 
 license_namespaces = {
   "skos": SKOS,
@@ -222,3 +226,16 @@ def get_pagination(catalog_graph):
             for obj in catalog_graph.objects(pagination_node, ref):
                 pagination[key] = unicode(obj)
     return pagination
+
+
+def get_format_values():
+    g = Graph()
+    for prefix, namespace in format_namespaces.items():
+        g.bind(prefix, namespace)
+    file = os.path.join(__location__, 'formats.xml')
+    g.parse(file, format='xml')
+    format_values = {}
+    for format_uri_ref in g.subjects():
+        format_extension = format_uri_ref.split('/')[-1]
+        format_values[format_extension] = format_uri_ref
+    return format_values
