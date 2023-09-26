@@ -106,7 +106,8 @@
         "https://example.com/documentation-resource-2"
       ],
       "rights": "Creative Commons CC Zero License (cc-zero)",
-      "license": "NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired"
+      "license": "NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired",
+      "format": "CSV"
     },
     {
       "id": "28e75e40-e1a1-497b-a1b9-8c1834d60201",
@@ -116,7 +117,8 @@
         "https://example.com/documentation-resource-2"
       ],
       "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by",
-      "license": "NonCommercialAllowed-CommercialAllowed-ReferenceRequired"
+      "license": "NonCommercialAllowed-CommercialAllowed-ReferenceRequired",
+      "format": "HTML"
     },
     {
       "id": "0cfce6ba-28f4-4229-b733-f6492c650395",
@@ -126,7 +128,8 @@
         "https://example.com/documentation-resource-2"
       ],
       "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask",
-      "license": "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0"
+      "license": "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0",
+      "format": "JSON"
     }
   ],
   "extras": [

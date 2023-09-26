@@ -228,6 +228,7 @@ def get_pagination(catalog_graph):
                 pagination[key] = unicode(obj)
     return pagination
 
+
 def get_format_values():
     g = rdflib.Graph()
     for prefix, namespace in format_namespaces.items():
