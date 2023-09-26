@@ -889,12 +889,24 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             # Format
             if resource_dict.get('format'):
+<<<<<<< Updated upstream
                 g.add((
                     distribution,
                     DCT['format'],
                     Literal(resource_dict['format'])
                 ))
 
+=======
+                for key, value in valid_formats.items():
+                    if resource_dict.get('format') == key:
+                        format_uri = URIRef(value)
+                        g.add((
+                            distribution,
+                            DCT['format'],
+                            format_uri
+                        ))
+                        
+>>>>>>> Stashed changes
             # Mime-Type
             if resource_dict.get('mimetype'):
                 g.add((
