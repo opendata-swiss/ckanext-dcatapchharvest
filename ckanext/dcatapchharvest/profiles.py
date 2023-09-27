@@ -531,8 +531,10 @@ class SwissDCATAPProfile(MultiLangProfile):
             license = self._license_rights_name(distribution, DCT.license)
             if rights is None and license is not None:
                 resource_dict['license'] = license
+                resource_dict['rights'] = license
             if rights is not None and license is None:
                 resource_dict['license'] = rights
+                resource_dict['rights'] = rights
             if license is not None and rights is not None:
                 resource_dict['license'] = license
                 resource_dict['rights'] = rights
