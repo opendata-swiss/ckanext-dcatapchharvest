@@ -18,6 +18,7 @@ valid_frequencies = dh.get_frequency_values()
 valid_licenses = dh.get_license_values()
 eu_theme_mapping = dh.get_theme_mapping()
 valid_formats = dh.get_format_values()
+valid_media_types = dh.get_iana_media_type_values()
 
 
 DCT = dh.DCT
@@ -904,6 +905,16 @@ class SwissDCATAPProfile(MultiLangProfile):
                             distribution,
                             DCT['format'],
                             format_uri
+                        ))
+
+             # Media Type
+            if resource_dict.get('media_type'):
+                for key, value in valid_media_types.items():
+                    if resource_dict.get('media_type') == key:
+                        g.add((
+                            distribution,
+                            DCT['media_type'],
+                            value
                         ))
 
             # Mime-Type

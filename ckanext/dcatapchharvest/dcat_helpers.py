@@ -1,5 +1,6 @@
 import iribaker
 import json
+import csv
 import os
 from urlparse import urlparse
 from ckantoolkit import config
@@ -248,3 +249,15 @@ def get_publisher_dict_from_dataset(publisher):
     if not isinstance(publisher, dict):
         publisher = json.loads(publisher)
     return publisher.get('url'), publisher.get('name')
+
+
+def get_iana_media_type_values():
+    media_type_values = {}
+    csv_file = os.path.join(__location__, 'iana_media_types.csv')
+    with open(csv_file, 'r') as file:
+        csv_reader = csv.DictReader(file)
+        for row in csv_reader:
+            key = row['Name']
+            value = row['Template']
+            media_type_values[key] = value
+        return media_type_values
