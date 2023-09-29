@@ -910,14 +910,14 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             # Set Media Type value if format does not match
             if format_uri is None and resource_dict.get('media_type'):
-                    for key, value in valid_media_types.items():
-                        if resource_dict.get('media_type') == key:
-                            media_type_uri = URIRef(value)
-                            g.add((
-                                distribution,
-                                DCT['format'],
-                                media_type_uri
-                            ))
+                for key, value in valid_media_types.items():
+                    if resource_dict.get('media_type') == key:
+                        media_type_uri = URIRef(value)
+                        g.add((
+                            distribution,
+                            DCT['format'],
+                            media_type_uri
+                        ))
 
             # Mime-Type
             if resource_dict.get('mimetype'):
