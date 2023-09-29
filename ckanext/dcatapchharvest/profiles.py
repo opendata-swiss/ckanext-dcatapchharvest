@@ -897,6 +897,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((distribution, FOAF.page, doc))
 
             # Format
+            format_uri = None
             if resource_dict.get('format'):
                 for key, value in valid_formats.items():
                     if resource_dict.get('format') == key:
@@ -908,7 +909,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                         ))
 
             # Set Media Type value if format does not match
-            if not format_uri and resource_dict.get('media_type'):
+            if format_uri is None and resource_dict.get('media_type'):
                     for key, value in valid_media_types.items():
                         if resource_dict.get('media_type') == key:
                             media_type_uri = URIRef(value)

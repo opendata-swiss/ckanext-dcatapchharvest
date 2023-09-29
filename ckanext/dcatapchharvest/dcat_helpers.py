@@ -261,6 +261,10 @@ def get_iana_media_type_values():
     records = root.findall('.//ns:record', media_types_namespaces)
     media_type_values = {}
     for record in records:
+        if record.find('ns:file', media_types_namespaces) is None:
+            continue
+        if record.find('ns:name', media_types_namespaces) is None:
+            continue
         name = record.find('ns:name', media_types_namespaces).text
         file_value = record.find('ns:file', media_types_namespaces).text
         media_type_values[name] = media_types_namespaces['ns']+'/'+file_value
