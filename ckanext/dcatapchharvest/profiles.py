@@ -722,7 +722,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         if dataset_dict.get('see_alsos'):
             references = dataset_dict.get('see_alsos')
             for reference in references:
-                # we only excpect dicts here
+                # we only expect dicts here
                 if not isinstance(reference, dict):
                     continue
                 reference_identifier = reference.get('dataset_identifier')
@@ -732,6 +732,32 @@ class SwissDCATAPProfile(MultiLangProfile):
                         RDFS.seeAlso,
                         Literal(reference_identifier)
                     ))
+
+        if dataset_dict.get("qualified_relations"):
+            for reference in dataset_dict["qualified_relations"]:
+                if not reference.get("relation"):
+                    continue
+
+                qualified_relation = BNode()
+                g.add((qualified_relation, RDF.type, DCAT.Relationship))
+                g.add((
+                    qualified_relation,
+                    DCT.relation,
+                    URIRef(reference["relation"])
+                ))
+
+                if reference.get("role"):
+                    g.add((
+                        qualified_relation,
+                        DCAT.hadRole,
+                        URIRef(reference["role"])
+                    ))
+
+                g.add((
+                    dataset_ref,
+                    DCAT.qualifiedRelation,
+                    qualified_relation
+                ))
 
         # Contact details
         if dataset_dict.get('contact_points'):
