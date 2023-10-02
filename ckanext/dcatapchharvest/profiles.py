@@ -163,6 +163,12 @@ class SwissDCATAPProfile(MultiLangProfile):
             return unicode(o), None
         return None, None
 
+    def _get_publisher_url_from_identifier(self, identifier):
+        identifier_split = identifier.split('@')
+        if len(identifier_split) > 1:
+            return ORGANIZATION_BASE_URL + identifier_split[1]
+        return ''
+
     def _publisher(self, subject, predicate, identifier):
         """
         Returns a dict with details about a dct:publisher entity, a foaf:Agent
@@ -199,7 +205,9 @@ class SwissDCATAPProfile(MultiLangProfile):
                 publisher['name'] = ''
 
         if not publisher.get('url'):
-            publisher['url'] = _get_publisher_url_from_identifier(identifier)
+            publisher['url'] = self._get_publisher_url_from_identifier(
+                identifier
+            )
         return json.dumps(publisher)
 
     def _relations(self, subject, predicate):
@@ -945,7 +953,7 @@ class SwissDCATAPProfile(MultiLangProfile):
     def _publisher_to_graph(self, dataset_ref, dataset_dict):
         g = self.g
         publisher_uri, publisher_name = \
-            _get_publisher_dict_from_dataset(
+            dh.get_publisher_dict_from_dataset(
                 dataset_dict.get('publisher')
             )
         if publisher_uri:
@@ -989,7 +997,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             dataset_dict.get('organization'),
         ]):
             publisher_uri, publisher_name = \
-                _get_publisher_dict_from_dataset(
+                dh.get_publisher_dict_from_dataset(
                     dataset_dict.get('publisher')
                 )
             if publisher_uri:
@@ -1201,18 +1209,3 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
     def parse_dataset(self, dataset_dict, dataset_ref):
         super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,
                                                          dataset_ref)
-
-
-def _get_publisher_url_from_identifier(identifier):
-    identifier_split = identifier.split('@')
-    if len(identifier_split) > 1:
-        return ORGANIZATION_BASE_URL + identifier_split[1]
-    return ''
-
-
-def _get_publisher_dict_from_dataset(publisher):
-    if not publisher:
-        return None, None
-    if not isinstance(publisher, dict):
-        publisher = json.loads(publisher)
-    return publisher.get('url'), publisher.get('name')
