@@ -163,7 +163,13 @@ class SwissDCATAPProfile(MultiLangProfile):
             return unicode(o), None
         return None, None
 
-    def _publisher(self, subject, predicate, identifier):
+    def _get_publisher_url_from_identifier(self, identifier):
+        identifier_split = identifier.split('@')
+        if len(identifier_split) > 1:
+            return ORGANIZATION_BASE_URL + identifier_split[1]
+        return ''
+
+    def _publisher(self, subject, identifier):
         """
         Returns a dict with details about a dct:publisher entity, a foaf:Agent
 
@@ -186,7 +192,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         an empty string if they could not be found
         """
         publisher = {}
-        for agent in self.g.objects(subject, predicate):
+        for agent in self.g.objects(subject, DCT.publisher):
             publisher['url'] = (str(agent) if isinstance(agent,
                                 URIRef) else '')
             publisher_name = self._object_value(agent, FOAF.name)
@@ -199,14 +205,16 @@ class SwissDCATAPProfile(MultiLangProfile):
                 publisher['name'] = ''
 
         if not publisher.get('url'):
-            publisher['url'] = _get_publisher_url_from_identifier(identifier)
+            publisher['url'] = self._get_publisher_url_from_identifier(
+                identifier
+            )
         return json.dumps(publisher)
 
-    def _relations(self, subject, predicate):
+    def _relations(self, subject):
 
         relations = []
 
-        for relation_node in self.g.objects(subject, predicate):
+        for relation_node in self.g.objects(subject, DCT.relation):
             relation = {
                 'label': self._object_value(relation_node, RDFS.label),
                 'url': relation_node
@@ -234,24 +242,24 @@ class SwissDCATAPProfile(MultiLangProfile):
                 return node
         return None
 
-    def _keywords(self, subject, predicate):
+    def _keywords(self, subject):
         keywords = {}
         # initialize the keywords with empty lists for all languages
         for lang in dh.get_langs():
             keywords[lang] = []
 
-        for keyword_node in self.g.objects(subject, predicate):
+        for keyword_node in self.g.objects(subject, DCAT.keyword):
             lang = keyword_node.language
             keyword = munge_tag(unicode(keyword_node))
             keywords.setdefault(lang, []).append(keyword)
 
         return keywords
 
-    def _contact_points(self, subject, predicate):
+    def _contact_points(self, subject):
 
         contact_points = []
 
-        for contact_node in self.g.objects(subject, predicate):
+        for contact_node in self.g.objects(subject, DCAT.contactPoint):
             email = self._object_value(contact_node, VCARD.hasEmail)
             if email:
                 email_clean = email.replace(EMAIL_MAILTO_PREFIX, '')
@@ -266,11 +274,11 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return contact_points
 
-    def _temporals(self, subject, predicate):
+    def _temporals(self, subject):
 
         temporals = []
 
-        for temporal_node in self.g.objects(subject, predicate):
+        for temporal_node in self.g.objects(subject, DCT.temporal):
             # Currently specified properties in DCAT-AP.
             start_date, start_date_type = self._object_value_and_datatype(
                 temporal_node, DCAT.startDate)
@@ -383,8 +391,8 @@ class SwissDCATAPProfile(MultiLangProfile):
         except ValueError:
             return None
 
-    def _get_eu_accrual_periodicity(self, subject, predicate):
-        ogdch_value = self._object_value(subject, predicate)
+    def _get_eu_accrual_periodicity(self, subject):
+        ogdch_value = self._object_value(subject, DCT.accrualPeriodicity)
         ogdch_value = URIRef(ogdch_value)
         for key, value in valid_frequencies.items():
             if ogdch_value == value:
@@ -420,11 +428,9 @@ class SwissDCATAPProfile(MultiLangProfile):
                 dataset_dict[key] = value
 
         # Accrual periodicity
-        for key, predicate in (
-                ('accrual_periodicity', DCT.accrualPeriodicity),
-        ):
-            value = self._get_eu_accrual_periodicity(dataset_ref, predicate)
-            dataset_dict[key] = value
+        dataset_dict['accrual_periodicity'] = self._get_eu_accrual_periodicity(
+            dataset_ref
+        )
 
         # Timestamp fields
         for key, predicate in (
@@ -453,7 +459,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             dataset_dict['tags'].append({'name': munge_tag(unicode(keyword))})
 
         # Keywords
-        dataset_dict['keywords'] = self._keywords(dataset_ref, DCAT.keyword)
+        dataset_dict['keywords'] = self._keywords(dataset_ref)
 
         # Themes
         dcat_theme_urls = self._object_value_list(dataset_ref, DCAT.theme)
@@ -472,24 +478,22 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Contact details
         dataset_dict['contact_points'] = self._contact_points(
             dataset_ref,
-            DCAT.contactPoint
         )
 
         # Publisher
         dataset_dict['publisher'] = self._publisher(
             dataset_ref,
-            DCT.publisher,
             dataset_dict.get('identifier', '')
         )
 
         # Relations
-        dataset_dict['relations'] = self._relations(dataset_ref, DCT.relation)
+        dataset_dict['relations'] = self._relations(dataset_ref)
         for relation in dataset_dict['relations']:
             if relation['label'] == {}:
                 relation['label'] = str(relation.get('url', ''))
 
         # Temporal
-        dataset_dict['temporals'] = self._temporals(dataset_ref, DCT.temporal)
+        dataset_dict['temporals'] = self._temporals(dataset_ref)
 
         # References
         see_alsos = self._object_value_list(dataset_ref, RDFS.seeAlso)
@@ -945,7 +949,7 @@ class SwissDCATAPProfile(MultiLangProfile):
     def _publisher_to_graph(self, dataset_ref, dataset_dict):
         g = self.g
         publisher_uri, publisher_name = \
-            _get_publisher_dict_from_dataset(
+            dh.get_publisher_dict_from_dataset(
                 dataset_dict.get('publisher')
             )
         if publisher_uri:
@@ -989,7 +993,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             dataset_dict.get('organization'),
         ]):
             publisher_uri, publisher_name = \
-                _get_publisher_dict_from_dataset(
+                dh.get_publisher_dict_from_dataset(
                     dataset_dict.get('publisher')
                 )
             if publisher_uri:
@@ -1201,18 +1205,3 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
     def parse_dataset(self, dataset_dict, dataset_ref):
         super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,
                                                          dataset_ref)
-
-
-def _get_publisher_url_from_identifier(identifier):
-    identifier_split = identifier.split('@')
-    if len(identifier_split) > 1:
-        return ORGANIZATION_BASE_URL + identifier_split[1]
-    return ''
-
-
-def _get_publisher_dict_from_dataset(publisher):
-    if not publisher:
-        return None, None
-    if not isinstance(publisher, dict):
-        publisher = json.loads(publisher)
-    return publisher.get('url'), publisher.get('name')

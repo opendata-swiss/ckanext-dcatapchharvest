@@ -1,4 +1,5 @@
 import iribaker
+import json
 import os
 from urlparse import urlparse
 from ckantoolkit import config
@@ -239,3 +240,11 @@ def get_format_values():
         format_extension = format_uri_ref.split('/')[-1]
         format_values[format_extension] = format_uri_ref
     return format_values
+
+
+def get_publisher_dict_from_dataset(publisher):
+    if not publisher:
+        return None, None
+    if not isinstance(publisher, dict):
+        publisher = json.loads(publisher)
+    return publisher.get('url'), publisher.get('name')
