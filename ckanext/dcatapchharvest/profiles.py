@@ -800,7 +800,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('status', ADMS.status, None, Literal),
                 ('coverage', DCT.coverage, None, Literal),
                 ('identifier', DCT.identifier, None, Literal),
-                ('media_type', DCAT.mediaType, None, Literal),
                 ('spatial', DCT.spatial, None, Literal),
             ]
 
@@ -896,7 +895,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((doc, RDF.type, FOAF.Document))
                 g.add((distribution, FOAF.page, doc))
 
-            # Format
+            # Format and Media Type Case 1:
+            # Format: Set Format value if format matches EU vocabulary
             format_uri = None
             if resource_dict.get('format'):
                 for key, value in valid_formats.items():
@@ -907,8 +907,20 @@ class SwissDCATAPProfile(MultiLangProfile):
                             DCT['format'],
                             format_uri
                         ))
+            # Media Type: Set Format value if format matches EU vocabulary
+            # and media type is not set
+            if format_uri and resource_dict.get('media_type') is None:
+                g.add((
+                    distribution,
+                    DCT['media_type'],
+                    format_uri
+                ))
 
-            # Set Media Type value if format does not match
+            # Format and Media Type Case 2:
+            # Set Media Type and Formar value
+            # if format does not match eu vocabulary
+            # but media type matches iana vocabulary
+            media_type_uri = None
             if format_uri is None and resource_dict.get('media_type'):
                 for key, value in valid_media_types.items():
                     if resource_dict.get('media_type') == key:
@@ -918,6 +930,31 @@ class SwissDCATAPProfile(MultiLangProfile):
                             DCT['format'],
                             media_type_uri
                         ))
+                        g.add((
+                            distribution,
+                            DCT['media_type'],
+                            media_type_uri
+                        ))
+
+            # Format and Media Type Case 3:
+            # Set Media Type and Format value
+            # if format does not match eu vocabulary
+            # but format matches iana vocabulary
+            if format_uri is None and media_type_uri is None:
+                if resource_dict.get('format'):
+                    for key, value in valid_media_types.items():
+                        if resource_dict.get('format') == key:
+                            media_type_uri_by_format = URIRef(value)
+                            g.add((
+                                distribution,
+                                DCT['format'],
+                                media_type_uri_by_format
+                            ))
+                            g.add((
+                                distribution,
+                                DCT['media_type'],
+                                media_type_uri_by_format
+                            ))
 
             # Mime-Type
             if resource_dict.get('mimetype'):
