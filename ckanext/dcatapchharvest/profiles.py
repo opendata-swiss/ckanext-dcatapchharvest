@@ -919,68 +919,45 @@ class SwissDCATAPProfile(MultiLangProfile):
                         (distribution, DCT.license, resource_license_ref)
                         )
 
-    def _format_and_media_type_to_graph(self, resource_dict, distribution): # noqa
+    def _format_and_media_type_to_graph(self, resource_dict, distribution):
         g = self.g
         # Format and Media Type Case 1:
         # Format: Set Format value if format matches EU vocabulary
         format_uri = None
         if resource_dict.get('format'):
-            for key, value in valid_formats.items():
-                if resource_dict.get('format') == key:
-                    format_uri = URIRef(value)
-                    g.add((
-                        distribution,
-                        DCT['format'],
-                        format_uri
-                    ))
-        # Media Type: Set Format value if format matches EU vocabulary
-        # and media type is not set
+            format = resource_dict.get('format')
+            if format in valid_formats:
+                format_uri = URIRef(valid_formats[format])
+                g.add((distribution, DCT['format'], format_uri))
+
+        # Media Type: Set Format value
+        # if format matches EU vocabulary and media type is not set
         if format_uri and resource_dict.get('media_type') is None:
-            g.add((
-                distribution,
-                DCAT.mediaType,
-                format_uri
-            ))
+            g.add((distribution, DCAT.mediaType, format_uri))
 
         # Format and Media Type Case 2:
-        # Set Media Type and Formar value
-        # if format does not match eu vocabulary
-        # but media type matches iana vocabulary
+        # Set Media Type and Format value
+        # if format does not match EU vocabulary
+        # but media type matches IANA vocabulary
         media_type_uri = None
-        if format_uri is None and resource_dict.get('media_type'):
-            for key, value in valid_media_types.items():
-                if resource_dict.get('media_type') == key:
-                    media_type_uri = URIRef(value)
-                    g.add((
-                        distribution,
-                        DCT['format'],
-                        media_type_uri
-                    ))
-                    g.add((
-                        distribution,
-                        DCAT.mediaType,
-                        media_type_uri
-                    ))
+        format_uri = None
+        if resource_dict.get('media_type'):
+            media_type = resource_dict.get('media_type')
+            if media_type in valid_media_types:
+                media_type_uri = URIRef(valid_media_types[media_type])
+                g.add((distribution, DCT['format'], media_type_uri))
+                g.add((distribution, DCAT.mediaType, media_type_uri))
 
         # Format and Media Type Case 3:
         # Set Media Type and Format value
-        # if format does not match eu vocabulary
-        # but format matches iana vocabulary
-        if format_uri is None and media_type_uri is None:
-            if resource_dict.get('format'):
-                for key, value in valid_media_types.items():
-                    if resource_dict.get('format') == key:
-                        media_type_uri_by_format = URIRef(value)
-                        g.add((
-                            distribution,
-                            DCT['format'],
-                            media_type_uri_by_format
-                        ))
-                        g.add((
-                            distribution,
-                            DCAT.mediaType,
-                            media_type_uri_by_format
-                        ))
+        # if format does not match EU vocabulary
+        # but format matches IANA vocabulary
+        if media_type_uri is None and resource_dict.get('format'):
+            format = resource_dict.get('format')
+            if format in valid_media_types:
+                media_type_uri = URIRef(valid_media_types[format])
+                g.add((distribution, DCT['format'], media_type_uri))
+                g.add((distribution, DCAT.mediaType, media_type_uri))
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
         g = self.g
