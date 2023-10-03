@@ -129,7 +129,7 @@
       ],
       "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask",
       "license": "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0",
-      "format": "JSON"
+      "media_type": "1d-interleaved-parityfec"
     }
   ],
   "extras": [

@@ -5,8 +5,9 @@ from urlparse import urlparse
 from ckantoolkit import config
 from rdflib import URIRef, Graph
 from rdflib.namespace import Namespace, RDF, SKOS
-
+import xml.etree.ElementTree as ET
 import logging
+
 log = logging.getLogger(__name__)
 
 DCT = Namespace("http://purl.org/dc/terms/")
@@ -27,6 +28,10 @@ format_namespaces = {
   "rdf": RDF,
 }
 
+media_types_namespaces = {
+    'ns': 'http://www.iana.org/assignments'
+}
+
 license_namespaces = {
   "skos": SKOS,
   "dct": DCT,
@@ -34,7 +39,6 @@ license_namespaces = {
   "rdf": RDF,
   "rdfs": RDFS,
 }
-
 
 theme_namespaces = {
     "euthemes": EUTHEMES,
@@ -248,3 +252,20 @@ def get_publisher_dict_from_dataset(publisher):
     if not isinstance(publisher, dict):
         publisher = json.loads(publisher)
     return publisher.get('url'), publisher.get('name')
+
+
+def get_iana_media_type_values():
+    file = os.path.join(__location__, 'iana_media_types.xml')
+    tree = ET.parse(file)
+    root = tree.getroot()
+    records = root.findall('.//ns:record', media_types_namespaces)
+    media_type_values = {}
+    for record in records:
+        if record.find('ns:file', media_types_namespaces) is None:
+            continue
+        if record.find('ns:name', media_types_namespaces) is None:
+            continue
+        name = record.find('ns:name', media_types_namespaces).text
+        file_value = record.find('ns:file', media_types_namespaces).text
+        media_type_values[name] = media_types_namespaces['ns']+'/'+file_value
+    return media_type_values

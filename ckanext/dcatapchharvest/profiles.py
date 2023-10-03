@@ -18,6 +18,7 @@ valid_frequencies = dh.get_frequency_values()
 valid_licenses = dh.get_license_values()
 eu_theme_mapping = dh.get_theme_mapping()
 valid_formats = dh.get_format_values()
+valid_media_types = dh.get_iana_media_type_values()
 
 
 DCT = dh.DCT
@@ -799,57 +800,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('status', ADMS.status, None, Literal),
                 ('coverage', DCT.coverage, None, Literal),
                 ('identifier', DCT.identifier, None, Literal),
-                ('media_type', DCAT.mediaType, None, Literal),
                 ('spatial', DCT.spatial, None, Literal),
             ]
 
-            if resource_dict.get('rights'):
-                rights_uri = dh.get_license_uri_by_name(
-                    resource_dict.get('rights')
-                )
-                if rights_uri is not None:
-                    rights_ref = URIRef(rights_uri)
-                    g.add((rights_ref, RDF.type, DCT.RightsStatement))
-                    g.add((distribution, DCT.rights, rights_ref))
-                if rights_uri is None:
-                    rights_name = dh.get_license_name_by_uri(
-                        resource_dict.get('rights')
-                        )
-                    if rights_name is not None:
-                        resource_rights_ref = URIRef(
-                            resource_dict.get('rights')
-                            )
-                        g.add((
-                            resource_rights_ref,
-                            RDF.type,
-                            DCT.RightsStatement)
-                            )
-                        g.add((distribution, DCT.rights, resource_rights_ref))
-
-            if resource_dict.get('license'):
-                license_uri = dh.get_license_uri_by_name(
-                    resource_dict.get('license')
-                )
-                if license_uri is not None:
-                    license_ref = URIRef(license_uri)
-                    g.add((license_ref, RDF.type, DCT.LicenseDocument))
-                    g.add((distribution, DCT.license, license_ref))
-                if license_uri is None:
-                    license_name = dh.get_license_name_by_uri(
-                        resource_dict.get('license')
-                        )
-                    if license_name is not None:
-                        resource_license_ref = URIRef(
-                            resource_dict.get('license')
-                            )
-                        g.add((
-                            resource_license_ref,
-                            RDF.type,
-                            DCT.LicenseDocument)
-                            )
-                        g.add(
-                            (distribution, DCT.license, resource_license_ref)
-                            )
+            self._rights_and_license_to_graph(resource_dict, distribution)
+            self._format_and_media_type_to_graph(resource_dict, distribution)
 
             self._add_triples_from_dict(resource_dict, distribution, items)
             self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
@@ -895,17 +850,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((doc, RDF.type, FOAF.Document))
                 g.add((distribution, FOAF.page, doc))
 
-            # Format
-            if resource_dict.get('format'):
-                for key, value in valid_formats.items():
-                    if resource_dict.get('format') == key:
-                        format_uri = URIRef(value)
-                        g.add((
-                            distribution,
-                            DCT['format'],
-                            format_uri
-                        ))
-
             # Mime-Type
             if resource_dict.get('mimetype'):
                 g.add((
@@ -920,13 +864,100 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('modified', DCT.modified, None, Literal),
             ]
 
-            self._add_date_triples_from_dict(resource_dict, distribution,
-                                             items)
-
             # ByteSize
             if resource_dict.get('byte_size'):
                 g.add((distribution, DCAT.byteSize,
                        Literal(resource_dict['byte_size'])))
+
+    def _rights_and_license_to_graph(self, resource_dict, distribution):
+        g = self.g
+        if resource_dict.get('rights'):
+            rights_uri = dh.get_license_uri_by_name(
+                resource_dict.get('rights')
+            )
+            if rights_uri is not None:
+                rights_ref = URIRef(rights_uri)
+                g.add((rights_ref, RDF.type, DCT.RightsStatement))
+                g.add((distribution, DCT.rights, rights_ref))
+            if rights_uri is None:
+                rights_name = dh.get_license_name_by_uri(
+                    resource_dict.get('rights')
+                    )
+                if rights_name is not None:
+                    resource_rights_ref = URIRef(
+                        resource_dict.get('rights')
+                        )
+                    g.add((
+                        resource_rights_ref,
+                        RDF.type,
+                        DCT.RightsStatement)
+                        )
+                    g.add((distribution, DCT.rights, resource_rights_ref))
+
+        if resource_dict.get('license'):
+            license_uri = dh.get_license_uri_by_name(
+                resource_dict.get('license')
+            )
+            if license_uri is not None:
+                license_ref = URIRef(license_uri)
+                g.add((license_ref, RDF.type, DCT.LicenseDocument))
+                g.add((distribution, DCT.license, license_ref))
+            if license_uri is None:
+                license_name = dh.get_license_name_by_uri(
+                    resource_dict.get('license')
+                    )
+                if license_name is not None:
+                    resource_license_ref = URIRef(
+                        resource_dict.get('license')
+                        )
+                    g.add((
+                        resource_license_ref,
+                        RDF.type,
+                        DCT.LicenseDocument)
+                        )
+                    g.add(
+                        (distribution, DCT.license, resource_license_ref)
+                        )
+
+    def _format_and_media_type_to_graph(self, resource_dict, distribution):
+        g = self.g
+        # Format and Media Type Case 1:
+        # Format: Set Format value if format matches EU vocabulary
+        format_uri = None
+        if resource_dict.get('format'):
+            format = resource_dict.get('format')
+            if format in valid_formats:
+                format_uri = URIRef(valid_formats[format])
+                g.add((distribution, DCT['format'], format_uri))
+
+        # Media Type: Set Format value
+        # if format matches EU vocabulary and media type is not set
+        if format_uri and resource_dict.get('media_type') is None:
+            g.add((distribution, DCAT.mediaType, format_uri))
+
+        # Format and Media Type Case 2:
+        # Set Media Type and Format value
+        # if format does not match EU vocabulary
+        # but media type matches IANA vocabulary
+        media_type_uri = None
+        format_uri = None
+        if resource_dict.get('media_type'):
+            media_type = resource_dict.get('media_type')
+            if media_type in valid_media_types:
+                media_type_uri = URIRef(valid_media_types[media_type])
+                g.add((distribution, DCT['format'], media_type_uri))
+                g.add((distribution, DCAT.mediaType, media_type_uri))
+
+        # Format and Media Type Case 3:
+        # Set Media Type and Format value
+        # if format does not match EU vocabulary
+        # but format matches IANA vocabulary
+        if media_type_uri is None and resource_dict.get('format'):
+            format = resource_dict.get('format')
+            if format in valid_media_types:
+                media_type_uri = URIRef(valid_media_types[format])
+                g.add((distribution, DCT['format'], media_type_uri))
+                g.add((distribution, DCAT.mediaType, media_type_uri))
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
         g = self.g
