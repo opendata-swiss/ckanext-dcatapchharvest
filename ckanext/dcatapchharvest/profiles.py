@@ -224,6 +224,17 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return relations
 
+    def _qualified_relations(self, subject):
+        qualified_relations = []
+
+        for relation_node in self.g.objects(subject, DCAT.qualifiedRelation):
+            qualified_relations.append({
+                "relation": self._object_value(relation_node, DCT.relation),
+                "role": self._object_value(relation_node, DCAT.hadRole),
+            })
+
+        return qualified_relations
+
     def _license_rights_name(self, subject, predicate):
         for node in self.g.objects(subject, predicate):
             # DCAT-AP CH v1: the license as a literal (should be
@@ -416,6 +427,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         dataset_dict['resources'] = []
         dataset_dict['relations'] = []
         dataset_dict['see_alsos'] = []
+        dataset_dict['qualified_relations'] = []
 
         # Basic fields
         for key, predicate in (
@@ -500,6 +512,10 @@ class SwissDCATAPProfile(MultiLangProfile):
         see_alsos = self._object_value_list(dataset_ref, RDFS.seeAlso)
         for see_also in see_alsos:
             dataset_dict['see_alsos'].append({'dataset_identifier': see_also})
+
+        dataset_dict["qualified_relations"] = self._qualified_relations(
+            dataset_ref
+        )
 
         # Dataset URI
         dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
@@ -711,7 +727,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         if dataset_dict.get('see_alsos'):
             references = dataset_dict.get('see_alsos')
             for reference in references:
-                # we only excpect dicts here
+                # we only expect dicts here
                 if not isinstance(reference, dict):
                     continue
                 reference_identifier = reference.get('dataset_identifier')
@@ -721,6 +737,32 @@ class SwissDCATAPProfile(MultiLangProfile):
                         RDFS.seeAlso,
                         Literal(reference_identifier)
                     ))
+
+        if dataset_dict.get("qualified_relations"):
+            for reference in dataset_dict["qualified_relations"]:
+                if not reference.get("relation"):
+                    continue
+
+                qualified_relation = BNode()
+                g.add((qualified_relation, RDF.type, DCAT.Relationship))
+                g.add((
+                    qualified_relation,
+                    DCT.relation,
+                    URIRef(reference["relation"])
+                ))
+
+                if reference.get("role"):
+                    g.add((
+                        qualified_relation,
+                        DCAT.hadRole,
+                        URIRef(reference["role"])
+                    ))
+
+                g.add((
+                    dataset_ref,
+                    DCAT.qualifiedRelation,
+                    qualified_relation
+                ))
 
         # Contact details
         if dataset_dict.get('contact_points'):

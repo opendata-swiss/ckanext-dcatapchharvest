@@ -18,23 +18,23 @@ assert_true = nose.tools.assert_true
 class TestSwissDCATAPProfileParsing(BaseParseTest):
 
     def test_rights_license(self):
-            
+
             contents = self._get_file_contents('dataset-rights.xml')
             p = RDFParser(profiles=['swiss_dcat_ap'])
             p.parse(contents)
-    
+
             datasets = [d for d in p.datasets()]
-    
+
             # Dataset
             eq_(len(datasets), 1)
             dataset = datasets[0]
-            
+
              # Resources
             eq_(len(dataset['resources']), 1)
             resource = dataset['resources'][0]
             eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
             eq_(resource['license'], u'NonCommercialAllowed-CommercialWithPermission-ReferenceRequired')
-            
+
     def test_dataset_all_fields(self):
 
         contents = self._get_file_contents('1901.xml')
@@ -100,6 +100,23 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         # See alsos
         see_also = dataset['see_alsos'][0]
         eq_(see_also['dataset_identifier'], u'4682791@bundesamt-fur-statistik-bfs')
+
+        # Qualified relations
+        qualified_relations = sorted(dataset["qualified_relations"])
+        eq_(
+            qualified_relations[0],
+            {
+                "relation": "http://example.org/Original987",
+                "role": "http://www.iana.org/assignments/relation/original"
+            }
+        )
+        eq_(
+            qualified_relations[1],
+            {
+                "relation": "http://example.org/Related486",
+                "role": "http://www.iana.org/assignments/relation/related"
+            }
+        )
 
         #  Lists
         eq_(sorted(dataset['language']), [u'de', u'fr'])
