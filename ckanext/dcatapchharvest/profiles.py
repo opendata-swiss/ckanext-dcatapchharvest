@@ -967,7 +967,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Format: Set Format value if format matches EU vocabulary
         format_uri = None
         if resource_dict.get('format'):
-            format = resource_dict.get('format')
+            format = resource_dict.get('format').replace(' ', '_')
             if format in valid_formats:
                 format_uri = URIRef(valid_formats[format])
                 g.add((distribution, DCT['format'], format_uri))
