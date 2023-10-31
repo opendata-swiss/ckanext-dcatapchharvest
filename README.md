@@ -83,7 +83,7 @@ the CKAN config file, comma separated:
 
     ckanext.dcat_ch_rdf_harvester.test_env_urls = https://test.example.com,https://staging.example.com 
 
-The Swiss DCAT Harvester inherits all configuration options from the DCAT RDF harvester. 
+The Swiss DCAT Harvester inherits all configuration options from the [DCAT RDF harvester](https://github.com/ckan/ckanext-dcat#rdf-dcat-harvester). 
 It has the following additional configuration options:
 
 Exclude datasets from import: this will prevent the import of datasets with certain identifiers.
