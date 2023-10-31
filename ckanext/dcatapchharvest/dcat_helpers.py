@@ -1,7 +1,7 @@
 import iribaker
 import json
 import os
-from urlparse import urlparse
+from urllib.parse import urllib.parse
 from ckantoolkit import config
 from rdflib import URIRef, Graph
 from rdflib.namespace import Namespace, RDF, SKOS
@@ -60,7 +60,7 @@ def uri_to_iri(uri):
     if not uri:
         raise ValueError("Provided URI is empty or None")
 
-    result = urlparse(uri)
+    result = urllib.parse.urlparse(uri)
     if not result.scheme or not result.netloc or result.netloc == '-':
         raise ValueError("Provided URI does not have a valid schema or netloc")
 
