@@ -233,14 +233,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                 "had_role": self._object_value(relation_node, DCAT.hadRole),
             })
 
-        see_alsos = self._object_value_list(subject, RDFS.seeAlso)
-        for see_also in see_alsos:
-            permalink = dh.get_permalink(see_also)
-            qualified_relations.append({
-                "relation": permalink,
-                "had_role": "http://www.iana.org/assignments/relation/related"
-            })
-
         return qualified_relations
 
     def _license_rights_name(self, subject, predicate):
@@ -517,6 +509,10 @@ class SwissDCATAPProfile(MultiLangProfile):
         dataset_dict['temporals'] = self._temporals(dataset_ref)
 
         # References
+        see_alsos = self._object_value_list(dataset_ref, RDFS.seeAlso)
+        for see_also in see_alsos:
+            dataset_dict['see_alsos'].append({'dataset_identifier': see_also})
+
         dataset_dict["qualified_relations"] = self._qualified_relations(
             dataset_ref
         )
