@@ -230,7 +230,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         for relation_node in self.g.objects(subject, DCAT.qualifiedRelation):
             qualified_relations.append({
                 "relation": self._object_value(relation_node, DCT.relation),
-                "role": self._object_value(relation_node, DCAT.hadRole),
+                "had_role": self._object_value(relation_node, DCAT.hadRole),
             })
 
         return qualified_relations
@@ -751,11 +751,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                     URIRef(reference["relation"])
                 ))
 
-                if reference.get("role"):
+                if reference.get("had_role"):
                     g.add((
                         qualified_relation,
                         DCAT.hadRole,
-                        URIRef(reference["role"])
+                        URIRef(reference["had_role"])
                     ))
 
                 g.add((
