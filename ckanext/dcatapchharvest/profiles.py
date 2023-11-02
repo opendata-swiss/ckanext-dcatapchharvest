@@ -751,11 +751,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                     URIRef(reference["relation"])
                 ))
 
-                if reference.get("role"):
+                if reference.get("had_role"):
                     g.add((
                         qualified_relation,
                         DCAT.hadRole,
-                        URIRef(reference["role"])
+                        URIRef(reference["had_role"])
                     ))
 
                 g.add((
