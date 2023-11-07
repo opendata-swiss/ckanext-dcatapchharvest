@@ -897,6 +897,12 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((doc, RDF.type, FOAF.Document))
                 g.add((distribution, FOAF.page, doc))
 
+            # Access Services
+            access_services = resource_dict.get('access_services', [])
+            for uri in access_services:
+                ref = URIRef(uri)
+                g.add((distribution, DCAT.accessService, ref))
+
             # Mime-Type
             if resource_dict.get('mimetype'):
                 g.add((
