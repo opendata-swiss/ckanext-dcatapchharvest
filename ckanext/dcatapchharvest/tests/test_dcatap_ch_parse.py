@@ -158,8 +158,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(
             sorted(resource['access_services']),
             [
-                "https://example.com/my-great-data-service-1",
-                "https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700"
+                'https://example.com/my-great-data-service-1',
+                'https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700'
             ]
         )
 
