@@ -573,6 +573,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                 distribution, FOAF.page
             )
 
+            # Access services
+            resource_dict['access_services'] = self._object_value_list(
+                distribution, DCAT.accessService
+            )
+
             # Timestamp fields
             for key, predicate in (
                     ('issued', DCT.issued),
@@ -891,6 +896,12 @@ class SwissDCATAPProfile(MultiLangProfile):
                 doc = URIRef(link)
                 g.add((doc, RDF.type, FOAF.Document))
                 g.add((distribution, FOAF.page, doc))
+
+            # Access Services
+            access_services = resource_dict.get('access_services', [])
+            for uri in access_services:
+                ref = URIRef(uri)
+                g.add((distribution, DCAT.accessService, ref))
 
             # Mime-Type
             if resource_dict.get('mimetype'):

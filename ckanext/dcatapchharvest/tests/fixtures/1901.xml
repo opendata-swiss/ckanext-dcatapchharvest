@@ -27,6 +27,8 @@
         <foaf:page>
           <foaf:Document rdf:about="https://example.com/documentation-distribution-2"/>
         </foaf:page>
+        <dcat:accessService rdf:resource="https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700"/>
+        <dcat:accessService rdf:resource="https://example.com/my-great-data-service-1"/>
       </dcat:Distribution>
     </dcat:distribution>
     <dct:language>de</dct:language>
