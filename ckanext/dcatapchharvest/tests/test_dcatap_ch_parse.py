@@ -155,6 +155,13 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
             sorted(resource['documentation']),
             ['https://example.com/documentation-distribution-1', 'https://example.com/documentation-distribution-2']
         )
+        eq_(
+            sorted(resource['access_services']),
+            [
+                "https://example.com/my-great-data-service-1",
+                "https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700"
+            ]
+        )
 
         # Distribution URI
         eq_(resource['uri'], u'https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585/resource/c8ec6ca0-6923-4cf3-92f2-95a10e6f8e25')
