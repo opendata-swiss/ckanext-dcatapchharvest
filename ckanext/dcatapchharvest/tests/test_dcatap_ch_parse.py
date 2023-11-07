@@ -153,13 +153,16 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         # Lists
         eq_(
             sorted(resource['documentation']),
-            ['https://example.com/documentation-distribution-1', 'https://example.com/documentation-distribution-2']
+            [
+                u'https://example.com/documentation-distribution-1',
+                u'https://example.com/documentation-distribution-2'
+            ]
         )
         eq_(
             sorted(resource['access_services']),
             [
-                'https://example.com/my-great-data-service-1',
-                'https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700'
+                u'https://example.com/my-great-data-service-1',
+                u'https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700'
             ]
         )
 
