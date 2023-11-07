@@ -81,6 +81,10 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             for link in resource_dict.get("documentation", []):
                 assert self._triple(g, distribution, FOAF.page, URIRef(link))
 
+            eq_(len([t for t in g.triples((distribution, DCAT.accessService, None))]), 2)
+            for link in distribution.get("access_services", []):
+                assert self._triple(g, distribution, DCAT.accessService, URIRef(link))
+
             # e2c50e70-67ad-4f86-bb1b-3f93867eadaa
             if resource_dict.get('rights') == 'Creative Commons CC Zero License (cc-zero)':
                 assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.de/def/licenses/cc-zero"))
