@@ -526,6 +526,10 @@ class SwissDCATAPProfile(MultiLangProfile):
             dataset_ref, FOAF.page
         )
 
+        # Conformity
+        dataset_dict['conforms_to'] = self._object_value_list(
+            dataset_ref, FOAF.page
+        )
         # Resources
         for distribution in self._distributions(dataset_ref):
             resource_dict = {
