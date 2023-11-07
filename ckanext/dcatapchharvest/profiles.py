@@ -573,6 +573,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                 distribution, FOAF.page
             )
 
+            # Access services
+            resource_dict['access_services'] = self._object_value_list(
+                distribution, DCAT.accessService
+            )
+
             # Timestamp fields
             for key, predicate in (
                     ('issued', DCT.issued),
