@@ -63,6 +63,17 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
         for documentation_link in dataset['documentation']:
             assert self._triple(g, dataset_ref, FOAF.page, URIRef(documentation_link))
 
+        # Conformance
+        conforms_to = dataset.get("conforms_to", [])
+        # Check if the number of triples matches the number of conformance uris
+        eq_(
+            len(list(g.triples((dataset_ref, DCT.conformsTo, None)))),
+            len(conforms_to)
+        )
+        for link in conforms_to:
+            # Check if the triple (dataset_ref, DCT.conformsTo, URIRef(link)) exists in the graph
+            assert (dataset_ref, DCT.conformsTo, URIRef(link)) in g
+
         # List
         for item in [
             ('language', DCT.language, Literal),
