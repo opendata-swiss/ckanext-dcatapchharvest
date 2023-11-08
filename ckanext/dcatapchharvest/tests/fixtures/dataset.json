@@ -5,6 +5,10 @@
   "url": "http://example.com/ds1",
   "version": "1.0b",
   "issued": "2015-06-26T15:21:09.034694",
+  "conforms_to": [
+        "http://resource.geosciml.org/ontology/timescale/gts",
+        "https://inspire.ec.europa.eu/documents"
+      ],
   "keywords": {
     "fr": [],
     "de": [

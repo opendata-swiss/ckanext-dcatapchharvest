@@ -92,5 +92,7 @@
     <foaf:page>
       <foaf:Document rdf:about="https://example.com/documentation-dataset-2"/>
     </foaf:page>
+    <dct:conformsTo rdf:resource="http://resource.geosciml.org/ontology/timescale/gts"/>
+    <dct:conformsTo rdf:resource="https://inspire.ec.europa.eu/documents"/>
   </dcat:Dataset>
 </rdf:RDF>
