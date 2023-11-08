@@ -125,6 +125,10 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
             sorted(dataset['documentation']),
             ['https://example.com/documentation-dataset-1', 'https://example.com/documentation-dataset-2']
         )
+        eq_(
+            sorted(dataset['conforms_to']),
+            [u'http://resource.geosciml.org/ontology/timescale/gts', u'https://inspire.ec.europa.eu/documents']
+        )
 
         # Dataset URI
         eq_(extras['uri'], u'https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585')
