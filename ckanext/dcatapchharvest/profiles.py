@@ -821,7 +821,6 @@ class SwissDCATAPProfile(MultiLangProfile):
         conformance_uris = dataset_dict.get('conforms_to', [])
         for uri in conformance_uris:
             ref = URIRef(uri)
-            g.add((ref, RDF.type, DCT.conformsTo))
             g.add((dataset_ref, DCT.conformsTo, ref))
 
         # Themes
