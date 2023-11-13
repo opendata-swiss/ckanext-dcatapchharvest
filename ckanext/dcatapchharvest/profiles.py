@@ -584,12 +584,9 @@ class SwissDCATAPProfile(MultiLangProfile):
             )
 
             # Temporal resolution
-
-            temporal_resolution = self._object_value_list(
+            resource_dict['temporal_resolution'] = self._object_value(
                 distribution, DCAT.temporalResolution
             )
-            if temporal_resolution == XSD.duration:
-                resource_dict['temporal_resolution'] = temporal_resolution
 
             # Timestamp fields
             for key, predicate in (
@@ -922,6 +919,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             # Temporal Resolution
             if resource_dict.get('temporal_resolution'):
+                log.debug("export temporal_resolution : %s" % (resource_dict.get('temporal_resolution')))
                 g.add((
                     distribution,
                     DCAT.temporalResolution,
