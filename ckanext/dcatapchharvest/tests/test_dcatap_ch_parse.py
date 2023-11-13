@@ -151,6 +151,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['license'], u'Creative Commons CC Zero License (cc-zero)')
         eq_(resource['language'], [u'fr'])
         eq_(resource['issued'], u'1900-12-31T00:00:00')
+        eq_(resource['temporal_resolution'], u'P1D')
         eq_(resource['url'], u'https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901')
         assert 'download_url' not in resource, "download_url not available on resource"
 
