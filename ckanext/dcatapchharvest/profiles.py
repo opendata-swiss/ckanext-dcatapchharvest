@@ -919,7 +919,6 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             # Temporal Resolution
             if resource_dict.get('temporal_resolution'):
-                log.debug("export temporal_resolution : %s" % (resource_dict.get('temporal_resolution')))
                 g.add((
                     distribution,
                     DCAT.temporalResolution,
