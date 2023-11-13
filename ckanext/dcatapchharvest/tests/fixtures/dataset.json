@@ -135,6 +135,7 @@
         "https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700",
         "https://example.com/my-great-data-service-1"
       ],
+      "temporal_resolution":"P1D",
       "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask",
       "license": "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0",
       "media_type": "1d-interleaved-parityfec"
