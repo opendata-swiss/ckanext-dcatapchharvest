@@ -56,7 +56,6 @@
         <vcard:fn>info@bfs.admin.ch</vcard:fn>
       </vcard:Organization>
     </dcat:contactPoint>
-    </dcat:contactPoint>
     <dct:title xml:lang="de">Statistisches Jahrbuch der Schweiz 1901</dct:title>
     <dct:spatial>Schweiz</dct:spatial>
     <dcat:keyword xml:lang="rm">basas-statisticas-e-survistas</dcat:keyword>
