@@ -585,9 +585,9 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             # Temporal resolution
 
-            temporal_resolution = self._object_value_list(distribution, DCAT.temporalResolution)
-            log.debug("temporal_resolution : %s" % (temporal_resolution))
-            # Check if the value corresponds to XSD.duration
+            temporal_resolution = self._object_value_list(
+                distribution, DCAT.temporalResolution
+            )
             if temporal_resolution == XSD.duration:
                 resource_dict['temporal_resolution'] = temporal_resolution
 
@@ -925,7 +925,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((
                     distribution,
                     DCAT.temporalResolution,
-                    Literal(resource_dict['temporal_resolution'], datatype=XSD.duration)
+                    Literal(resource_dict['temporal_resolution'],
+                            datatype=XSD.duration)
                 ))
 
             # Mime-Type
