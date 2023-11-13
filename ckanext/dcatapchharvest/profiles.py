@@ -583,6 +583,14 @@ class SwissDCATAPProfile(MultiLangProfile):
                 distribution, DCAT.accessService
             )
 
+            # Temporal resolution
+
+            temporal_resolution = self._object_value_list(distribution, DCAT.temporalResolution)
+            log.debug("temporal_resolution : %s" % (temporal_resolution))
+            # Check if the value corresponds to XSD.duration
+            if temporal_resolution == XSD.duration:
+                resource_dict['temporal_resolution'] = temporal_resolution
+
             # Timestamp fields
             for key, predicate in (
                     ('issued', DCT.issued),
@@ -911,6 +919,14 @@ class SwissDCATAPProfile(MultiLangProfile):
             for uri in access_services:
                 ref = URIRef(uri)
                 g.add((distribution, DCAT.accessService, ref))
+
+            # Temporal Resolution
+            if resource_dict.get('temporal_resolution'):
+                g.add((
+                    distribution,
+                    DCAT.temporalResolution,
+                    Literal(resource_dict['temporal_resolution'], datatype=XSD.duration)
+                ))
 
             # Mime-Type
             if resource_dict.get('mimetype'):
