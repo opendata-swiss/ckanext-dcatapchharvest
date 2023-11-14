@@ -4,14 +4,13 @@ import logging
 
 import nose
 
-from rdflib import Literal
+from rdflib import URIRef, Literal, XSD
 from rdflib.namespace import RDF
 
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
 from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, XSD
 
-from rdflib import URIRef
 import ckanext.dcatapchharvest.dcat_helpers as dh
 
 from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
@@ -128,6 +127,10 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
             if resource_dict.get('format') == "1d-interleaved-parityfec":
                 assert self._triple(g, distribution, DCT['format'], URIRef("http://www.iana.org/assignments/video/1d-interleaved-parityfec"))
+
+            if resource_dict.get('temporal_resolution') == "P1D":
+                expected_literal = Literal("P1D", datatype=XSD.duration)
+                assert self._triple(g, distribution, DCAT.temporalResolution, expected_literal)
 
 
     def test_graph_from_dataset_uri(self):
