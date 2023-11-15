@@ -105,7 +105,7 @@ def _changes_in_date(existing_datetime, new_datetime):
                 "Datetime %s has no time zone info: assuming Europe/Zurich" %
                 existing_datetime
             )
-        new = dateutil_parse(existing_datetime)
+        new = dateutil_parse(new_datetime)
         if new.tzinfo is None:
             new = new.replace(tzinfo=DEFAULT_TIMEZONE)
             log.debug(
