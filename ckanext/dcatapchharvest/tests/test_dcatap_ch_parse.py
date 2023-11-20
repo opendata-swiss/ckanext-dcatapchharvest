@@ -120,7 +120,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         #  Lists
         eq_(sorted(dataset['language']), [u'de', u'fr'])
-        eq_(sorted(dataset['groups']), [{'name': u'statistical-basis'}])
+        eq_(sorted(dataset['groups']), [{'name': u'GOVE'}])
         eq_(
             sorted(dataset['documentation']),
             ['https://example.com/documentation-dataset-1', 'https://example.com/documentation-dataset-2']
