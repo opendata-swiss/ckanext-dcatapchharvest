@@ -436,14 +436,14 @@ class SwissDCATAPProfile(MultiLangProfile):
                     new_theme_url = dcat_theme_url.replace(
                         OGD_THEMES_URI, CHTHEMES_URI)
                     eu_theme_url = unicode(
-                        eu_theme_mapping[URIRef(new_theme_url)])
+                        eu_theme_mapping[URIRef(new_theme_url)][0])
 
                 # Case 2: We get a dcat-ap.ch theme (the same as the
                 #         opendata.swiss themes, but different base url). Get
                 #         the correct EU theme from the theme mapping.
                 elif dcat_theme_url.startswith(CHTHEMES_URI):
                     eu_theme_url = unicode(
-                        eu_theme_mapping[URIRef(dcat_theme_url)])
+                        eu_theme_mapping[URIRef(dcat_theme_url)][0])
 
                 # Case 3: We get an EU theme and don't need to look it up in
                 #         the mapping.
