@@ -424,7 +424,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         """
         groups = []
         dcat_theme_urls = self._object_value_list(subject, DCAT.theme)
-        log.warning(dcat_theme_urls)
+
         if dcat_theme_urls:
             for dcat_theme_url in dcat_theme_urls:
                 # Case 1: We get a deprecated opendata.swiss theme. Replace
@@ -450,7 +450,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                 eu_theme_slug = search_result.group()
                 groups.append({'name': eu_theme_slug})
 
-        log.warning(groups)
         return groups
 
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
