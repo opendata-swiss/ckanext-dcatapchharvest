@@ -34,8 +34,6 @@ OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SPDX = Namespace('http://spdx.org/rdf/terms#')
 XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
-CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
-CHTHEMES = Namespace(CHTHEMES_URI)
 ODRS = Namespace("http://schema.theodi.org/odrs#")
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
@@ -64,7 +62,9 @@ namespaces = {
     'odrs': ODRS,
 }
 
-ogd_theme_base_url = 'http://opendata.swiss/themes'
+OGD_THEMES_URI = 'http://opendata.swiss/themes/'
+CHTHEMES_URI = 'http://dcat-ap.ch/vocabulary/themes/'
+EUTHEMES_URI = 'http://publications.europa.eu/resource/authority/data-theme/'
 
 slug_id_pattern = re.compile('[^/]+(?=/$|$)')
 
@@ -418,6 +418,41 @@ class SwissDCATAPProfile(MultiLangProfile):
                  "in the official list of frequencies" % ogdch_value)
         return ""
 
+    def _get_groups(self, subject):
+        """Map the DCAT.theme values of a dataset to themes from the EU theme
+        vocabulary http://publications.europa.eu/resource/authority/data-theme
+        """
+        groups = []
+        dcat_theme_urls = self._object_value_list(subject, DCAT.theme)
+        log.warning(dcat_theme_urls)
+        if dcat_theme_urls:
+            for dcat_theme_url in dcat_theme_urls:
+                # Case 1: We get a deprecated opendata.swiss theme. Replace
+                #         the base url with the dcat-ap.ch base url, so we can
+                #         look it up in the theme mapping.
+                if dcat_theme_url.startswith(OGD_THEMES_URI):
+                    dcat_theme_url = dcat_theme_url.replace(
+                        OGD_THEMES_URI, CHTHEMES_URI)
+
+                # Case 2: We get a dcat-ap.ch theme (the same as the
+                #         opendata.swiss themes, but different base url). Get
+                #         the correct EU theme from the theme mapping.
+                if dcat_theme_url.startswith(CHTHEMES_URI):
+                    eu_theme_url = unicode(
+                        eu_theme_mapping[URIRef(dcat_theme_url)])
+
+                # Case 3: We get an EU theme and don't need to look it up in
+                #         the mapping.
+                if dcat_theme_url.startswith(EUTHEMES_URI):
+                    eu_theme_url = dcat_theme_url
+
+                search_result = slug_id_pattern.search(eu_theme_url)
+                eu_theme_slug = search_result.group()
+                groups.append({'name': eu_theme_slug})
+
+        log.warning(groups)
+        return groups
+
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
         log.debug("Parsing dataset '%r'" % dataset_ref)
 
@@ -475,13 +510,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         dataset_dict['keywords'] = self._keywords(dataset_ref)
 
         # Themes
-        dcat_theme_urls = self._object_value_list(dataset_ref, DCAT.theme)
-        if dcat_theme_urls:
-            dataset_dict['groups'] = []
-            for dcat_theme_url in dcat_theme_urls:
-                search_result = slug_id_pattern.search(dcat_theme_url)
-                dcat_theme_slug = search_result.group()
-                dataset_dict['groups'].append({'name': dcat_theme_slug})
+        dataset_dict['groups'] = self._get_groups(dataset_ref)
 
         #  Languages
         languages = self._object_value_list(dataset_ref, DCT.language)
