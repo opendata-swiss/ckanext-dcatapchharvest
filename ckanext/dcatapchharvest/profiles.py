@@ -422,35 +422,45 @@ class SwissDCATAPProfile(MultiLangProfile):
         """Map the DCAT.theme values of a dataset to themes from the EU theme
         vocabulary http://publications.europa.eu/resource/authority/data-theme
         """
-        groups = []
+        group_names = []
         dcat_theme_urls = self._object_value_list(subject, DCAT.theme)
 
         if dcat_theme_urls:
             for dcat_theme_url in dcat_theme_urls:
+                eu_theme_url = None
+
                 # Case 1: We get a deprecated opendata.swiss theme. Replace
                 #         the base url with the dcat-ap.ch base url, so we can
                 #         look it up in the theme mapping.
                 if dcat_theme_url.startswith(OGD_THEMES_URI):
-                    dcat_theme_url = dcat_theme_url.replace(
+                    new_theme_url = dcat_theme_url.replace(
                         OGD_THEMES_URI, CHTHEMES_URI)
+                    eu_theme_url = unicode(
+                        eu_theme_mapping[URIRef(new_theme_url)])
 
                 # Case 2: We get a dcat-ap.ch theme (the same as the
                 #         opendata.swiss themes, but different base url). Get
                 #         the correct EU theme from the theme mapping.
-                if dcat_theme_url.startswith(CHTHEMES_URI):
+                elif dcat_theme_url.startswith(CHTHEMES_URI):
                     eu_theme_url = unicode(
                         eu_theme_mapping[URIRef(dcat_theme_url)])
 
                 # Case 3: We get an EU theme and don't need to look it up in
                 #         the mapping.
-                if dcat_theme_url.startswith(EUTHEMES_URI):
+                elif dcat_theme_url.startswith(EUTHEMES_URI):
                     eu_theme_url = dcat_theme_url
+
+                if eu_theme_url is None:
+                    log.info("Could not find an EU theme that matched the "
+                             "given theme: {}".format(dcat_theme_url))
+                    continue
 
                 search_result = slug_id_pattern.search(eu_theme_url)
                 eu_theme_slug = search_result.group()
-                groups.append({'name': eu_theme_slug})
+                group_names.append(eu_theme_slug)
 
-        return list(set(groups))
+        # Deduplicate group names before returning list of group dicts
+        return [{'name': name} for name in list(set(group_names))]
 
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
         log.debug("Parsing dataset '%r'" % dataset_ref)
