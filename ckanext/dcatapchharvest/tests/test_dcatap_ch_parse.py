@@ -405,3 +405,21 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
         resource = dataset["resources"][0]
+
+    def test_eu_themes_mapping(self):
+        contents = self._get_file_contents('catalog-themes.xml')
+        p = RDFParser(profiles=['swiss_dcat_ap'])
+        p.parse(contents)
+
+        for dataset in p.datasets():
+            eq_(
+                sorted(dataset['groups']),
+                [
+                    {'name': u'ECON'},
+                    {'name': u'GOVE'},
+                    {'name': u'SOCI'},
+                ],
+                "Groups not mapped correctly for dataset {}".format(
+                    dataset['identifier']
+                )
+            )
