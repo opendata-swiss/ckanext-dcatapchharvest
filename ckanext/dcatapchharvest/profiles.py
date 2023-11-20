@@ -450,7 +450,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                 eu_theme_slug = search_result.group()
                 groups.append({'name': eu_theme_slug})
 
-        return groups
+        return list(set(groups))
 
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
         log.debug("Parsing dataset '%r'" % dataset_ref)
