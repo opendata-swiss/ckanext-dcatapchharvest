@@ -28,6 +28,8 @@
                 <dcat:theme rdf:resource="http://dcat-ap.ch/vocabulary/themes/work"/>
                 <dcat:theme rdf:resource="http://dcat-ap.ch/vocabulary/themes/construction"/>
             </dcat:Dataset>
+        </dcat:dataset>
+        <dcat:dataset>
             <dcat:Dataset>
                 <dct:identifier>dcat-ap-ch-themes-dedupe@bundesamt-fur-statistik-bfs</dct:identifier>
                 <dcat:theme rdf:resource="http://dcat-ap.ch/vocabulary/themes/statistical-basis"/>
