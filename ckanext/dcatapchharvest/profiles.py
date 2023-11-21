@@ -874,18 +874,11 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Themes
         groups = self._get_dataset_value(dataset_dict, 'groups', [])
         for group_name in groups:
-            ogdch_theme_ref = URIRef(CHTHEMES_URI + group_name.get('name'))
-            eu_theme_ref_list = eu_theme_mapping.get(ogdch_theme_ref)
-            for eu_theme_ref in eu_theme_ref_list:
-                g.add((
-                    dataset_ref,
-                    DCAT.theme,
-                    eu_theme_ref,
-                ))
+            eu_theme_ref = URIRef(EUTHEMES_URI + group_name.get('name'))
             g.add((
                 dataset_ref,
                 DCAT.theme,
-                ogdch_theme_ref,
+                eu_theme_ref,
             ))
 
         # Resources
