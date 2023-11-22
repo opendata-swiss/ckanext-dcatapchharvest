@@ -230,7 +230,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         for relation_node in self.g.objects(subject, DCAT.qualifiedRelation):
             qualified_relations.append({
                 "relation": self._object_value(relation_node, DCT.relation),
-                "role": self._object_value(relation_node, DCAT.hadRole),
+                "had_role": self._object_value(relation_node, DCAT.hadRole),
             })
 
         return qualified_relations
@@ -526,6 +526,11 @@ class SwissDCATAPProfile(MultiLangProfile):
             dataset_ref, FOAF.page
         )
 
+        # Conformance
+        dataset_dict['conforms_to'] = self._object_value_list(
+            dataset_ref, DCT.conformsTo
+        )
+
         # Resources
         for distribution in self._distributions(dataset_ref):
             resource_dict = {
@@ -571,6 +576,16 @@ class SwissDCATAPProfile(MultiLangProfile):
             # Documentation
             resource_dict['documentation'] = self._object_value_list(
                 distribution, FOAF.page
+            )
+
+            # Access services
+            resource_dict['access_services'] = self._object_value_list(
+                distribution, DCAT.accessService
+            )
+
+            # Temporal resolution
+            resource_dict['temporal_resolution'] = self._object_value(
+                distribution, DCAT.temporalResolution
             )
 
             # Timestamp fields
@@ -699,7 +714,6 @@ class SwissDCATAPProfile(MultiLangProfile):
         items = [
             ('language', DCT.language, None, Literal),
             ('theme', DCAT.theme, None, URIRef),
-            ('conforms_to', DCT.conformsTo, None, Literal),
             ('alternate_identifier', ADMS.identifier, None, Literal),
             ('has_version', DCT.hasVersion, None, Literal),
             ('is_version_of', DCT.isVersionOf, None, Literal),
@@ -751,11 +765,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                     URIRef(reference["relation"])
                 ))
 
-                if reference.get("role"):
+                if reference.get("had_role"):
                     g.add((
                         qualified_relation,
                         DCAT.hadRole,
-                        URIRef(reference["role"])
+                        URIRef(reference["had_role"])
                     ))
 
                 g.add((
@@ -813,6 +827,12 @@ class SwissDCATAPProfile(MultiLangProfile):
             g.add((doc, RDF.type, FOAF.Document))
             g.add((dataset_ref, FOAF.page, doc))
 
+        # Conformance
+        conformance_uris = dataset_dict.get('conforms_to', [])
+        for uri in conformance_uris:
+            ref = URIRef(uri)
+            g.add((dataset_ref, DCT.conformsTo, ref))
+
         # Themes
         groups = self._get_dataset_value(dataset_dict, 'groups', [])
         for group_name in groups:
@@ -855,7 +875,6 @@ class SwissDCATAPProfile(MultiLangProfile):
             #  Lists
             items = [
                 ('language', DCT.language, None, Literal),
-                ('conforms_to', DCT.conformsTo, None, Literal),
             ]
             self._add_list_triples_from_dict(resource_dict, distribution,
                                              items)
@@ -891,6 +910,21 @@ class SwissDCATAPProfile(MultiLangProfile):
                 doc = URIRef(link)
                 g.add((doc, RDF.type, FOAF.Document))
                 g.add((distribution, FOAF.page, doc))
+
+            # Access Services
+            access_services = resource_dict.get('access_services', [])
+            for uri in access_services:
+                ref = URIRef(uri)
+                g.add((distribution, DCAT.accessService, ref))
+
+            # Temporal Resolution
+            if resource_dict.get('temporal_resolution'):
+                g.add((
+                    distribution,
+                    DCAT.temporalResolution,
+                    Literal(resource_dict['temporal_resolution'],
+                            datatype=XSD.duration)
+                ))
 
             # Mime-Type
             if resource_dict.get('mimetype'):
@@ -1237,7 +1271,6 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             #  Lists
             items = [
                 ("language", DCT.language, None, Literal),
-                ("conforms_to", DCT.conformsTo, None, Literal),
             ]
             self._add_list_triples_from_dict(resource_dict, distribution,
                                              items)

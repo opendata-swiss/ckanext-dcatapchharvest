@@ -27,6 +27,9 @@
         <foaf:page>
           <foaf:Document rdf:about="https://example.com/documentation-distribution-2"/>
         </foaf:page>
+        <dcat:accessService rdf:resource="https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700"/>
+        <dcat:accessService rdf:resource="https://example.com/my-great-data-service-1"/>
+        <dcat:temporalResolution rdf:datatype="http://www.w3.org/2001/XMLSchema#duration">P1D</dcat:temporalResolution>
       </dcat:Distribution>
     </dcat:distribution>
     <dct:language>de</dct:language>
@@ -90,5 +93,7 @@
     <foaf:page>
       <foaf:Document rdf:about="https://example.com/documentation-dataset-2"/>
     </foaf:page>
+    <dct:conformsTo rdf:resource="http://resource.geosciml.org/ontology/timescale/gts"/>
+    <dct:conformsTo rdf:resource="https://inspire.ec.europa.eu/documents"/>
   </dcat:Dataset>
 </rdf:RDF>

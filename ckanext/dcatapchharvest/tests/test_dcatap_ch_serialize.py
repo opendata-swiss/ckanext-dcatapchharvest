@@ -4,14 +4,13 @@ import logging
 
 import nose
 
-from rdflib import Literal
+from rdflib import URIRef, Literal, XSD
 from rdflib.namespace import RDF
 
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
 from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, XSD
 
-from rdflib import URIRef
 import ckanext.dcatapchharvest.dcat_helpers as dh
 
 from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
@@ -19,6 +18,7 @@ from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
 eq_ = nose.tools.eq_
 assert_true = nose.tools.assert_true
 log = logging.getLogger(__name__)
+
 
 class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
@@ -63,6 +63,17 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
         for documentation_link in dataset['documentation']:
             assert self._triple(g, dataset_ref, FOAF.page, URIRef(documentation_link))
 
+        # Conformance
+        conforms_to = dataset.get("conforms_to", [])
+        # Check if the number of triples matches the number of conformance uris
+        eq_(
+            len(list(g.triples((dataset_ref, DCT.conformsTo, None)))),
+            len(conforms_to)
+        )
+        for link in conforms_to:
+            # Check if the triple (dataset_ref, DCT.conformsTo, URIRef(link)) exists in the graph
+            assert (dataset_ref, DCT.conformsTo, URIRef(link)) in g
+
         # List
         for item in [
             ('language', DCT.language, Literal),
@@ -78,42 +89,50 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             distribution = URIRef(dh.resource_uri(resource_dict))
             assert self._triple(g, distribution, RDF.type, DCAT.Distribution)
             for link in resource_dict.get("documentation", []):
-                assert self._triple(g, distribution, FOAF.page, URIRef(link))   
-            
-            #e2c50e70-67ad-4f86-bb1b-3f93867eadaa    
+                assert self._triple(g, distribution, FOAF.page, URIRef(link))
+
+            eq_(
+                len([t for t in g.triples((distribution, DCAT.accessService, None))]),
+                len(resource_dict.get("access_services", []))
+            )
+            for link in resource_dict.get("access_services", []):
+                assert self._triple(g, distribution, DCAT.accessService, URIRef(link))
+
+            # e2c50e70-67ad-4f86-bb1b-3f93867eadaa
             if resource_dict.get('rights') == 'Creative Commons CC Zero License (cc-zero)':
                 assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.de/def/licenses/cc-zero"))
-                
+
             if resource_dict.get('license') == 'NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired':
                 assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_open"))
-                
-                
-            #28e75e40-e1a1-497b-a1b9-8c1834d60201
+
+            # 28e75e40-e1a1-497b-a1b9-8c1834d60201
             if resource_dict.get('rights') == "http://dcat-ap.ch/vocabulary/licenses/terms_by":
                 assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"))
-                
+
             if resource_dict.get('license') == "NonCommercialAllowed-CommercialAllowed-ReferenceRequired":
                 assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"))
-        
-        
-            #0cfce6ba-28f4-4229-b733-f6492c650395
+
+            # 0cfce6ba-28f4-4229-b733-f6492c650395
             if resource_dict.get('rights') == "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask":
                 assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by_ask"))
-                
+
             if resource_dict.get('license') == "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0":
                 assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0"))
-                
 
             if resource_dict.get('format') == "CSV":
                 assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/CSV"))
-                
+
             if resource_dict.get('format') == "HTML":
                 assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/HTML"))
-                
+
             if resource_dict.get('format') == "1d-interleaved-parityfec":
                 assert self._triple(g, distribution, DCT['format'], URIRef("http://www.iana.org/assignments/video/1d-interleaved-parityfec"))
 
-                
+            if resource_dict.get('temporal_resolution') == "P1D":
+                expected_literal = Literal("P1D", datatype=XSD.duration)
+                assert self._triple(g, distribution, DCAT.temporalResolution, expected_literal)
+
+
     def test_graph_from_dataset_uri(self):
         """Tests that datasets (resources) with a uri from the test system
         have that uri changed to reference the prod system when they are output

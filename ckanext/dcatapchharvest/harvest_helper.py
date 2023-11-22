@@ -1,12 +1,14 @@
 import ckan.plugins.toolkit as tk
 import ckan.model as model
 from dateutil.parser import parse as dateutil_parse, ParserError
+from dateutil.tz import tz
 
 import logging
 
 log = logging.getLogger(__name__)
 
 NOTIFICATION_USER = 'harvest-notification'
+DEFAULT_TIMEZONE = tz.gettz('Europe/Zurich')
 
 
 def map_resources_to_ids(pkg_dict, package_id):
@@ -94,15 +96,30 @@ def _changes_in_date(existing_datetime, new_datetime):
         return False
     if not existing_datetime or not new_datetime:
         return True
+
     try:
-        if dateutil_parse(existing_datetime) == dateutil_parse(new_datetime):
-            return False
+        existing = dateutil_parse(existing_datetime)
+        if existing.tzinfo is None:
+            existing = existing.replace(tzinfo=DEFAULT_TIMEZONE)
+            log.debug(
+                "Datetime %s has no time zone info: assuming Europe/Zurich" %
+                existing_datetime
+            )
+        new = dateutil_parse(new_datetime)
+        if new.tzinfo is None:
+            new = new.replace(tzinfo=DEFAULT_TIMEZONE)
+            log.debug(
+                "Datetime %s has no time zone info: assuming Europe/Zurich" %
+                new_datetime
+            )
     except (ParserError, OverflowError) as e:
         log.info(
             "Error when parsing dates {}, {}: {}".format(
                 existing_datetime, new_datetime, e
             )
         )
+        return False
 
+    if new == existing:
         return False
     return True

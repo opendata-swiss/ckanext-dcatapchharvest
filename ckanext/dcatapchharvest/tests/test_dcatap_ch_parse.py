@@ -107,14 +107,14 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
             qualified_relations[0],
             {
                 "relation": "http://example.org/Original987",
-                "role": "http://www.iana.org/assignments/relation/original"
+                "had_role": "http://www.iana.org/assignments/relation/original"
             }
         )
         eq_(
             qualified_relations[1],
             {
                 "relation": "http://example.org/Related486",
-                "role": "http://www.iana.org/assignments/relation/related"
+                "had_role": "http://www.iana.org/assignments/relation/related"
             }
         )
 
@@ -124,6 +124,10 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(
             sorted(dataset['documentation']),
             ['https://example.com/documentation-dataset-1', 'https://example.com/documentation-dataset-2']
+        )
+        eq_(
+            sorted(dataset['conforms_to']),
+            [u'http://resource.geosciml.org/ontology/timescale/gts', u'https://inspire.ec.europa.eu/documents']
         )
 
         # Dataset URI
@@ -147,13 +151,24 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['license'], u'Creative Commons CC Zero License (cc-zero)')
         eq_(resource['language'], [u'fr'])
         eq_(resource['issued'], u'1900-12-31T00:00:00')
+        eq_(resource['temporal_resolution'], u'P1D')
         eq_(resource['url'], u'https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901')
         assert 'download_url' not in resource, "download_url not available on resource"
 
         # Lists
         eq_(
             sorted(resource['documentation']),
-            ['https://example.com/documentation-distribution-1', 'https://example.com/documentation-distribution-2']
+            [
+                u'https://example.com/documentation-distribution-1',
+                u'https://example.com/documentation-distribution-2'
+            ]
+        )
+        eq_(
+            sorted(resource['access_services']),
+            [
+                u'https://example.com/my-great-data-service-1',
+                u'https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700'
+            ]
         )
 
         # Distribution URI

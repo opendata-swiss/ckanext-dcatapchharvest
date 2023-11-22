@@ -103,11 +103,14 @@ def dataset_uri(dataset_dict, dataset_ref=None):
                 uri = ''
                 break
     if not uri:
-        site_url = config.get('ckan.site_url')
-        uri = u'{0}/perma/{1}'.format(site_url,
-                                      dataset_dict.get('identifier'))
+        uri = get_permalink(dataset_dict.get('identifier'))
 
     return uri
+
+
+def get_permalink(identifier):
+    site_url = config.get('ckan.site_url')
+    return u'{0}/perma/{1}'.format(site_url, identifier)
 
 
 def resource_uri(resource_dict, distribution=None):

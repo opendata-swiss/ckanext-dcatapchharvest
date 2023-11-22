@@ -5,6 +5,10 @@
   "url": "http://example.com/ds1",
   "version": "1.0b",
   "issued": "2015-06-26T15:21:09.034694",
+  "conforms_to": [
+        "http://resource.geosciml.org/ontology/timescale/gts",
+        "https://inspire.ec.europa.eu/documents"
+      ],
   "keywords": {
     "fr": [],
     "de": [
@@ -127,6 +131,11 @@
         "https://example.com/documentation-resource-1",
         "https://example.com/documentation-resource-2"
       ],
+      "access_services": [
+        "https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700",
+        "https://example.com/my-great-data-service-1"
+      ],
+      "temporal_resolution":"P1D",
       "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask",
       "license": "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0",
       "media_type": "1d-interleaved-parityfec"
