@@ -320,14 +320,14 @@ class SwissDCATAPProfile(MultiLangProfile):
         return temporals
 
     def _clean_datetime(self, datetime_value, data_type):
-        """Convert a literal in one of the accepted data types into an isoformat
-        datetime string.
+        """Convert a literal in one of the accepted data types into an
+        isoformat datetime string.
 
         Accepted types are: xsd:date, xsd:dateTime, xsd:gYear, or
         xsd:gYearMonth; or schema:Date or schema:DateTime, for temporals
         specified as schema:startDate and schema:endDate.
 
-        We only consider the parts of the date that are expected from the given
+        We only consider parts of the date that are expected from the given
         data_type, e.g. the year of an xsd:gYear, even if the month and day
         have been included in the datetime_value. If a datetime_value with
         data_type of xsd:dateTime or schema:DateTime does not contain time
@@ -1041,8 +1041,11 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
         g = self.g
-        old_valid_frequencies = [i for i in list(valid_frequencies.values()) if i != URIRef(
-                "http://purl.org/cld/freq/completelyIrregular")]
+        old_valid_frequencies = [
+            i for i in list(valid_frequencies.values())
+            if i != URIRef(
+                    "http://purl.org/cld/freq/completelyIrregular")
+            ]
         if URIRef(accrual_periodicity) in \
                 old_valid_frequencies + list(valid_frequencies.keys()):
             g.add((
