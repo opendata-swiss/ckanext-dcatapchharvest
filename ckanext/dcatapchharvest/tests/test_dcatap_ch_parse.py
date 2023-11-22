@@ -120,7 +120,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         #  Lists
         eq_(sorted(dataset['language']), [u'de', u'fr'])
-        eq_(sorted(dataset['groups']), [{'name': u'GOVE'}])
+        eq_(sorted(dataset['groups']), [{'name': u'gove'}])
         eq_(
             sorted(dataset['documentation']),
             ['https://example.com/documentation-dataset-1', 'https://example.com/documentation-dataset-2']
@@ -415,9 +415,9 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
             eq_(
                 sorted(dataset['groups']),
                 [
-                    {'name': u'ECON'},
-                    {'name': u'GOVE'},
-                    {'name': u'SOCI'},
+                    {'name': u'econ'},
+                    {'name': u'gove'},
+                    {'name': u'soci'},
                 ],
                 "Groups not mapped correctly for dataset {}".format(
                     dataset['identifier']
