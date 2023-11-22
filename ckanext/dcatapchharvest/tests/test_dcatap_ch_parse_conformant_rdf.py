@@ -14,7 +14,7 @@ class ConformantProfileParseTest(BaseParseTest):
         p = RDFParser(profiles=['swiss_dcat_ap'])
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
-        eq_(dataset['url'], u"https://www.bfs.admin.ch/bfs/de/home/statistiken.html")
+        eq_(dataset['url'], "https://www.bfs.admin.ch/bfs/de/home/statistiken.html")
 
     def test_dcatap_conformant_publisher_import(self):
         contents = self._get_file_contents('conformant/dataset-publisher.xml')

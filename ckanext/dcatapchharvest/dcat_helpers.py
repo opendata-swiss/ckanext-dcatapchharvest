@@ -85,7 +85,7 @@ def dataset_uri(dataset_dict, dataset_ref=None):
     to the production site. In that case, the dataset uris will contain the
     url of the test environment, so we have to replace it with the prod one.
     """
-    uri = (unicode(dataset_ref)
+    uri = (str(dataset_ref)
            if isinstance(dataset_ref, URIRef)
            else '')
     if not uri:
@@ -110,7 +110,7 @@ def dataset_uri(dataset_dict, dataset_ref=None):
 
 def get_permalink(identifier):
     site_url = config.get('ckan.site_url')
-    return u'{0}/perma/{1}'.format(site_url, identifier)
+    return '{0}/perma/{1}'.format(site_url, identifier)
 
 
 def resource_uri(resource_dict, distribution=None):
@@ -127,7 +127,7 @@ def resource_uri(resource_dict, distribution=None):
     resource haven't been saved. This is all right as it will be generated
     when the dataset is output in RDF format.
     """
-    uri = (unicode(distribution)
+    uri = (str(distribution)
            if isinstance(distribution, URIRef)
            else '')
     if not uri:
@@ -154,7 +154,7 @@ def resource_uri(resource_dict, distribution=None):
 def get_frequency_values():
     g = Graph()
     frequency_mapping = {}
-    for prefix, namespace in frequency_namespaces.items():
+    for prefix, namespace in list(frequency_namespaces.items()):
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'frequency.ttl')
     g.parse(file, format='turtle')
@@ -169,24 +169,24 @@ def get_frequency_values():
 
 def get_license_uri_by_name(vocabulary_name):
     license_vocabulary = get_license_values()
-    for key, value in license_vocabulary.items():
-        if unicode(vocabulary_name) == unicode(value):
+    for key, value in list(license_vocabulary.items()):
+        if str(vocabulary_name) == str(value):
             return key
     return None
 
 
 def get_license_name_by_uri(vocabulary_uri):
     license_vocabulary = get_license_values()
-    for key, value in license_vocabulary.items():
-        if unicode(vocabulary_uri) == unicode(key):
-            return unicode(value)
+    for key, value in list(license_vocabulary.items()):
+        if str(vocabulary_uri) == str(key):
+            return str(value)
     return None
 
 
 def get_license_values():
     g = Graph()
     license_mapping = {}
-    for prefix, namespace in license_namespaces.items():
+    for prefix, namespace in list(license_namespaces.items()):
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'license.ttl')
     g.parse(file, format='turtle')
@@ -204,7 +204,7 @@ def get_license_values():
 def get_theme_mapping():
     g = Graph()
     theme_mapping = {}
-    for prefix, namespace in theme_namespaces.items():
+    for prefix, namespace in list(theme_namespaces.items()):
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'themes.ttl')
     g.parse(file, format='turtle')
@@ -232,13 +232,13 @@ def get_pagination(catalog_graph):
         ]
         for key, ref in items:
             for obj in catalog_graph.objects(pagination_node, ref):
-                pagination[key] = unicode(obj)
+                pagination[key] = str(obj)
     return pagination
 
 
 def get_format_values():
     g = Graph()
-    for prefix, namespace in format_namespaces.items():
+    for prefix, namespace in list(format_namespaces.items()):
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'formats.xml')
     g.parse(file, format='xml')
