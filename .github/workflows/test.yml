@@ -3,10 +3,12 @@ on: [push, pull_request]
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container:
-      image: python:2.7.18-buster
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - name: Set up Python 
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.10
       - name: Install requirements
         run: pip install flake8 pycodestyle
       - name: Check syntax
