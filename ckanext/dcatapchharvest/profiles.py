@@ -456,7 +456,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     continue
 
                 search_result = slug_id_pattern.search(eu_theme_url)
-                eu_theme_slug = search_result.group()
+                eu_theme_slug = search_result.group().lower()
                 group_names.append(eu_theme_slug)
 
         # Deduplicate group names before returning list of group dicts
