@@ -22,11 +22,11 @@ valid_media_types = dh.get_iana_media_type_values()
 
 
 DCT = dh.DCT
-DCAT = Namespace("http://www.w3.org/ns/dcat#")
-VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
+DCAT = Namespace('http://www.w3.org/ns/dcat#')
+VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
 SCHEMA = Namespace('http://schema.org/')
-ADMS = Namespace("http://www.w3.org/ns/adms#")
-FOAF = Namespace("http://xmlns.com/foaf/0.1/")
+ADMS = Namespace('http://www.w3.org/ns/adms#')
+FOAF = Namespace('http://xmlns.com/foaf/0.1/')
 TIME = Namespace('http://www.w3.org/2006/time')
 LOCN = Namespace('http://www.w3.org/ns/locn#')
 GSP = Namespace('http://www.opengis.net/ont/geosparql#')
@@ -34,7 +34,7 @@ OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SPDX = Namespace('http://spdx.org/rdf/terms#')
 XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
-ODRS = Namespace("http://schema.theodi.org/odrs#")
+ODRS = Namespace('http://schema.theodi.org/odrs#')
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
