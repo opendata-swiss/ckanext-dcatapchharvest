@@ -236,19 +236,14 @@ class SwissDCATAPProfile(MultiLangProfile):
         return qualified_relations
 
     def _get_eu_or_iana_format(self, subject):
-        valid_formats_lower = {key.lower() for key in valid_formats.keys()}
-        valid_media_types_lower = {key.lower() for key in valid_media_types.keys()}
-
         format_value = self._object_value(subject, DCT['format'])
-        if format_value.lower() in valid_formats_lower \
-                or format_value.lower() in valid_media_types_lower:
+        if format_value.lower() in valid_formats \
+                or format_value.lower() in valid_media_types:
             return format_value
         else:
             return ''
 
     def _get_iana_media_type(self, subject):
-        valid_media_types_lower = {key.lower() for key in valid_media_types.keys()}
-
         media_type_value_raw = self._object_value(subject, DCAT.mediaType)
         pattern = r'[^/]+$'  # Match one or more characters that are not '/'
         media_type_value_re = re.search(pattern, media_type_value_raw)
@@ -257,7 +252,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         else:
             media_type_value = media_type_value_raw
 
-        if media_type_value in valid_media_types_lower:
+        if media_type_value.lower() in valid_media_types:
             return media_type_value
         else:
             return ''
@@ -1059,44 +1054,30 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Exception: if a format is not available in the EU vocabulary,
         # use IANA media type vocabulary
         if resource_dict.get('format'):
-            format_value = resource_dict.get('format')
-            valid_formats_lower =\
-                {key.lower() for key in valid_formats.keys()}
-            valid_media_types_lower = \
-                {key.lower() for key in valid_media_types.keys()}
-
-            if format_value.lower() in valid_formats_lower:
-                g.add(
+            lowercase_format_value = resource_dict.get('format').lower()
+            if lowercase_format_value in valid_formats:
+                g.add((
                     distribution,
                     DCT['format'],
-                    URIRef(valid_formats_lower[format_value.lower()])
-                )
-            elif format_value.lower() not in valid_formats_lower \
-                    and format_value.lower() in valid_media_types_lower:
-                g.add(
+                    URIRef(valid_formats[lowercase_format_value])
+                ))
+            elif lowercase_format_value not in valid_formats \
+                    and lowercase_format_value in valid_media_types:
+                g.add((
                     distribution,
                     DCT['format'],
-                    URIRef(valid_media_types_lower[format_value.lower()])
-                )
-            else:
-                g.add(distribution, DCT['format'], BNode())
-        else:
-            g.add(distribution, DCT['format'], BNode())
+                    URIRef(valid_media_types[lowercase_format_value])
+                ))
 
         # Export media type if it matches IANA media type vocabulary
         if resource_dict.get('media_type'):
-            media_type_value = resource_dict.get('media_type')
-            valid_media_types_lower = \
-                {key.lower() for key in valid_media_types.keys()}
-
-            if media_type_value.lower() in valid_media_types_lower:
-                g.add(
+            lowercase_media_type_value = resource_dict.get('media_type').lower()
+            if lowercase_media_type_value in valid_media_types:
+                g.add((
                     distribution,
                     DCAT.mediaType,
-                    URIRef(valid_media_types_lower[media_type_value.lower()])
-                )
-            else:
-                g.add(distribution, DCAT.mediaType, BNode())
+                    URIRef(valid_media_types[lowercase_media_type_value])
+                ))
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
         g = self.g
