@@ -1071,7 +1071,8 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Export media type if it matches IANA media type vocabulary
         if resource_dict.get('media_type'):
-            lowercase_media_type_value = resource_dict.get('media_type').lower()
+            lowercase_media_type_value = \
+                resource_dict.get('media_type').lower()
             if lowercase_media_type_value in valid_media_types:
                 g.add((
                     distribution,
