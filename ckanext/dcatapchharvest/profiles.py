@@ -235,6 +235,33 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return qualified_relations
 
+    def _get_eu_or_iana_format(self, subject):
+        valid_formats_lower = {key.lower() for key in valid_formats.keys()}
+        valid_media_types_lower = {key.lower() for key in valid_media_types.keys()}
+
+        format_value = self._object_value(subject, DCT['format'])
+        if format_value.lower() in valid_formats_lower \
+                or format_value.lower() in valid_media_types_lower:
+            return format_value
+        else:
+            return ''
+
+    def _get_iana_media_type(self, subject):
+        valid_media_types_lower = {key.lower() for key in valid_media_types.keys()}
+
+        media_type_value_raw = self._object_value(subject, DCAT.mediaType)
+        pattern = r'[^/]+$'  # Match one or more characters that are not '/'
+        media_type_value_re = re.search(pattern, media_type_value_raw)
+        if media_type_value_re:
+            media_type_value = media_type_value_re.group(0)
+        else:
+            media_type_value = media_type_value_raw
+
+        if media_type_value in valid_media_types_lower:
+            return media_type_value
+        else:
+            return ''
+
     def _license_rights_name(self, subject, predicate):
         for node in self.g.objects(subject, predicate):
             # DCAT-AP CH v1: the license as a literal (should be
@@ -579,9 +606,6 @@ class SwissDCATAPProfile(MultiLangProfile):
             #  Simple values
             for key, predicate in (
                     ('identifier', DCT.identifier),
-                    ('format', DCT['format']),
-                    ('mimetype', DCAT.mediaType),
-                    ('media_type', DCAT.mediaType),
                     ('download_url', DCAT.downloadURL),
                     ('url', DCAT.accessURL),
                     ('coverage', DCT.coverage),
@@ -606,10 +630,15 @@ class SwissDCATAPProfile(MultiLangProfile):
                     resource_dict['license'] = rights
                     resource_dict['rights'] = license
 
-            # if media type is not set, use format as fallback
-            if (not resource_dict.get('media_type') and
-                    resource_dict.get('format')):
+            # Format & Media type
+            resource_dict['format'] = self._get_eu_or_iana_format(distribution)
+            resource_dict['media_type'] = self._get_iana_media_type(distribution)
+            # Set 'media_type' as 'format' if 'media_type' is not set but 'format' exists
+            if not resource_dict.get('media_type') and resource_dict.get('format'):
                 resource_dict['media_type'] = resource_dict['format']
+            # Set 'format' as 'media_type' if 'format' is not set but 'media_type' exists
+            elif not resource_dict.get('format') and resource_dict.get('media_type'):
+                resource_dict['format'] = resource_dict['media_type']
 
             # Documentation
             resource_dict['documentation'] = self._object_value_list(
@@ -957,14 +986,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                             datatype=XSD.duration)
                 ))
 
-            # Mime-Type
-            if resource_dict.get('mimetype'):
-                g.add((
-                    distribution,
-                    DCAT.mediaType,
-                    Literal(resource_dict['mimetype'])
-                ))
-
             # Dates
             items = [
                 ('issued', DCT.issued, None, Literal),
@@ -1028,43 +1049,32 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _format_and_media_type_to_graph(self, resource_dict, distribution):
         g = self.g
-        # Format and Media Type Case 1:
-        # Format: Set Format value if format matches EU vocabulary
-        format_uri = None
+        # Set Format value if format matches EU vocabulary
+        # Exception: If a format is not available in the EU vocabulary,
+        # use IANA media type vocabulary
+
+        # Export format
         if resource_dict.get('format'):
-            format = resource_dict.get('format').replace(' ', '_')
-            if format in valid_formats:
-                format_uri = URIRef(valid_formats[format])
-                g.add((distribution, DCT['format'], format_uri))
+            format_value = resource_dict.get('format')
+            valid_formats_lower = {key.lower() for key in valid_formats.keys()}
+            valid_media_types_lower = {key.lower() for key in valid_media_types.keys()}
+            if format_value.lower() in valid_formats_lower:
+                g.add(distribution, DCT['format'], URIRef(valid_formats_lower[format_value.lower()]))
+            elif format_value in valid_media_types:
+                g.add(distribution, DCT['format'], URIRef(valid_media_types_lower[format_value.lower()]))
+            else:
+                g.add(distribution, DCT['format'], BNode())
+        else:
+            g.add(distribution, DCT['format'], BNode())
 
-        # Media Type: Set Format value
-        # if format matches EU vocabulary and media type is not set
-        if format_uri and resource_dict.get('media_type') is None:
-            g.add((distribution, DCAT.mediaType, format_uri))
-
-        # Format and Media Type Case 2:
-        # Set Media Type and Format value
-        # if format does not match EU vocabulary
-        # but media type matches IANA vocabulary
-        media_type_uri = None
-        format_uri = None
+        # Export media type
         if resource_dict.get('media_type'):
-            media_type = resource_dict.get('media_type')
-            if media_type in valid_media_types:
-                media_type_uri = URIRef(valid_media_types[media_type])
-                g.add((distribution, DCT['format'], media_type_uri))
-                g.add((distribution, DCAT.mediaType, media_type_uri))
-
-        # Format and Media Type Case 3:
-        # Set Media Type and Format value
-        # if format does not match EU vocabulary
-        # but format matches IANA vocabulary
-        if media_type_uri is None and resource_dict.get('format'):
-            format = resource_dict.get('format')
-            if format in valid_media_types:
-                media_type_uri = URIRef(valid_media_types[format])
-                g.add((distribution, DCT['format'], media_type_uri))
-                g.add((distribution, DCAT.mediaType, media_type_uri))
+            media_type_value = resource_dict.get('media_type')
+            valid_media_types_lower = {key.lower() for key in valid_media_types.keys()}
+            if media_type_value in valid_media_types:
+                g.add(distribution, DCAT.mediaType, URIRef(valid_media_types[media_type_value]))
+            else:
+                g.add(distribution, DCAT.mediaType, BNode())
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
         g = self.g
@@ -1286,7 +1296,6 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 ("status", ADMS.status, None, Literal),
                 ("coverage", DCT.coverage, None, Literal),
                 ("identifier", DCT.identifier, None, Literal),
-                ("media_type", SCHEMA.mediaType, None, Literal),
                 ("spatial", DCT.spatial, None, Literal),
             ]
 
@@ -1308,18 +1317,6 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             # Download URL & Access URL
             self.download_access_url(resource_dict, distribution, g)
-
-            # Format
-            if resource_dict.get("format"):
-                g.add((distribution, DCT["format"],
-                       Literal(resource_dict["format"])))
-
-            # Mime-Type
-            if resource_dict.get("mimetype"):
-                g.add(
-                    (distribution, SCHEMA.mediaType,
-                     Literal(resource_dict["mimetype"]))
-                )
 
             # Dates
             items = [
