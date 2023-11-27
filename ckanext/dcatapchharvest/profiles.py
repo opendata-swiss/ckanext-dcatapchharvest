@@ -631,13 +631,19 @@ class SwissDCATAPProfile(MultiLangProfile):
                     resource_dict['rights'] = license
 
             # Format & Media type
-            resource_dict['format'] = self._get_eu_or_iana_format(distribution)
-            resource_dict['media_type'] = self._get_iana_media_type(distribution)
-            # Set 'media_type' as 'format' if 'media_type' is not set but 'format' exists
-            if not resource_dict.get('media_type') and resource_dict.get('format'):
+            resource_dict['format'] = \
+                self._get_eu_or_iana_format(distribution)
+            resource_dict['media_type'] = \
+                self._get_iana_media_type(distribution)
+            # Set 'media_type' as 'format'
+            # if 'media_type' is not set but 'format' exists
+            if not resource_dict.get('media_type') \
+                    and resource_dict.get('format'):
                 resource_dict['media_type'] = resource_dict['format']
-            # Set 'format' as 'media_type' if 'format' is not set but 'media_type' exists
-            elif not resource_dict.get('format') and resource_dict.get('media_type'):
+            # Set 'format' as 'media_type'
+            # if 'format' is not set but 'media_type' exists
+            elif not resource_dict.get('format') \
+                    and resource_dict.get('media_type'):
                 resource_dict['format'] = resource_dict['media_type']
 
             # Documentation
@@ -1049,30 +1055,46 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _format_and_media_type_to_graph(self, resource_dict, distribution):
         g = self.g
-        # Set Format value if format matches EU vocabulary
-        # Exception: If a format is not available in the EU vocabulary,
+        # Export format value if it matches EU vocabulary
+        # Exception: if a format is not available in the EU vocabulary,
         # use IANA media type vocabulary
-
-        # Export format
         if resource_dict.get('format'):
             format_value = resource_dict.get('format')
-            valid_formats_lower = {key.lower() for key in valid_formats.keys()}
-            valid_media_types_lower = {key.lower() for key in valid_media_types.keys()}
+            valid_formats_lower =\
+                {key.lower() for key in valid_formats.keys()}
+            valid_media_types_lower = \
+                {key.lower() for key in valid_media_types.keys()}
+
             if format_value.lower() in valid_formats_lower:
-                g.add(distribution, DCT['format'], URIRef(valid_formats_lower[format_value.lower()]))
-            elif format_value in valid_media_types:
-                g.add(distribution, DCT['format'], URIRef(valid_media_types_lower[format_value.lower()]))
+                g.add(
+                    distribution,
+                    DCT['format'],
+                    URIRef(valid_formats_lower[format_value.lower()])
+                )
+            elif format_value.lower() not in valid_formats_lower \
+                    and format_value.lower() in valid_media_types_lower:
+                g.add(
+                    distribution,
+                    DCT['format'],
+                    URIRef(valid_media_types_lower[format_value.lower()])
+                )
             else:
                 g.add(distribution, DCT['format'], BNode())
         else:
             g.add(distribution, DCT['format'], BNode())
 
-        # Export media type
+        # Export media type if it matches IANA media type vocabulary
         if resource_dict.get('media_type'):
             media_type_value = resource_dict.get('media_type')
-            valid_media_types_lower = {key.lower() for key in valid_media_types.keys()}
-            if media_type_value in valid_media_types:
-                g.add(distribution, DCAT.mediaType, URIRef(valid_media_types[media_type_value]))
+            valid_media_types_lower = \
+                {key.lower() for key in valid_media_types.keys()}
+
+            if media_type_value.lower() in valid_media_types_lower:
+                g.add(
+                    distribution,
+                    DCAT.mediaType,
+                    URIRef(valid_media_types_lower[media_type_value.lower()])
+                )
             else:
                 g.add(distribution, DCAT.mediaType, BNode())
 
