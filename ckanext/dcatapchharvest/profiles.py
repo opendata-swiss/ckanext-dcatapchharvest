@@ -237,25 +237,33 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _get_eu_or_iana_format(self, subject):
         format_value = self._object_value(subject, DCT['format'])
-        if format_value.lower() in valid_formats \
-                or format_value.lower() in valid_media_types:
-            return format_value
+        if isinstance(format_value, dict):
+            log.debug("The format object is a dictionary type.")
         else:
-            return ''
+            lowercase_format_value = format_value.lower()
+            if lowercase_format_value in valid_formats \
+                    or lowercase_format_value in valid_media_types:
+                return lowercase_format_value
+            else:
+                return ''
 
     def _get_iana_media_type(self, subject):
         media_type_value_raw = self._object_value(subject, DCAT.mediaType)
-        pattern = r'[^/]+$'  # Match one or more characters that are not '/'
-        media_type_value_re = re.search(pattern, media_type_value_raw)
-        if media_type_value_re:
-            media_type_value = media_type_value_re.group(0)
+        if isinstance(media_type_value_raw, dict):
+            log.debug("The media type object is a dictionary type.")
         else:
-            media_type_value = media_type_value_raw
+            pattern = r'[^/]+$'  # Match one or more characters that are not '/'
+            media_type_value_re = re.search(pattern, media_type_value_raw)
+            if media_type_value_re:
+                media_type_value = media_type_value_re.group(0)
+            else:
+                media_type_value = media_type_value_raw
 
-        if media_type_value.lower() in valid_media_types:
-            return media_type_value
-        else:
-            return ''
+            lowercase_media_type_value = media_type_value.lower()
+            if lowercase_media_type_value in valid_media_types:
+                return lowercase_media_type_value
+            else:
+                return ''
 
     def _license_rights_name(self, subject, predicate):
         for node in self.g.objects(subject, predicate):
