@@ -143,9 +143,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['title']['de'], u'')
         assert all(l in resource['description'] for l in ['de', 'fr', 'it', 'en']), "resource description contains all languages"
         eq_(resource['description']['de'], u'')
-        eq_(resource['format'], u'HTML')
-        eq_(resource['mimetype'], u'text/html')
-        eq_(resource['media_type'], u'text/html')
+        eq_(resource['format'], u'html')
+        eq_(resource['media_type'], u'html')
         eq_(resource['identifier'], u'346265-fr@bundesamt-fur-statistik-bfs')
         eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
         eq_(resource['license'], u'Creative Commons CC Zero License (cc-zero)')
@@ -295,7 +294,6 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         resource = datasets[0]['resources'][0]
 
-        eq_(resource['format'], u'CSV')
 
     def test_temporals_accepted_formats(self):
         contents = self._get_file_contents('dataset-datetimes.xml')

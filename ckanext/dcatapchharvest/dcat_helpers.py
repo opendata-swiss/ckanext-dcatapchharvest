@@ -244,7 +244,7 @@ def get_format_values():
     g.parse(file, format='xml')
     format_values = {}
     for format_uri_ref in g.subjects():
-        format_extension = format_uri_ref.split('/')[-1]
+        format_extension = format_uri_ref.split('/')[-1].lower()
         format_values[format_extension] = format_uri_ref
     return format_values
 
@@ -268,7 +268,7 @@ def get_iana_media_type_values():
             continue
         if record.find('ns:name', media_types_namespaces) is None:
             continue
-        name = record.find('ns:name', media_types_namespaces).text
+        name = record.find('ns:name', media_types_namespaces).text.lower()
         file_value = record.find('ns:file', media_types_namespaces).text
         media_type_values[name] = media_types_namespaces['ns']+'/'+file_value
     return media_type_values
