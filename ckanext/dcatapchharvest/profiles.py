@@ -252,7 +252,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         if isinstance(media_type_value_raw, dict):
             log.debug("The media type object is a dictionary type.")
         else:
-            pattern = r'http://www.iana.org/assignments/(.+/.+)$'
+            pattern = r'.*/(.+/.+)$'
             media_type_value_re = re.search(pattern, media_type_value_raw)
             if media_type_value_re:
                 media_type_value = media_type_value_re.group(1)
