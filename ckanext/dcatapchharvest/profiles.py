@@ -1079,13 +1079,12 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Export media type if it matches IANA media type vocabulary
         if resource_dict.get('media_type'):
-            lowercase_media_type_value = \
-                resource_dict.get('media_type').lower()
-            if lowercase_media_type_value in valid_media_types:
+            media_type_subtype = resource_dict.get('media_type').split('/')[1]
+            if media_type_subtype in valid_media_types:
                 g.add((
                     distribution,
                     DCAT.mediaType,
-                    URIRef(valid_media_types[lowercase_media_type_value])
+                    URIRef(valid_media_types[media_type_subtype])
                 ))
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
