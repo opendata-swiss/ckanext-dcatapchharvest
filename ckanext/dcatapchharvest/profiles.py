@@ -240,7 +240,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         if isinstance(format_value, dict):
             log.debug("The format object is a dictionary type.")
         else:
-            lowercase_format_value = format_value.lower()
+            lowercase_format_value = format_value.lower().split('/')[-1]
             if lowercase_format_value in valid_formats \
                     or lowercase_format_value in valid_media_types:
                 return lowercase_format_value
@@ -1079,12 +1079,12 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Export media type if it matches IANA media type vocabulary
         if resource_dict.get('media_type'):
-            media_type_subtype = resource_dict.get('media_type').split('/')[1]
-            if media_type_subtype in valid_media_types:
+            media_type = resource_dict.get('media_type')
+            if media_type in valid_media_types:
                 g.add((
                     distribution,
                     DCAT.mediaType,
-                    URIRef(valid_media_types[media_type_subtype])
+                    URIRef(valid_media_types[media_type])
                 ))
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
