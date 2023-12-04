@@ -144,7 +144,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         assert all(l in resource['description'] for l in ['de', 'fr', 'it', 'en']), "resource description contains all languages"
         eq_(resource['description']['de'], u'')
         eq_(resource['format'], u'html')
-        eq_(resource['media_type'], u'html')
+        eq_(resource['media_type'], u'text/html')
         eq_(resource['identifier'], u'346265-fr@bundesamt-fur-statistik-bfs')
         eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
         eq_(resource['license'], u'Creative Commons CC Zero License (cc-zero)')
