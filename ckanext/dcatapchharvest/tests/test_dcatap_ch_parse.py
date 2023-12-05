@@ -144,7 +144,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         assert all(l in resource['description'] for l in ['de', 'fr', 'it', 'en']), "resource description contains all languages"
         eq_(resource['description']['de'], u'')
         eq_(resource['format'], u'html')
-        eq_(resource['media_type'], u'html')
+        eq_(resource['media_type'], u'text/html')
         eq_(resource['identifier'], u'346265-fr@bundesamt-fur-statistik-bfs')
         eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
         eq_(resource['license'], u'Creative Commons CC Zero License (cc-zero)')
@@ -294,7 +294,6 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         resource = datasets[0]['resources'][0]
 
-
     def test_temporals_accepted_formats(self):
         contents = self._get_file_contents('dataset-datetimes.xml')
         p = RDFParser(profiles=['swiss_dcat_ap'])
@@ -404,6 +403,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         dataset = [d for d in p.datasets()][0]
         resource = dataset["resources"][0]
 
+        eq_(resource['rights'], u"NonCommercialAllowed-CommercialWithPermission-ReferenceRequired")
+
     def test_eu_themes_mapping(self):
         contents = self._get_file_contents('catalog-themes.xml')
         p = RDFParser(profiles=['swiss_dcat_ap'])
@@ -421,3 +422,21 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
                     dataset['identifier']
                 )
             )
+
+    def test_format_media_type(self):
+        """Test that format and media type are parsed both from URIs and from
+        strings
+        """
+        contents = self._get_file_contents('dataset-media-types.xml')
+        p = RDFParser(profiles=['swiss_dcat_ap'])
+        p.parse(contents)
+
+        dataset = [d for d in p.datasets()][0]
+        results = [
+            (resource.get('format'), resource.get('media_type'))
+            for resource in dataset['resources']
+        ]
+        eq_(
+            sorted(results),
+            [('html', 'text/html'), ('json', 'application/json')]
+        )

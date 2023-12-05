@@ -258,17 +258,21 @@ def get_publisher_dict_from_dataset(publisher):
 
 
 def get_iana_media_type_values():
+    media_type_values = {}
     file = os.path.join(__location__, 'iana_media_types.xml')
     tree = ET.parse(file)
     root = tree.getroot()
-    records = root.findall('.//ns:record', media_types_namespaces)
-    media_type_values = {}
-    for record in records:
-        if record.find('ns:file', media_types_namespaces) is None:
-            continue
-        if record.find('ns:name', media_types_namespaces) is None:
-            continue
-        name = record.find('ns:name', media_types_namespaces).text.lower()
-        file_value = record.find('ns:file', media_types_namespaces).text
-        media_type_values[name] = media_types_namespaces['ns']+'/'+file_value
+    registries = root.findall('.//ns:registry', media_types_namespaces)
+    for registry in registries:
+        registry_type = registry.get('id')
+        records = registry.findall('.//ns:record', media_types_namespaces)
+        for record in records:
+            if record.find('ns:file', media_types_namespaces) is None:
+                continue
+            if record.find('ns:name', media_types_namespaces) is None:
+                continue
+            name = record.find('ns:name', media_types_namespaces).text.lower()
+            file_value = record.find('ns:file', media_types_namespaces).text
+            media_type_values[registry_type + '/' + name] = \
+                media_types_namespaces['ns'] + '/' + file_value
     return media_type_values

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:dcat="http://www.w3.org/ns/dcat#" xmlns:dcterms="http://purl.org/dc/terms/">
+  <dcat:Dataset rdf:about="https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585">
+    <dcat:distribution>
+      <dcat:Distribution>
+        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/text/html"/>
+        <dcterms:format rdf:resource="http://publications.europa.eu/resource/authority/file-type/HTML"/>
+      </dcat:Distribution>
+    </dcat:distribution>
+    <dcat:distribution>
+      <dcat:Distribution>
+        <dcat:mediaType rdf:datatype="http://www.w3.org/2001/XMLSchema#string">application/json</dcat:mediaType>
+        <dcterms:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">application/json</dcterms:format>
+      </dcat:Distribution>
+    </dcat:distribution>
+  </dcat:Dataset>
+</rdf:RDF>

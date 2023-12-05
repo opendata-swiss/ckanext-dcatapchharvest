@@ -240,7 +240,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         if isinstance(format_value, dict):
             log.debug("The format object is a dictionary type.")
         else:
-            lowercase_format_value = format_value.lower()
+            lowercase_format_value = format_value.lower().split('/')[-1]
             if lowercase_format_value in valid_formats \
                     or lowercase_format_value in valid_media_types:
                 return lowercase_format_value
@@ -252,10 +252,12 @@ class SwissDCATAPProfile(MultiLangProfile):
         if isinstance(media_type_value_raw, dict):
             log.debug("The media type object is a dictionary type.")
         else:
-            pattern = r'[^/]+$'  # Match characters that are not '/'
+            # This matches either a URI (http://example.com/foo/bar) or
+            # a string (foo/bar)
+            pattern = r'(.*\/|^)(.+\/.+)$'
             media_type_value_re = re.search(pattern, media_type_value_raw)
             if media_type_value_re:
-                media_type_value = media_type_value_re.group(0)
+                media_type_value = media_type_value_re.group(2)
             else:
                 media_type_value = media_type_value_raw
 
@@ -1079,13 +1081,12 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Export media type if it matches IANA media type vocabulary
         if resource_dict.get('media_type'):
-            lowercase_media_type_value = \
-                resource_dict.get('media_type').lower()
-            if lowercase_media_type_value in valid_media_types:
+            media_type = resource_dict.get('media_type')
+            if media_type in valid_media_types:
                 g.add((
                     distribution,
                     DCAT.mediaType,
-                    URIRef(valid_media_types[lowercase_media_type_value])
+                    URIRef(valid_media_types[media_type])
                 ))
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
