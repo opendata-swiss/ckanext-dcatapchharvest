@@ -461,12 +461,18 @@ class SwissDCATAPProfile(MultiLangProfile):
             for dcat_theme_url in dcat_theme_urls:
                 eu_theme_url = None
 
+                # Python 2 / 3 compatibility
+                import sys
+                if sys.version_info[0] >= 3:
+                    unicode = str
+
                 # Case 1: We get a deprecated opendata.swiss theme. Replace
                 #         the base url with the dcat-ap.ch base url, so we can
                 #         look it up in the theme mapping.
                 if dcat_theme_url.startswith(OGD_THEMES_URI):
                     new_theme_url = dcat_theme_url.replace(
                         OGD_THEMES_URI, CHTHEMES_URI)
+
                     eu_theme_url = unicode(
                         eu_theme_mapping[URIRef(new_theme_url)][0])
 
