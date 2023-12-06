@@ -22,11 +22,11 @@ valid_media_types = dh.get_iana_media_type_values()
 
 
 DCT = dh.DCT
-DCAT = Namespace("http://www.w3.org/ns/dcat#")
-VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
+DCAT = Namespace('http://www.w3.org/ns/dcat#')
+VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
 SCHEMA = Namespace('http://schema.org/')
-ADMS = Namespace("http://www.w3.org/ns/adms#")
-FOAF = Namespace("http://xmlns.com/foaf/0.1/")
+ADMS = Namespace('http://www.w3.org/ns/adms#')
+FOAF = Namespace('http://xmlns.com/foaf/0.1/')
 TIME = Namespace('http://www.w3.org/2006/time')
 LOCN = Namespace('http://www.w3.org/ns/locn#')
 GSP = Namespace('http://www.opengis.net/ont/geosparql#')
@@ -34,9 +34,7 @@ OWL = Namespace('http://www.w3.org/2002/07/owl#')
 SPDX = Namespace('http://spdx.org/rdf/terms#')
 XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
-CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
-CHTHEMES = Namespace(CHTHEMES_URI)
-ODRS = Namespace("http://schema.theodi.org/odrs#")
+ODRS = Namespace('http://schema.theodi.org/odrs#')
 
 GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
 
@@ -64,7 +62,9 @@ namespaces = {
     'odrs': ODRS,
 }
 
-ogd_theme_base_url = 'http://opendata.swiss/themes'
+OGD_THEMES_URI = 'http://opendata.swiss/themes/'
+CHTHEMES_URI = 'http://dcat-ap.ch/vocabulary/themes/'
+EUTHEMES_URI = 'http://publications.europa.eu/resource/authority/data-theme/'
 
 slug_id_pattern = re.compile('[^/]+(?=/$|$)')
 
@@ -234,6 +234,38 @@ class SwissDCATAPProfile(MultiLangProfile):
             })
 
         return qualified_relations
+
+    def _get_eu_or_iana_format(self, subject):
+        format_value = self._object_value(subject, DCT['format'])
+        if isinstance(format_value, dict):
+            log.debug("The format object is a dictionary type.")
+        else:
+            lowercase_format_value = format_value.lower().split('/')[-1]
+            if lowercase_format_value in valid_formats \
+                    or lowercase_format_value in valid_media_types:
+                return lowercase_format_value
+            else:
+                return ''
+
+    def _get_iana_media_type(self, subject):
+        media_type_value_raw = self._object_value(subject, DCAT.mediaType)
+        if isinstance(media_type_value_raw, dict):
+            log.debug("The media type object is a dictionary type.")
+        else:
+            # This matches either a URI (http://example.com/foo/bar) or
+            # a string (foo/bar)
+            pattern = r'(.*\/|^)(.+\/.+)$'
+            media_type_value_re = re.search(pattern, media_type_value_raw)
+            if media_type_value_re:
+                media_type_value = media_type_value_re.group(2)
+            else:
+                media_type_value = media_type_value_raw
+
+            lowercase_media_type_value = media_type_value.lower()
+            if lowercase_media_type_value in valid_media_types:
+                return lowercase_media_type_value
+            else:
+                return ''
 
     def _license_rights_name(self, subject, predicate):
         for node in self.g.objects(subject, predicate):
@@ -418,6 +450,50 @@ class SwissDCATAPProfile(MultiLangProfile):
                  "in the official list of frequencies" % ogdch_value)
         return ""
 
+    def _get_groups(self, subject):
+        """Map the DCAT.theme values of a dataset to themes from the EU theme
+        vocabulary http://publications.europa.eu/resource/authority/data-theme
+        """
+        group_names = []
+        dcat_theme_urls = self._object_value_list(subject, DCAT.theme)
+
+        if dcat_theme_urls:
+            for dcat_theme_url in dcat_theme_urls:
+                eu_theme_url = None
+
+                # Case 1: We get a deprecated opendata.swiss theme. Replace
+                #         the base url with the dcat-ap.ch base url, so we can
+                #         look it up in the theme mapping.
+                if dcat_theme_url.startswith(OGD_THEMES_URI):
+                    new_theme_url = dcat_theme_url.replace(
+                        OGD_THEMES_URI, CHTHEMES_URI)
+                    eu_theme_url = unicode(
+                        eu_theme_mapping[URIRef(new_theme_url)][0])
+
+                # Case 2: We get a dcat-ap.ch theme (the same as the
+                #         opendata.swiss themes, but different base url). Get
+                #         the correct EU theme from the theme mapping.
+                elif dcat_theme_url.startswith(CHTHEMES_URI):
+                    eu_theme_url = unicode(
+                        eu_theme_mapping[URIRef(dcat_theme_url)][0])
+
+                # Case 3: We get an EU theme and don't need to look it up in
+                #         the mapping.
+                elif dcat_theme_url.startswith(EUTHEMES_URI):
+                    eu_theme_url = dcat_theme_url
+
+                if eu_theme_url is None:
+                    log.info("Could not find an EU theme that matched the "
+                             "given theme: {}".format(dcat_theme_url))
+                    continue
+
+                search_result = slug_id_pattern.search(eu_theme_url)
+                eu_theme_slug = search_result.group().lower()
+                group_names.append(eu_theme_slug)
+
+        # Deduplicate group names before returning list of group dicts
+        return [{'name': name} for name in list(set(group_names))]
+
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
         log.debug("Parsing dataset '%r'" % dataset_ref)
 
@@ -475,13 +551,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         dataset_dict['keywords'] = self._keywords(dataset_ref)
 
         # Themes
-        dcat_theme_urls = self._object_value_list(dataset_ref, DCAT.theme)
-        if dcat_theme_urls:
-            dataset_dict['groups'] = []
-            for dcat_theme_url in dcat_theme_urls:
-                search_result = slug_id_pattern.search(dcat_theme_url)
-                dcat_theme_slug = search_result.group()
-                dataset_dict['groups'].append({'name': dcat_theme_slug})
+        dataset_dict['groups'] = self._get_groups(dataset_ref)
 
         #  Languages
         languages = self._object_value_list(dataset_ref, DCT.language)
@@ -541,9 +611,6 @@ class SwissDCATAPProfile(MultiLangProfile):
             #  Simple values
             for key, predicate in (
                     ('identifier', DCT.identifier),
-                    ('format', DCT['format']),
-                    ('mimetype', DCAT.mediaType),
-                    ('media_type', DCAT.mediaType),
                     ('download_url', DCAT.downloadURL),
                     ('url', DCAT.accessURL),
                     ('coverage', DCT.coverage),
@@ -568,10 +635,21 @@ class SwissDCATAPProfile(MultiLangProfile):
                     resource_dict['license'] = rights
                     resource_dict['rights'] = license
 
-            # if media type is not set, use format as fallback
-            if (not resource_dict.get('media_type') and
-                    resource_dict.get('format')):
+            # Format & Media type
+            resource_dict['format'] = \
+                self._get_eu_or_iana_format(distribution)
+            resource_dict['media_type'] = \
+                self._get_iana_media_type(distribution)
+            # Set 'media_type' as 'format'
+            # if 'media_type' is not set but 'format' exists
+            if not resource_dict.get('media_type') \
+                    and resource_dict.get('format'):
                 resource_dict['media_type'] = resource_dict['format']
+            # Set 'format' as 'media_type'
+            # if 'format' is not set but 'media_type' exists
+            elif not resource_dict.get('format') \
+                    and resource_dict.get('media_type'):
+                resource_dict['format'] = resource_dict['media_type']
 
             # Documentation
             resource_dict['documentation'] = self._object_value_list(
@@ -836,18 +914,11 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Themes
         groups = self._get_dataset_value(dataset_dict, 'groups', [])
         for group_name in groups:
-            ogdch_theme_ref = URIRef(CHTHEMES_URI + group_name.get('name'))
-            eu_theme_ref_list = eu_theme_mapping.get(ogdch_theme_ref)
-            for eu_theme_ref in eu_theme_ref_list:
-                g.add((
-                    dataset_ref,
-                    DCAT.theme,
-                    eu_theme_ref,
-                ))
+            eu_theme_ref = URIRef(EUTHEMES_URI + group_name.get('name'))
             g.add((
                 dataset_ref,
                 DCAT.theme,
-                ogdch_theme_ref,
+                eu_theme_ref,
             ))
 
         # Resources
@@ -926,14 +997,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                             datatype=XSD.duration)
                 ))
 
-            # Mime-Type
-            if resource_dict.get('mimetype'):
-                g.add((
-                    distribution,
-                    DCAT.mediaType,
-                    Literal(resource_dict['mimetype'])
-                ))
-
             # Dates
             items = [
                 ('issued', DCT.issued, None, Literal),
@@ -997,43 +1060,34 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _format_and_media_type_to_graph(self, resource_dict, distribution):
         g = self.g
-        # Format and Media Type Case 1:
-        # Format: Set Format value if format matches EU vocabulary
-        format_uri = None
+        # Export format value if it matches EU vocabulary
+        # Exception: if a format is not available in the EU vocabulary,
+        # use IANA media type vocabulary
         if resource_dict.get('format'):
-            format = resource_dict.get('format').replace(' ', '_')
-            if format in valid_formats:
-                format_uri = URIRef(valid_formats[format])
-                g.add((distribution, DCT['format'], format_uri))
+            lowercase_format_value = resource_dict.get('format').lower()
+            if lowercase_format_value in valid_formats:
+                g.add((
+                    distribution,
+                    DCT['format'],
+                    URIRef(valid_formats[lowercase_format_value])
+                ))
+            elif lowercase_format_value not in valid_formats \
+                    and lowercase_format_value in valid_media_types:
+                g.add((
+                    distribution,
+                    DCT['format'],
+                    URIRef(valid_media_types[lowercase_format_value])
+                ))
 
-        # Media Type: Set Format value
-        # if format matches EU vocabulary and media type is not set
-        if format_uri and resource_dict.get('media_type') is None:
-            g.add((distribution, DCAT.mediaType, format_uri))
-
-        # Format and Media Type Case 2:
-        # Set Media Type and Format value
-        # if format does not match EU vocabulary
-        # but media type matches IANA vocabulary
-        media_type_uri = None
-        format_uri = None
+        # Export media type if it matches IANA media type vocabulary
         if resource_dict.get('media_type'):
             media_type = resource_dict.get('media_type')
             if media_type in valid_media_types:
-                media_type_uri = URIRef(valid_media_types[media_type])
-                g.add((distribution, DCT['format'], media_type_uri))
-                g.add((distribution, DCAT.mediaType, media_type_uri))
-
-        # Format and Media Type Case 3:
-        # Set Media Type and Format value
-        # if format does not match EU vocabulary
-        # but format matches IANA vocabulary
-        if media_type_uri is None and resource_dict.get('format'):
-            format = resource_dict.get('format')
-            if format in valid_media_types:
-                media_type_uri = URIRef(valid_media_types[format])
-                g.add((distribution, DCT['format'], media_type_uri))
-                g.add((distribution, DCAT.mediaType, media_type_uri))
+                g.add((
+                    distribution,
+                    DCAT.mediaType,
+                    URIRef(valid_media_types[media_type])
+                ))
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
         g = self.g
@@ -1256,7 +1310,6 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 ("status", ADMS.status, None, Literal),
                 ("coverage", DCT.coverage, None, Literal),
                 ("identifier", DCT.identifier, None, Literal),
-                ("media_type", SCHEMA.mediaType, None, Literal),
                 ("spatial", DCT.spatial, None, Literal),
             ]
 
@@ -1278,18 +1331,6 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             # Download URL & Access URL
             self.download_access_url(resource_dict, distribution, g)
-
-            # Format
-            if resource_dict.get("format"):
-                g.add((distribution, DCT["format"],
-                       Literal(resource_dict["format"])))
-
-            # Mime-Type
-            if resource_dict.get("mimetype"):
-                g.add(
-                    (distribution, SCHEMA.mediaType,
-                     Literal(resource_dict["mimetype"]))
-                )
 
             # Dates
             items = [
