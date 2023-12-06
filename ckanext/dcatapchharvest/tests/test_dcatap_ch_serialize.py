@@ -34,7 +34,7 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        eq_(unicode(dataset_ref), utils.dataset_uri(dataset))
+        eq_(str(dataset_ref), utils.dataset_uri(dataset))
 
         # Basic fields
         assert self._triple(g, dataset_ref, RDF.type, DCAT.Dataset)
@@ -46,14 +46,14 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, dataset_ref, DCT.issued, dataset['issued'], XSD.dateTime)
         assert len(list(g.objects(dataset_ref, DCT.modified))) == 0
 
-        for key, value in dataset['description'].iteritems():
+        for key, value in dataset['description'].items():
             if dataset['description'].get(key):
                 assert self._triple(g, dataset_ref, DCT.description, Literal(value, lang=key))
         eq_(len([t for t in g.triples((dataset_ref, DCT.description, None))]), 2)
 
         # Tags
         eq_(len([t for t in g.triples((dataset_ref, DCAT.keyword, None))]), 3)
-        for key, keywords in dataset['keywords'].iteritems():
+        for key, keywords in dataset['keywords'].items():
             if dataset['keywords'].get(key):
                 for keyword in keywords:
                     assert self._triple(g, dataset_ref, DCAT.keyword, Literal(keyword, lang=key))

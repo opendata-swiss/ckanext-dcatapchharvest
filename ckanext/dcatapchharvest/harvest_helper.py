@@ -19,7 +19,7 @@ def map_resources_to_ids(pkg_dict, package_id):
         {r['id']: _get_resource_id_string(r) for r in existing_resources}
     for resource in pkg_dict.get('resources'):
         resource_id_dict = _get_resource_id_string(resource)
-        id_to_reuse = [k for k, v in existing_resources_mapping.items()
+        id_to_reuse = [k for k, v in list(existing_resources_mapping.items())
                        if v == resource_id_dict]
         if id_to_reuse:
             id_to_reuse = id_to_reuse[0]
