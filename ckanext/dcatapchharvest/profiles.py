@@ -914,7 +914,8 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Themes
         groups = self._get_dataset_value(dataset_dict, 'groups', [])
         for group_name in groups:
-            eu_theme_ref = URIRef(EUTHEMES_URI + group_name.get('name'))
+            eu_theme_slug = group_name.get('name').upper()
+            eu_theme_ref = URIRef(EUTHEMES_URI + eu_theme_slug)
             g.add((
                 dataset_ref,
                 DCAT.theme,
