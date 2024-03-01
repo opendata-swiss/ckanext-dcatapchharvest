@@ -197,7 +197,8 @@ class SwissDCATI14YRDFHarvester(SwissDCATRDFHarvester):
         info['name'] = 'dcat_ch_i14y_rdf'
         info['title'] = 'DCAT-AP Switzerland I14Y RDF Harvester'
         info['description'] = \
-            'Harvester for DCAT-AP Switzerland datasets from an RDF graph desighned for I14Y'  # noqa
+            'Harvester for DCAT-AP Switzerland datasets from ' \
+            'an RDF graph designed for I14Y'
 
         return info
 
