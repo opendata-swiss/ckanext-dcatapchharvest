@@ -69,7 +69,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         url = url.replace('ogd.global.szh.loc', 'data.stadt-zuerich.ch')
         return url, []
 
-    def _get_guid(self, dataset_dict, source_url=None):
+    def _get_guid(self, dataset_dict, source_url=None):  # noqa
         '''
         Try to get a unique identifier for a harvested dataset
         It will be the first found of:
