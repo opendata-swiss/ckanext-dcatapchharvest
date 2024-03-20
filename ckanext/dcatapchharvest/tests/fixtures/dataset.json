@@ -125,6 +125,16 @@
       "format": "HTML"
     },
     {
+      "id": "ae728273-a6c1-4cf4-b77d-c5c02ae28508",
+      "package_id": "4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6",
+      "format": "RDF N-Triples"
+    },
+    {
+      "id": "f70ed72c-ac4f-4ab3-a97e-9780b3849776",
+      "package_id": "4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6",
+      "format": "JSON-LD"
+    },
+    {
       "id": "0cfce6ba-28f4-4229-b733-f6492c650395",
       "package_id": "e2a8b9fd-b00e-461a-9e99-686b7c2d146a",
       "documentation": [
