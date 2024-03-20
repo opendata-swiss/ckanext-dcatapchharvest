@@ -125,6 +125,12 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             if resource_dict.get('format') == "HTML":
                 assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/HTML"))
 
+            if resource_dict.get('format') == "RDF N-Triples":
+                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/RDF_N_TRIPLES"))
+
+            if resource_dict.get('format') == "JSON-LD":
+                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/JSON_LD"))
+
             if resource_dict.get('media_type') == "application/1d-interleaved-parityfec":
                 assert self._triple(g, distribution, DCAT.mediaType, URIRef("http://www.iana.org/assignments/application/1d-interleaved-parityfec"))
 
