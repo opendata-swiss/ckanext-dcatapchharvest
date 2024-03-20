@@ -1072,8 +1072,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     DCT['format'],
                     URIRef(valid_formats[lowercase_format_value])
                 ))
-            elif lowercase_format_value not in valid_formats \
-                    and lowercase_format_value in valid_media_types:
+            elif lowercase_format_value in valid_media_types:
                 g.add((
                     distribution,
                     DCT['format'],
