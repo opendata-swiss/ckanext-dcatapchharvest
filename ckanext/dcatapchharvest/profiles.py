@@ -862,6 +862,9 @@ class SwissDCATAPProfile(MultiLangProfile):
                 dataset_dict, 'contact_points'
             )
             for contact_point in contact_points:
+                if not contact_point.get('email') or not contact_point.get('name'):
+                    continue
+
                 contact_details = BNode()
                 contact_point_email = \
                     EMAIL_MAILTO_PREFIX + contact_point['email']
