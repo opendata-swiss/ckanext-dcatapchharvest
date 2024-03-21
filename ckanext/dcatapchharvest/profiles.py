@@ -862,7 +862,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 dataset_dict, 'contact_points'
             )
             for contact_point in contact_points:
-                if not contact_point.get('email') or not contact_point.get('name'):
+                if not contact_point.get('email') \
+                        or not contact_point.get('name'):
                     continue
 
                 contact_details = BNode()
@@ -871,9 +872,11 @@ class SwissDCATAPProfile(MultiLangProfile):
                 contact_point_name = contact_point['name']
 
                 g.add((contact_details, RDF.type, VCARD.Organization))
-                g.add(
-                    (contact_details, VCARD.hasEmail, URIRef(contact_point_email))
-                )
+                g.add((
+                    contact_details,
+                    VCARD.hasEmail,
+                    URIRef(contact_point_email)
+                ))
                 g.add((contact_details, VCARD.fn, Literal(contact_point_name)))
 
                 g.add((dataset_ref, DCAT.contactPoint, contact_details))
