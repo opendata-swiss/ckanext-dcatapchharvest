@@ -1257,8 +1257,11 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         if dataset_dict.get("contact_points"):
             contact_points = self._get_dataset_value(
                 dataset_dict, "contact_points"
-            )  # noqa
+            )
             for contact_point in contact_points:
+                if not contact_point.get('email') \
+                        or not contact_point.get('name'):
+                    continue
                 contact_details = BNode()
                 contact_point_email = \
                     EMAIL_MAILTO_PREFIX + contact_point["email"]
