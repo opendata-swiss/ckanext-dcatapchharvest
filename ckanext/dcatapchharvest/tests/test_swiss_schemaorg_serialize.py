@@ -7,7 +7,7 @@ from rdflib.namespace import RDF
 
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
-from ckanext.dcat.profiles import SCHEMA
+from ckanext.dcat.profiles import SCHEMA, VCARD
 
 from rdflib import URIRef
 import ckanext.dcatapchharvest.dcat_helpers as dh
@@ -39,6 +39,17 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, dataset_ref, SCHEMA.name, dataset['title'])
         assert self._triple(g, dataset_ref, SCHEMA.version, dataset['version'])
         assert self._triple(g, dataset_ref, SCHEMA.identifier, extras['identifier'])
+
+        # Contact points
+        eq_(len([t for t in g.triples((dataset_ref, SCHEMA.contactPoint, None))]), 1)
+
+        contact_point = next(g.objects(dataset_ref, SCHEMA.contactPoint))
+        eq_(next(g.objects(contact_point, RDF.type)), VCARD.Organization)
+        eq_(
+            next(g.objects(contact_point, VCARD.hasEmail)),
+            URIRef("mailto:maria.muster@example.com")
+        )
+        eq_(next(g.objects(contact_point, VCARD.fn)), Literal("Maria Muster"))
 
         # Dates
         assert self._triple(g, dataset_ref, SCHEMA.datePublished, dataset['issued'])

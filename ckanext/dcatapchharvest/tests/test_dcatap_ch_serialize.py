@@ -9,7 +9,7 @@ from rdflib.namespace import RDF
 
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
-from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, XSD
+from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, VCARD, XSD
 
 import ckanext.dcatapchharvest.dcat_helpers as dh
 
@@ -62,6 +62,17 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
         eq_(len([t for t in g.triples((dataset_ref, FOAF.page, None))]), 2)
         for documentation_link in dataset['documentation']:
             assert self._triple(g, dataset_ref, FOAF.page, URIRef(documentation_link))
+
+        # Contact points
+        eq_(len([t for t in g.triples((dataset_ref, DCAT.contactPoint, None))]), 1)
+
+        contact_point = next(g.objects(dataset_ref, DCAT.contactPoint))
+        eq_(next(g.objects(contact_point, RDF.type)), VCARD.Organization)
+        eq_(
+            next(g.objects(contact_point, VCARD.hasEmail)),
+            URIRef("mailto:maria.muster@example.com")
+        )
+        eq_(next(g.objects(contact_point, VCARD.fn)), Literal("Maria Muster"))
 
         # Conformance
         conforms_to = dataset.get("conforms_to", [])
