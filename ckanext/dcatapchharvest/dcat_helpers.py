@@ -241,6 +241,9 @@ def get_format_values():
     https://github.com/opendata-swiss/ckanext-switzerland-ng/blob/master/ckanext/switzerland/helpers/format_mapping.yaml)
     to the URIs in the EU file-type vocabulary
     (http://publications.europa.eu/resource/authority/file-type).
+
+    The standardised formats are converted to lowercase, with non-letter
+    characters replaced by '_', for use as keys in this dict.
     """
     g = Graph()
     for prefix, namespace in format_namespaces.items():
