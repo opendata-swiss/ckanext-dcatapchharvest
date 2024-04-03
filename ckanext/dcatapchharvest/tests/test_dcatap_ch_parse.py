@@ -324,7 +324,6 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         p = RDFParser(profiles=['swiss_dcat_ap'])
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
-        print(sorted(dataset["temporals"]))
         eq_(len(dataset['temporals']), 5)
 
         eq_(
