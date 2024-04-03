@@ -20,5 +20,11 @@
         <dcterms:format rdf:resource="http://publications.europa.eu/resource/authority/file-type/GRID_ASCII"/>
       </dcat:Distribution>
     </dcat:distribution>
+    <dcat:distribution>
+      <dcat:Distribution>
+        <dcat:mediaType rdf:datatype="http://www.w3.org/2001/XMLSchema#string">text/plain</dcat:mediaType>
+        <dcterms:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ESRI ASCII Grid</dcterms:format>
+      </dcat:Distribution>
+    </dcat:distribution>
   </dcat:Dataset>
 </rdf:RDF>

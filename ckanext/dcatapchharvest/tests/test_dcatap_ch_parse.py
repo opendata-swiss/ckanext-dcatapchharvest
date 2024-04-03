@@ -438,6 +438,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(
             sorted(results),
             [
+                ('esri_ascii_grid', 'text/plain'),
                 ('grid_ascii', 'text/plain'),
                 ('html', 'text/html'),
                 ('json', 'application/json')
