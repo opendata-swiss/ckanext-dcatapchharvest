@@ -438,5 +438,9 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         ]
         eq_(
             sorted(results),
-            [('html', 'text/html'), ('json', 'application/json')]
+            [
+                ('grid_ascii', 'text/plain'),
+                ('html', 'text/html'),
+                ('json', 'application/json')
+            ]
         )

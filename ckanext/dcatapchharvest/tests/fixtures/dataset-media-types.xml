@@ -14,5 +14,11 @@
         <dcterms:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">application/json</dcterms:format>
       </dcat:Distribution>
     </dcat:distribution>
+    <dcat:distribution>
+      <dcat:Distribution>
+        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/text/plain"/>
+        <dcterms:format rdf:resource="http://publications.europa.eu/resource/authority/file-type/GRID_ASCII"/>
+      </dcat:Distribution>
+    </dcat:distribution>
   </dcat:Dataset>
 </rdf:RDF>
