@@ -1065,15 +1065,15 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Exception: if a format is not available in the EU vocabulary,
         # use IANA media type vocabulary
         if resource_dict.get('format'):
-            lowercase_format_value = resource_dict.get('format').lower()
+            lowercase_format_value = resource_dict.get('format').lower()\
+                .replace(' ', '_').replace('-', '_')
             if lowercase_format_value in valid_formats:
                 g.add((
                     distribution,
                     DCT['format'],
                     URIRef(valid_formats[lowercase_format_value])
                 ))
-            elif lowercase_format_value not in valid_formats \
-                    and lowercase_format_value in valid_media_types:
+            elif lowercase_format_value in valid_media_types:
                 g.add((
                     distribution,
                     DCT['format'],
