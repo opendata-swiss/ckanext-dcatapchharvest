@@ -858,15 +858,25 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Contact details
         if dataset_dict.get('contact_points'):
-            contact_points = self._get_dataset_value(dataset_dict, 'contact_points')  # noqa
+            contact_points = self._get_dataset_value(
+                dataset_dict, 'contact_points'
+            )
             for contact_point in contact_points:
+                if not contact_point.get('email') \
+                        or not contact_point.get('name'):
+                    continue
+
                 contact_details = BNode()
                 contact_point_email = \
                     EMAIL_MAILTO_PREFIX + contact_point['email']
                 contact_point_name = contact_point['name']
 
                 g.add((contact_details, RDF.type, VCARD.Organization))
-                g.add((contact_details, VCARD.hasEmail, URIRef(contact_point_email)))  # noqa
+                g.add((
+                    contact_details,
+                    VCARD.hasEmail,
+                    URIRef(contact_point_email)
+                ))
                 g.add((contact_details, VCARD.fn, Literal(contact_point_name)))
 
                 g.add((dataset_ref, DCAT.contactPoint, contact_details))
@@ -1247,8 +1257,11 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         if dataset_dict.get("contact_points"):
             contact_points = self._get_dataset_value(
                 dataset_dict, "contact_points"
-            )  # noqa
+            )
             for contact_point in contact_points:
+                if not contact_point.get('email') \
+                        or not contact_point.get('name'):
+                    continue
                 contact_details = BNode()
                 contact_point_email = \
                     EMAIL_MAILTO_PREFIX + contact_point["email"]

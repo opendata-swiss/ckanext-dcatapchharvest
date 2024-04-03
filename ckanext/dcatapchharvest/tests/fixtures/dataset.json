@@ -101,6 +101,18 @@
     "https://example.com/documentation-dataset-1",
     "https://example.com/documentation-dataset-2"
   ],
+  "contact_points": [
+    {
+      "name": "Maria Muster",
+      "email": "maria.muster@example.com"
+    },
+    {
+      "name": "Maria Muster"
+    },
+    {
+      "email": "maria.muster@example.com"
+    }
+  ],
   "resources": [
     {
       "id": "e2c50e70-67ad-4f86-bb1b-3f93867eadaa",
