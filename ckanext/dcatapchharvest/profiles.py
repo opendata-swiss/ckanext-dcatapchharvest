@@ -241,6 +241,10 @@ class SwissDCATAPProfile(MultiLangProfile):
             log.debug("The format object is a dictionary type.")
         else:
             lowercase_format_value = format_value.lower().split('/')[-1]
+            # In case the format is given as a literal, not a URI, we have to
+            # format it the same as the keys in the valid_formats dict.
+            lowercase_format_value = lowercase_format_value.replace(' ', '_')\
+                .replace('-', '_')
             if lowercase_format_value in valid_formats \
                     or lowercase_format_value in valid_media_types:
                 return lowercase_format_value
