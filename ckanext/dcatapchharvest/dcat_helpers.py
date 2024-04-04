@@ -290,10 +290,14 @@ def get_iana_media_type_values():
         registry_type = registry.get('id')
         records = registry.findall('.//ns:record', media_types_namespaces)
         for record in records:
-            name = record.find('ns:name', media_types_namespaces).text.lower()
+            name = record.find(
+                'ns:name', media_types_namespaces
+            ).text.lower()
 
             if record.find('ns:file', media_types_namespaces) is not None:
-                uri_suffix = record.find('ns:file', media_types_namespaces).text
+                uri_suffix = record.find(
+                    'ns:file', media_types_namespaces
+                ).text
             else:
                 uri_suffix = registry_type + '/' + name
 
