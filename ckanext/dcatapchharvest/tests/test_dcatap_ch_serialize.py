@@ -154,6 +154,9 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             if resource_dict.get('media_type') == "application/1d-interleaved-parityfec":
                 assert self._triple(g, distribution, DCAT.mediaType, URIRef("http://www.iana.org/assignments/media-types/application/1d-interleaved-parityfec"))
 
+            if resource_dict.get('format') == "application/1d-interleaved-parityfec":
+                assert self._triple(g, distribution, DCT['format'], URIRef("http://www.iana.org/assignments/media-types/application/1d-interleaved-parityfec"))
+
             if resource_dict.get('temporal_resolution') == "P1D":
                 expected_literal = Literal("P1D", datatype=XSD.duration)
                 assert self._triple(g, distribution, DCAT.temporalResolution, expected_literal)
