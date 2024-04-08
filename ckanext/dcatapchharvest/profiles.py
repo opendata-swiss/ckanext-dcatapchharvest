@@ -36,8 +36,6 @@ XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
 ODRS = Namespace('http://schema.theodi.org/odrs#')
 
-GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
-
 EMAIL_MAILTO_PREFIX = 'mailto:'
 ORGANIZATION_BASE_URL = 'https://opendata.swiss/organization/'
 
@@ -235,37 +233,49 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return qualified_relations
 
+    def _munge_format(self, format_string):
+        """Munge a distribution format into a form that matches the keys in
+        the valid_formats dict.
+        """
+        return format_string.lower().split('/')[-1] \
+            .replace(' ', '_') \
+            .replace('-', '_')
+
+    def _munge_media_type(self, media_type_string):
+        """Munge a distribution media-type or format into a form that matches
+        the keys in the valid_media_types dict.
+        """
+        # This matches either a URI (http://example.com/foo/bar) or
+        # a string (foo/bar)
+        pattern = r'(.*\/|^)(.+\/.+)$'
+        media_type_value_re = re.search(pattern, media_type_string)
+        if media_type_value_re:
+            media_type_value = media_type_value_re.group(2)
+        else:
+            media_type_value = media_type_string
+
+        return media_type_value.lower()
+
     def _get_eu_or_iana_format(self, subject):
         format_value = self._object_value(subject, DCT['format'])
         if isinstance(format_value, dict):
             log.debug("The format object is a dictionary type.")
         else:
-            lowercase_format_value = format_value.lower().split('/')[-1]
-            if lowercase_format_value in valid_formats \
-                    or lowercase_format_value in valid_media_types:
-                return lowercase_format_value
-            else:
-                return ''
+            format_key = self._munge_format(format_value)
+            media_type_key = self._munge_media_type(format_value)
+
+            if format_key in valid_formats \
+                    or media_type_key in valid_media_types:
+                return format_key
 
     def _get_iana_media_type(self, subject):
         media_type_value_raw = self._object_value(subject, DCAT.mediaType)
         if isinstance(media_type_value_raw, dict):
             log.debug("The media type object is a dictionary type.")
         else:
-            # This matches either a URI (http://example.com/foo/bar) or
-            # a string (foo/bar)
-            pattern = r'(.*\/|^)(.+\/.+)$'
-            media_type_value_re = re.search(pattern, media_type_value_raw)
-            if media_type_value_re:
-                media_type_value = media_type_value_re.group(2)
-            else:
-                media_type_value = media_type_value_raw
-
-            lowercase_media_type_value = media_type_value.lower()
-            if lowercase_media_type_value in valid_media_types:
-                return lowercase_media_type_value
-            else:
-                return ''
+            media_type_key = self._munge_media_type(media_type_value_raw)
+            if media_type_key in valid_media_types:
+                return media_type_key
 
     def _license_rights_name(self, subject, predicate):
         for node in self.g.objects(subject, predicate):
@@ -1075,19 +1085,21 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Exception: if a format is not available in the EU vocabulary,
         # use IANA media type vocabulary
         if resource_dict.get('format'):
-            lowercase_format_value = resource_dict.get('format').lower()\
-                .replace(' ', '_').replace('-', '_')
-            if lowercase_format_value in valid_formats:
+            format_key = self._munge_format(resource_dict.get('format'))
+            media_type_key = self._munge_media_type(
+                resource_dict.get('format')
+            )
+            if format_key in valid_formats:
                 g.add((
                     distribution,
                     DCT['format'],
-                    URIRef(valid_formats[lowercase_format_value])
+                    URIRef(valid_formats[format_key])
                 ))
-            elif lowercase_format_value in valid_media_types:
+            elif media_type_key in valid_media_types:
                 g.add((
                     distribution,
                     DCT['format'],
-                    URIRef(valid_media_types[lowercase_format_value])
+                    URIRef(valid_media_types[media_type_key])
                 ))
 
         # Export media type if it matches IANA media type vocabulary

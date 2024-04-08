@@ -324,7 +324,6 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         p = RDFParser(profiles=['swiss_dcat_ap'])
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
-        print(sorted(dataset["temporals"]))
         eq_(len(dataset['temporals']), 5)
 
         eq_(
@@ -438,5 +437,11 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         ]
         eq_(
             sorted(results),
-            [('html', 'text/html'), ('json', 'application/json')]
+            [
+                ('esri_ascii_grid', 'text/plain'),
+                ('grid_ascii', 'text/plain'),
+                ('html', 'text/html'),
+                ('json', 'application/json'),
+                ('text/calendar', 'text/calendar')
+            ]
         )

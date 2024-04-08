@@ -9,7 +9,7 @@
     <dcat:distribution>
       <dcat:Distribution rdf:about="https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585/resource/c8ec6ca0-6923-4cf3-92f2-95a10e6f8e25">
         <dct:title xml:lang="fr">Annuaire statistique de la Suisse 1901</dct:title>
-        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/text/html"/>
+        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/media-types/text/html"/>
         <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1900-12-31T00:00:00</dct:issued>
         <dcat:accessURL rdf:resource="https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901"/>
         <dct:language>fr</dct:language>

@@ -237,15 +237,38 @@ def get_pagination(catalog_graph):
 
 
 def get_format_values():
+    """Generate a dict that maps our standardised formats (the keys in this file
+    https://github.com/opendata-swiss/ckanext-switzerland-ng/blob/master/ckanext/switzerland/helpers/format_mapping.yaml)
+    to the URIs in the EU file-type vocabulary
+    (http://publications.europa.eu/resource/authority/file-type).
+
+    The standardised formats are converted to lowercase, with non-letter
+    characters replaced by '_', for use as keys in this dict.
+    """
     g = Graph()
     for prefix, namespace in format_namespaces.items():
         g.bind(prefix, namespace)
-    file = os.path.join(__location__, 'formats.xml')
-    g.parse(file, format='xml')
+    formats_file = os.path.join(__location__, 'formats.xml')
+    g.parse(formats_file, format='xml')
     format_values = {}
     for format_uri_ref in g.subjects():
         format_extension = format_uri_ref.split('/')[-1].lower()
         format_values[format_extension] = format_uri_ref
+
+    # Add special cases that aren't so easy to map.
+    format_values.update(
+        {
+            "api": "http://publications.europa.eu/resource/authority/file-type/REST",  # noqa
+            "esri_ascii_grid": "http://publications.europa.eu/resource/authority/file-type/GRID_ASCII",  # noqa
+            "sparql": "http://publications.europa.eu/resource/authority/file-type/SPARQLQ",  # noqa
+            "wcs": "http://publications.europa.eu/resource/authority/file-type/WCS_SRVC",  # noqa
+            "wfs": "http://publications.europa.eu/resource/authority/file-type/WFS_SRVC",  # noqa
+            "wms": "http://publications.europa.eu/resource/authority/file-type/WMS_SRVC",  # noqa
+            "wmts": "http://publications.europa.eu/resource/authority/file-type/WMTS_SRVC",  # noqa
+            "worldfile": "http://publications.europa.eu/resource/authority/file-type/WORLD"  # noqa
+        }
+    )
+
     return format_values
 
 
@@ -267,12 +290,18 @@ def get_iana_media_type_values():
         registry_type = registry.get('id')
         records = registry.findall('.//ns:record', media_types_namespaces)
         for record in records:
-            if record.find('ns:file', media_types_namespaces) is None:
-                continue
-            if record.find('ns:name', media_types_namespaces) is None:
-                continue
-            name = record.find('ns:name', media_types_namespaces).text.lower()
-            file_value = record.find('ns:file', media_types_namespaces).text
+            name = record.find(
+                'ns:name', media_types_namespaces
+            ).text.lower()
+
+            if record.find('ns:file', media_types_namespaces) is not None:
+                uri_suffix = record.find(
+                    'ns:file', media_types_namespaces
+                ).text
+            else:
+                uri_suffix = registry_type + '/' + name
+
             media_type_values[registry_type + '/' + name] = \
-                media_types_namespaces['ns'] + '/' + file_value
+                media_types_namespaces['ns'] + '/media-types/' + uri_suffix
+
     return media_type_values

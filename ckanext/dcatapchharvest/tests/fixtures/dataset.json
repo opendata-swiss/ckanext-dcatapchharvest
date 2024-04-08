@@ -147,6 +147,26 @@
       "format": "JSON-LD"
     },
     {
+      "id": "755a5eb6-2dfc-4164-a2c2-3c9c5394c1bd",
+      "package_id": "4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6",
+      "format": "ESRI ASCII Grid"
+    },
+    {
+      "id": "f5b54574-3d11-4ab2-8449-73c4d4d5412e",
+      "package_id": "4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6",
+      "format": "WORLDFILE"
+    },
+    {
+      "id": "082dec4d-1b01-4463-886e-6bb9e5b3a69a",
+      "package_id": "4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6",
+      "format": "WCS"
+    },
+    {
+      "id": "65d68995-02d2-423b-87fe-ea159240c903",
+      "package_id": "4b6fe9ca-dc77-4cec-92a4-55c6624a5bd6",
+      "format": "application/1d-interleaved-parityfec"
+    },
+    {
       "id": "0cfce6ba-28f4-4229-b733-f6492c650395",
       "package_id": "e2a8b9fd-b00e-461a-9e99-686b7c2d146a",
       "documentation": [

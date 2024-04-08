@@ -4,7 +4,7 @@
   <dcat:Dataset rdf:about="https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585">
     <dcat:distribution>
       <dcat:Distribution>
-        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/text/html"/>
+        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/media-types/text/html"/>
         <dcterms:format rdf:resource="http://publications.europa.eu/resource/authority/file-type/HTML"/>
       </dcat:Distribution>
     </dcat:distribution>
@@ -12,6 +12,24 @@
       <dcat:Distribution>
         <dcat:mediaType rdf:datatype="http://www.w3.org/2001/XMLSchema#string">application/json</dcat:mediaType>
         <dcterms:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">application/json</dcterms:format>
+      </dcat:Distribution>
+    </dcat:distribution>
+    <dcat:distribution>
+      <dcat:Distribution>
+        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/media-types/text/plain"/>
+        <dcterms:format rdf:resource="http://publications.europa.eu/resource/authority/file-type/GRID_ASCII"/>
+      </dcat:Distribution>
+    </dcat:distribution>
+    <dcat:distribution>
+      <dcat:Distribution>
+        <dcat:mediaType rdf:datatype="http://www.w3.org/2001/XMLSchema#string">text/plain</dcat:mediaType>
+        <dcterms:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">ESRI ASCII Grid</dcterms:format>
+      </dcat:Distribution>
+    </dcat:distribution>
+    <dcat:distribution>
+      <dcat:Distribution>
+        <dcat:mediaType rdf:datatype="http://www.w3.org/2001/XMLSchema#string">text/calendar</dcat:mediaType>
+        <dcterms:format rdf:datatype="http://www.w3.org/2001/XMLSchema#string">iCalendar</dcterms:format>
       </dcat:Distribution>
     </dcat:distribution>
   </dcat:Dataset>
