@@ -302,5 +302,6 @@ def get_iana_media_type_values():
                 uri_suffix = registry_type + '/' + name
 
             media_type_values[registry_type + '/' + name] = \
-                media_types_namespaces['ns'] + '/' + uri_suffix
+                media_types_namespaces['ns'] + '/media-types/' + uri_suffix
+
     return media_type_values

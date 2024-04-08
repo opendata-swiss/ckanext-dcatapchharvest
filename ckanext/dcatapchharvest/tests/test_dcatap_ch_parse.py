@@ -107,14 +107,14 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
             qualified_relations[0],
             {
                 "relation": "http://example.org/Original987",
-                "had_role": "http://www.iana.org/assignments/relation/original"
+                "had_role": "https://www.iana.org/assignments/media-types/relation/original"
             }
         )
         eq_(
             qualified_relations[1],
             {
                 "relation": "http://example.org/Related486",
-                "had_role": "http://www.iana.org/assignments/relation/related"
+                "had_role": "https://www.iana.org/assignments/media-types/relation/related"
             }
         )
 

@@ -4,7 +4,7 @@
   <dcat:Dataset rdf:about="https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585">
     <dcat:distribution>
       <dcat:Distribution>
-        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/text/html"/>
+        <dcat:mediaType rdf:resource="https://www.iana.org/assignments/media-types/text/html"/>
         <dcterms:format rdf:resource="http://publications.europa.eu/resource/authority/file-type/HTML"/>
       </dcat:Distribution>
     </dcat:distribution>
@@ -16,7 +16,7 @@
     </dcat:distribution>
     <dcat:distribution>
       <dcat:Distribution>
-        <dcat:mediaType rdf:resource="http://www.iana.org/assignments/text/plain"/>
+        <dcat:mediaType rdf:resource="https://www.iana.org/assignments/media-types/text/plain"/>
         <dcterms:format rdf:resource="http://publications.europa.eu/resource/authority/file-type/GRID_ASCII"/>
       </dcat:Distribution>
     </dcat:distribution>
