@@ -37,13 +37,13 @@
     <dcat:qualifiedRelation>
       <dcat:Relationship>
         <dct:relation rdf:resource="http://example.org/Original987"/>
-        <dcat:hadRole rdf:resource="http://www.iana.org/assignments/media-types/relation/original"/>
+        <dcat:hadRole rdf:resource="http://www.iana.org/assignments/relation/original"/>
       </dcat:Relationship>
     </dcat:qualifiedRelation>
     <dcat:qualifiedRelation>
       <dcat:Relationship>
         <dct:relation rdf:resource="http://example.org/Related486"/>
-        <dcat:hadRole rdf:resource="http://www.iana.org/assignments/media-types/relation/related"/>
+        <dcat:hadRole rdf:resource="http://www.iana.org/assignments/relation/related"/>
       </dcat:Relationship>
     </dcat:qualifiedRelation>
     <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1900-12-31T00:00:00</dct:issued>
