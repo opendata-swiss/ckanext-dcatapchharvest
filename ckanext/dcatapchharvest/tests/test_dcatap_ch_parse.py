@@ -441,6 +441,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
                 ('esri_ascii_grid', 'text/plain'),
                 ('grid_ascii', 'text/plain'),
                 ('html', 'text/html'),
-                ('json', 'application/json')
+                ('json', 'application/json'),
+                ('text/calendar', 'text/calendar')
             ]
         )
