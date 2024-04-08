@@ -36,8 +36,6 @@ XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
 EUTHEMES = dh.EUTHEMES
 ODRS = Namespace('http://schema.theodi.org/odrs#')
 
-GEOJSON_IMT = 'https://www.iana.org/assignments/media-types/application/vnd.geo+json'  # noqa
-
 EMAIL_MAILTO_PREFIX = 'mailto:'
 ORGANIZATION_BASE_URL = 'https://opendata.swiss/organization/'
 
