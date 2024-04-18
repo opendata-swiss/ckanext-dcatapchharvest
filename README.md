@@ -92,11 +92,11 @@ Exclude datasets from import: this will prevent the import of datasets with cert
 {"excluded_dataset_identifiers":["aaa@oevch", "fahrtprognose@oevch"]}
 ```
 
-Exclude resource rights from import: this prevents the import of datasets with certain resource 
-rights.
+Exclude resource license from import: this prevents the import of datasets with certain resource 
+license.
 
 ```
-{"excluded_rights":["NonCommercialWithPermission-CommercialWithPermission-ReferenceRequired"]}
+{"excluded_license":["NonCommercialWithPermission-CommercialWithPermission-ReferenceRequired"]}
 ```
 
 Both configurations only work on the first import. Once imported the harvest 
