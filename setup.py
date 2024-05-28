@@ -79,6 +79,7 @@ setup(
         [ckan.plugins]
         ogdch_dcat=ckanext.dcatapchharvest.plugins:OgdchDcatPlugin
         dcat_ch_rdf_harvester=ckanext.dcatapchharvest.harvesters:SwissDCATRDFHarvester
+        dcat_ch_i14y_rdf_harvester=ckanext.dcatapchharvest.harvesters:SwissDCATI14YRDFHarvester
 
         [ckan.rdf.profiles]
         swiss_dcat_ap=ckanext.dcatapchharvest.profiles:SwissDCATAPProfile

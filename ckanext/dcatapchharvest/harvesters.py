@@ -2,6 +2,7 @@ import json
 
 import ckan.plugins as p
 import ckan.model as model
+import ckan.plugins.toolkit as tk
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
@@ -73,7 +74,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         Try to get a unique identifier for a harvested dataset
         It will be the first found of:
          * URI (rdf:about)
-         * dcat:identifier
+         * dct:identifier
          * Source URL + Dataset name
          * Dataset name
          The last two are obviously not optimal, as depend on title, which
@@ -186,3 +187,48 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
 def _derive_flat_title(title_dict):
     """localizes language dict if no language is specified"""
     return title_dict.get('de') or title_dict.get('fr') or title_dict.get('en') or title_dict.get('it') or ""  # noqa
+
+
+class SwissDCATI14YRDFHarvester(SwissDCATRDFHarvester):
+
+    def info(self):
+        info = super(SwissDCATI14YRDFHarvester, self).info()
+
+        info['name'] = 'dcat_ch_i14y_rdf'
+        info['title'] = 'DCAT-AP Switzerland I14Y RDF Harvester'
+        info['description'] = \
+            'Harvester for DCAT-AP Switzerland datasets from ' \
+            'an RDF graph designed for I14Y'
+
+        return info
+
+    def _get_guid(self, dataset_dict, source_url=None):
+        guid = super(SwissDCATI14YRDFHarvester, self).\
+            _get_guid(dataset_dict, source_url)
+
+        # get organization name
+        try:
+            dataset_organization = tk.get_action('organization_show')(
+                {},
+                {'id': dataset_dict['owner_org']}
+            )
+            dataset_organization_name = dataset_organization['name']
+
+        except tk.ObjectNotFound:
+            raise ValueError(
+                'The selected organization was not found.'
+            )
+
+        # identifier that has form of <id>,
+        # should be changed to the form <id>@<slug>,
+        # where slug is an organization name
+        if (dataset_dict.get('identifier')
+                and dataset_dict['identifier'] == guid
+                and '@' not in guid):
+            dataset_dict['identifier_i14y'] =\
+                dataset_dict['identifier']
+            dataset_dict['identifier'] =\
+                dataset_dict['identifier'] + '@'\
+                + dataset_organization_name
+
+        return dataset_dict['identifier']
