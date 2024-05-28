@@ -2,7 +2,7 @@ import json
 
 import ckan.plugins as p
 import ckan.model as model
-from ckan.logic import NotFound, get_action
+import ckan.plugins.toolkit as tk
 
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
@@ -208,13 +208,13 @@ class SwissDCATI14YRDFHarvester(SwissDCATRDFHarvester):
 
         # get organization name
         try:
-            dataset_organization = get_action('organization_show')(
+            dataset_organization = tk.get_action('organization_show')(
                 {},
                 {'id': dataset_dict['owner_org']}
             )
             dataset_organization_name = dataset_organization['name']
 
-        except NotFound:
+        except tk.NotFound:
             raise ValueError(
                 'The selected organization was not found.'
             )
