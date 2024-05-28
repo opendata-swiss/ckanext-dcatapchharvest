@@ -214,7 +214,7 @@ class SwissDCATI14YRDFHarvester(SwissDCATRDFHarvester):
             )
             dataset_organization_name = dataset_organization['name']
 
-        except tk.NotFound:
+        except tk.ObjectNotFound:
             raise ValueError(
                 'The selected organization was not found.'
             )
