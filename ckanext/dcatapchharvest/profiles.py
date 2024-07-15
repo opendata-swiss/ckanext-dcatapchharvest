@@ -525,13 +525,10 @@ class SwissDCATAPProfile(MultiLangProfile):
             value = self._object_value(dataset_ref, predicate)
             if value:
                 dataset_dict[key] = value
-
-        # Ensure to clear the url if DCAT.landingPage is not
-        # in the new harvester source xml
-        if 'url' not in dataset_dict or not dataset_dict['url']:
-            log.debug(
-                "Clearing existing URL field as no DCAT.landingPage found")
-            dataset_dict['url'] = ''
+            # Ensure to clear the basic key values if they are not
+            # in the new harvester source xml
+            elif key not in dataset_dict or not dataset_dict[key]:
+                dataset_dict[key] = ''
 
         # Accrual periodicity
         dataset_dict['accrual_periodicity'] = self._get_eu_accrual_periodicity(
