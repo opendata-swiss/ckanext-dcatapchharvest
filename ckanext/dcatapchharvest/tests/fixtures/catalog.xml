@@ -37,7 +37,7 @@
             <dct:RightsStatement rdf:about="http://dcat-ap.ch/vocabulary/licenses/terms_by"/>
         </dct:rights>
         <dct:license>
-          <dct:LicenseDocument rdf:about="http://dcat-ap.de/def/licenses/cc-zero"/>
+          <dct:LicenseDocument rdf:about="https://creativecommons.org/publicdomain/zero/1.0/"/>
         </dct:license>
         <dcat:keyword xml:lang="de">Publikation</dcat:keyword>
         <dcat:distribution>
@@ -68,7 +68,7 @@
           <dct:RightsStatement rdf:about="http://dcat-ap.ch/vocabulary/licenses/terms_by"/>
         </dct:rights>
         <dct:license>
-          <dct:LicenseDocument rdf:about="http://dcat-ap.de/def/licenses/cc-zero"/>
+          <dct:LicenseDocument rdf:about="https://creativecommons.org/publicdomain/zero/1.0/"/>
         </dct:license>
         <dcat:distribution>
           <dcat:Distribution>

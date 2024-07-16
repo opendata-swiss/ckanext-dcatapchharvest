@@ -18,9 +18,7 @@
         <dct:rights>
           <dct:RightsStatement rdf:about="http://dcat-ap.ch/vocabulary/licenses/terms_by"/>
         </dct:rights>
-        <dct:license>
-          <dct:LicenseDocument rdf:about="http://dcat-ap.de/def/licenses/cc-zero"/>
-        </dct:license>
+        <dct:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/"/>
         <foaf:page>
           <foaf:Document rdf:about="https://example.com/documentation-distribution-1"/>
         </foaf:page>
@@ -84,9 +82,7 @@
     <dct:rights>
       <dct:RightsStatement rdf:about="http://dcat-ap.ch/vocabulary/licenses/terms_by"/>
     </dct:rights>
-    <dct:license>
-      <dct:LicenseDocument rdf:about="http://dcat-ap.de/def/licenses/cc-zero"/>
-    </dct:license>
+    <dct:license rdf:resource="https://creativecommons.org/publicdomain/zero/1.0/"/>
     <foaf:page>
       <foaf:Document rdf:about="https://example.com/documentation-dataset-1"/>
     </foaf:page>
