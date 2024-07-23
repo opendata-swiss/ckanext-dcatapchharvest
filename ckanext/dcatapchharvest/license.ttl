@@ -1,16 +1,17 @@
+@prefix cc: <http://creativecommons.org/ns#>.
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dct: <http://purl.org/dc/terms/> .
-@prefix dc11: <http://purl.org/dc/elements/1.1/> .
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
 @prefix skosxl: <http://www.w3.org/2008/05/skos-xl#> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 <http://dcat-ap.ch/vocabulary/licenses>
   a owl:Ontology, skos:ConceptScheme ;
-  owl:versionInfo "202100623" ;
-  owl:versionIRI <http://dcat-ap.ch/vocabulary/licenses/20210623/> ;
+  owl:versionInfo "20240716" ;
+  owl:versionIRI <http://dcat-ap.ch/vocabulary/licenses/20240716/> ;
   rdfs:comment "Liste der Lizenzen, die im Feld dct:license einer DCAT-AP CH-konformen dcat:distribution fÃ¼r die Zulieferung an opendata.swiss erlaubt sind."@de ,
                "List of licenses that are allowed in the field dct:license for delivering a dcat:Distribution in a way that conforms to DCAT-AP CH"@en ;
   rdfs:label "Liste der Lizenzen"@de, "List of Licenses"@en;
@@ -77,66 +78,71 @@
   ] ;
   foaf:homepage <https://opendata.swiss/en/terms-of-use/#terms_by_ask> .
 
-<http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0>
-  a skos:Concept ;
-  dc11:identifier "cc-by/4.0" ;
-  skos:topConceptOf <http://dcat-ap.de/def/licenses> ;
-  skos:inScheme <http://dcat-ap.de/def/licenses> ;
-  skos:prefLabel "Creative Commons Namensnennung â€“ 4.0 International (CC BY 4.0)"@de ;
+<https://creativecommons.org/publicdomain/zero/1.0/>
+  a skos:Concept, cc:License ;
+  dc:identifier "cc-zero" ;
+  skos:prefLabel "Creative Commons Zero 1.0 Universal (CC0 1.0)"@en,
+                 "Creative Commons Zero 1.0 Universell (CC0 1.0)"@de,
+                 "Creative Commons Zero 1.0 Universel (CC0 1.0)"@fr,
+                 "Creative Commons Zero 1.0 Universale (CC0 1.0)"@it ;
+  skos:altLabel "cc-zero"@en,
+                "CC Zero"@en,
+                "CC0"@en ;
   skosxl:prefLabel [
     a skosxl:Label ;
-    skosxl:literalForm "Creative Commons Namensnennung â€“ 4.0 International (CC BY 4.0)"@de ;
-    rdfs:label "Creative Commons Namensnennung â€“ 4.0 International (CC BY 4.0)"@de
+    skosxl:literalForm "Creative Commons Zero 1.0 Universal (CC0 1.0)"@en ;
+    rdfs:label "Creative Commons Zero 1.0 Universell (CC0 1.0)"@de
   ] ;
-  skos:exactMatch <http://dcat-ap.de/def/licenses/cc-by/4.0> ;
-  skos:altLabel "cc-by/4.0"@de ;
-  dct:references <http://creativecommons.org/licenses/by/4.0/> ;
-  foaf:homepage <http://creativecommons.org/licenses/by/4.0/> .
-
-<http://dcat-ap.de/def/licenses/cc-zero>
-  a skos:Concept ;
-  dc11:identifier "cc-zero" ;
-  skos:topConceptOf <http://dcat-ap.de/def/licenses> ;
-  skos:inScheme <http://dcat-ap.de/def/licenses> ;
-  skos:prefLabel "Creative Commons CC Zero License (cc-zero)"@de ;
-  skosxl:prefLabel [
-    a skosxl:Label ;
-    skosxl:literalForm "Creative Commons CC Zero License (cc-zero)"@de ;
-    rdfs:label "Creative Commons CC Zero License (cc-zero)"@de
-  ] ;
-  skos:exactMatch <http://dcat-ap.de/def/licenses/cc-zero> ;
-  skos:altLabel "cc-zero"@de ;
+  foaf:homepage <http://www.opendefinition.org/licenses/cc-zero> ;
   dct:references <http://www.opendefinition.org/licenses/cc-zero> ;
-  foaf:homepage <http://www.opendefinition.org/licenses/cc-zero> .
+  cc:legalcode <http://creativecommons.org/publicdomain/zero/1.0/legalcode.de> ;
+  cc:legalcode <http://creativecommons.org/publicdomain/zero/1.0/legalcode.en> ;
+  cc:legalcode <http://creativecommons.org/publicdomain/zero/1.0/legalcode.fr> ;
+  cc:legalcode <http://creativecommons.org/publicdomain/zero/1.0/legalcode.it> .
 
-<http://dcat-ap.de/def/licenses/cc-by-sa>
-  a skos:Concept ;
-  dc11:identifier "cc-by-sa" ;
-  skos:topConceptOf <http://dcat-ap.de/def/licenses> ;
-  skos:inScheme <http://dcat-ap.de/def/licenses> ;
-  skos:prefLabel "Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen (CC-BY-SA)"@de ;
+<https://creativecommons.org/licenses/by/4.0/>
+  a skos:Concept, cc:License ;
+  dc:identifier "cc-by/4.0" ;
+  skos:prefLabel "Creative Commons Attribution 4.0 International(CC BY 4.0)"@en,
+                 "Creative Commons Namensnennung 4.0 International (CC BY 4.0)"@de,
+                 "Creative Commons Attribution 4.0 International (CC BY 4.0)"@fr,
+                 "Creative Commons Attribuzione 4.0 Internazionale (CC BY 4.0)"@it ;
+  skos:altLabel "cc-by/4.0"@en,
+                "cc-by"@en,
+                "CC BY 4.0"@en,
+                "CC-BY-4.0"@en ;
   skosxl:prefLabel [
     a skosxl:Label ;
-    skosxl:literalForm "Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen (CC-BY-SA)"@de ;
-    rdfs:label "Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen (CC-BY-SA)"@de
+    skosxl:literalForm "Creative Commons Attribution 4.0 International(CC BY 4.0)"@en ;
+    rdfs:label "Creative Commons Namensnennung 4.0 International (CC BY 4.0)"@de
   ] ;
-  skos:exactMatch <http://dcat-ap.de/def/licenses/cc-by-sa> ;
-  skos:altLabel "cc-by-sa"@de ;
+  foaf:homepage <http://www.opendefinition.org/licenses/cc-by/> ;
+  dct:references <http://www.opendefinition.org/licenses/cc-by/> ;
+  cc:legalcode <http://creativecommons.org/licenses/by/4.0/legalcode.de> ;
+  cc:legalcode <http://creativecommons.org/licenses/by/4.0/legalcode.en> ;
+  cc:legalcode <http://creativecommons.org/licenses/by/4.0/legalcode.fr> ;
+  cc:legalcode <http://creativecommons.org/licenses/by/4.0/legalcode.it> .
+
+<https://creativecommons.org/licenses/by-sa/4.0/>
+  a skos:Concept, cc:License ;
+  dc:identifier "cc-by-sa/4.0" ;
+  skos:prefLabel "Creative Commons Attribution-Sharealike 4.0 International (CC BY-SA 4.0)"@en,
+                 "Creative Commons Namensnennung-Share Alike 4.0 International (CC BY-SA 4.0)"@de,
+                 "Creative Commons Attribution-Partage Dans les Mêmes Conditions 4.0 International (CC BY-SA 4.0)"@fr,
+                 "Creative Commons Attribuzione-Condividiallostessomodo 4.0 Internazionale (CC BY-SA 4.0)"@it ;
+  skos:altLabel "cc-by-sa/4.0"@en,
+                "cc-by-sa"@en,
+                "CC BY-SA 4.0"@en,
+                "CC-BY-SA-4.0"@en ;
+  skosxl:prefLabel [
+    a skosxl:Label ;
+    skosxl:literalForm "Creative Commons Attribution-Sharealike 4.0 International (CC BY-SA 4.0)"@en ;
+    rdfs:label "Creative Commons Namensnennung-Share Alike 4.0 International (CC BY-SA 4.0)"@de
+  ] ;
+  foaf:homepage <http://www.opendefinition.org/licenses/cc-by-sa> ;
   dct:references <http://www.opendefinition.org/licenses/cc-by-sa> ;
-  foaf:homepage <http://www.opendefinition.org/licenses/cc-by-sa> .
+  cc:legalcode <http://creativecommons.org/licenses/by-sa/4.0/legalcode.de> ;
+  cc:legalcode <http://creativecommons.org/licenses/by-sa/4.0/legalcode.en> ;
+  cc:legalcode <http://creativecommons.org/licenses/by-sa/4.0/legalcode.fr> ;
+  cc:legalcode <http://creativecommons.org/licenses/by-sa/4.0/legalcode.it> .
 
-<http://dcat-ap.de/def/licenses/cc-by-sa/4.0>
-  a skos:Concept ;
-  dc11:identifier "cc-by-sa/4.0" ;
-  skos:topConceptOf <http://dcat-ap.de/def/licenses> ;
-  skos:inScheme <http://dcat-ap.de/def/licenses> ;
-  skos:prefLabel "Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International (CC-BY-SA 4.0)"@de ;
-  skosxl:prefLabel [
-    a skosxl:Label ;
-    skosxl:literalForm "Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International (CC-BY-SA 4.0)"@de ;
-    rdfs:label "Creative Commons Namensnennung - Weitergabe unter gleichen Bedingungen 4.0 International (CC-BY-SA 4.0)"@de
-  ] ;
-  skos:exactMatch <http://dcat-ap.de/def/licenses/cc-by-sa/4.0> ;
-  skos:altLabel "cc-by-sa/4.0"@de ;
-  dct:references <http://creativecommons.org/licenses/by-sa/4.0/> ;
-  foaf:homepage <http://creativecommons.org/licenses/by-sa/4.0/> .

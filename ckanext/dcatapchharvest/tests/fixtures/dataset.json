@@ -121,7 +121,7 @@
         "https://example.com/documentation-resource-1",
         "https://example.com/documentation-resource-2"
       ],
-      "rights": "Creative Commons CC Zero License (cc-zero)",
+      "rights": "Creative Commons Zero 1.0 Universell (CC0 1.0)",
       "license": "NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired",
       "format": "CSV"
     },
@@ -179,7 +179,7 @@
       ],
       "temporal_resolution":"P1D",
       "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask",
-      "license": "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0",
+      "license": "https://creativecommons.org/licenses/by/4.0/",
       "media_type": "application/1d-interleaved-parityfec"
     }
   ],

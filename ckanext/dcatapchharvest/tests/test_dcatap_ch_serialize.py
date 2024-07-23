@@ -110,8 +110,8 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
                 assert self._triple(g, distribution, DCAT.accessService, URIRef(link))
 
             # e2c50e70-67ad-4f86-bb1b-3f93867eadaa
-            if resource_dict.get('rights') == 'Creative Commons CC Zero License (cc-zero)':
-                assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.de/def/licenses/cc-zero"))
+            if resource_dict.get('rights') == 'Creative Commons Zero 1.0 Universal (CC0 1.0)':
+                assert self._triple(g, distribution, DCT.rights, URIRef("https://creativecommons.org/publicdomain/zero/1.0/"))
 
             if resource_dict.get('license') == 'NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired':
                 assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_open"))
@@ -127,8 +127,8 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             if resource_dict.get('rights') == "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask":
                 assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by_ask"))
 
-            if resource_dict.get('license') == "http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0":
-                assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/cc-by/4.0"))
+            if resource_dict.get('license') == "https://creativecommons.org/licenses/by/4.0/":
+                assert self._triple(g, distribution, DCT.license, URIRef("https://creativecommons.org/licenses/by/4.0/"))
 
             if resource_dict.get('format') == "CSV":
                 assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/CSV"))

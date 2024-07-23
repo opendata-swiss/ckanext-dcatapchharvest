@@ -147,7 +147,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['media_type'], u'text/html')
         eq_(resource['identifier'], u'346265-fr@bundesamt-fur-statistik-bfs')
         eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
-        eq_(resource['license'], u'Creative Commons CC Zero License (cc-zero)')
+        eq_(resource['license'], u'Creative Commons Zero 1.0 Universal (CC0 1.0)')
         eq_(resource['language'], [u'fr'])
         eq_(resource['issued'], u'1900-12-31T00:00:00')
         eq_(resource['temporal_resolution'], u'P1D')
