@@ -277,23 +277,13 @@ class SwissDCATAPProfile(MultiLangProfile):
             if media_type_key in valid_media_types:
                 return media_type_key
 
-    def _license_rights_name(self, subject, predicate):
-        for node in self.g.objects(subject, predicate):
-            # DCAT-AP CH v1: the license as a literal (should be
-            # the code for one of the DCAT-AP CH licenses)
-            if isinstance(node, Literal):
-                return unicode(node)
-            if isinstance(node, URIRef):
-                return dh.get_license_name_by_uri(node)
-        return None
-
-    def _license_rights_uri(self, subject, predicate):
+    def _license_rights_homepage_uri(self, subject, predicate):
         for node in self.g.objects(subject, predicate):
             # DCAT-AP CH v2 compatible license has to be a URI.
             if isinstance(node, Literal):
-                return dh.get_license_uri_by_name(node)
+                return dh.get_license_homepage_uri_by_name(node)
             if isinstance(node, URIRef):
-                return node
+                return dh.get_license_homepage_uri_by_uri(node)
         return None
 
     def _keywords(self, subject):
@@ -633,21 +623,28 @@ class SwissDCATAPProfile(MultiLangProfile):
                 if value:
                     resource_dict[key] = value
 
-            #  Rights & License save name
-            rights = self._license_rights_name(distribution, DCT.rights)
-            license = self._license_rights_name(distribution, DCT.license)
+            #  Rights & License save homepage uri
+            rights = self._license_rights_homepage_uri(distribution, DCT.rights)
+            license = self._license_rights_homepage_uri(distribution, DCT.license)
+
             if rights is None and license is not None:
                 resource_dict['license'] = license
                 resource_dict['rights'] = license
-            if rights is not None and license is None:
-                resource_dict['license'] = rights
+            elif rights is not None and license is None:
                 resource_dict['rights'] = rights
-            if license is not None and rights is not None:
+                if 'cc' not in rights:
+                    resource_dict['license'] = rights
+                else:
+                    resource_dict['license'] = None
+            elif license is not None and rights is not None:
                 resource_dict['license'] = license
                 resource_dict['rights'] = rights
-                if 'cc' in rights:
+                if 'cc' in license and 'cc' not in rights:
                     resource_dict['license'] = rights
                     resource_dict['rights'] = license
+            else:
+                resource_dict['license'] = None
+                resource_dict['rights'] = None
 
             # Format & Media type
             resource_dict['format'] = \

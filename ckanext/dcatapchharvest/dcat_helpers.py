@@ -4,7 +4,7 @@ import os
 from urlparse import urlparse
 from ckantoolkit import config
 from rdflib import URIRef, Graph
-from rdflib.namespace import Namespace, RDF, SKOS
+from rdflib.namespace import Namespace, RDF, SKOS, FOAF
 import xml.etree.ElementTree as ET
 import logging
 
@@ -17,6 +17,7 @@ HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 
 SKOSXL = Namespace("http://www.w3.org/2008/05/skos-xl#")
 RDFS = Namespace("http://www.w3.org/2000/01/rdf-schema#")
+FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 
 frequency_namespaces = {
   "skos": SKOS,
@@ -38,6 +39,7 @@ license_namespaces = {
   "skosxl": SKOSXL,
   "rdf": RDF,
   "rdfs": RDFS,
+  "foaf": FOAF,
 }
 
 theme_namespaces = {
@@ -167,38 +169,95 @@ def get_frequency_values():
     return frequency_mapping
 
 
-def get_license_uri_by_name(vocabulary_name):
-    license_vocabulary = get_license_values()
-    for key, value in license_vocabulary.items():
+def get_license_ref_uri_by_name(vocabulary_name):
+    _, license_ref_literal_vocabulary, _ = get_license_values()
+    for key, value in license_ref_literal_vocabulary.items():
         if unicode(vocabulary_name) == unicode(value):
             return key
     return None
 
 
-def get_license_name_by_uri(vocabulary_uri):
-    license_vocabulary = get_license_values()
-    for key, value in license_vocabulary.items():
+def get_license_ref_uri_by_homepage_uri(vocabulary_name):
+    _, _, license_homepage_ref_vocabulary = get_license_values()
+    for key, value in license_homepage_ref_vocabulary.items():
+        if unicode(vocabulary_name) == unicode(key):
+            return value
+    return None
+
+
+def get_license_name_by_ref_uri(vocabulary_uri):
+    _, license_ref_literal_vocabulary, _ = get_license_values()
+    for key, value in license_ref_literal_vocabulary.items():
         if unicode(vocabulary_uri) == unicode(key):
             return unicode(value)
     return None
 
 
+def get_license_name_by_homepage_uri(vocabulary_uri):
+    license_homepages_literal_vocabulary, _, _ = get_license_values()
+    for key, value in license_homepages_literal_vocabulary.items():
+        if unicode(vocabulary_uri) == unicode(key):
+            return unicode(value)
+    return None
+
+
+def get_license_homepage_uri_by_name(vocabulary_name):
+    license_homepages_literal_vocabulary, _, _ = get_license_values()
+    for key, value in license_homepages_literal_vocabulary.items():
+        if unicode(vocabulary_name) == unicode(value):
+            return key
+    return None
+
+
+def get_license_homepage_uri_by_uri(vocabulary_uri):
+    _, _, license_homepage_ref_vocabulary = get_license_values()
+    license_homepages = list(license_homepage_ref_vocabulary.keys())
+    if vocabulary_uri in license_homepages:
+        return unicode(vocabulary_uri)
+    else:
+        for key, value in license_homepage_ref_vocabulary.items():
+            if unicode(vocabulary_uri) == unicode(value):
+                return unicode(key)
+    return
+
+
 def get_license_values():
     g = Graph()
-    license_mapping = {}
+    license_ref_literal_mapping = {}
+    license_homepages_literal_mapping = {}
+    license_homepage_ref_mapping = {}
+
     for prefix, namespace in license_namespaces.items():
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'license.ttl')
     g.parse(file, format='turtle')
     for ogdch_license_ref in g.subjects(predicate=RDF.type,
                                         object=SKOS.Concept):
-        license_mapping[ogdch_license_ref] = None
-        for license_pref_label in g.objects(subject=ogdch_license_ref,
-                                            predicate=SKOSXL.prefLabel):
-            for license_literal in g.objects(subject=license_pref_label,
-                                             predicate=SKOSXL.literalForm):
-                license_mapping[ogdch_license_ref] = license_literal
-    return license_mapping
+        license_homepage = None
+        for homepage in g.objects(subject=ogdch_license_ref,
+                                  predicate=FOAF.homepage):
+            license_homepage = homepage
+            break  # Assume one homepage per concept
+
+        license_literal = None
+        try:
+            for license_pref_label in g.objects(subject=ogdch_license_ref,
+                                                predicate=SKOSXL.prefLabel):
+                for literal in g.objects(subject=license_pref_label,
+                                         predicate=SKOSXL.literalForm):
+                    license_literal = literal
+                    break  # Assume one literal per concept
+
+            license_homepages_literal_mapping[license_homepage] = license_literal  # noqa
+            license_ref_literal_mapping[ogdch_license_ref] = license_literal
+            license_homepage_ref_mapping[license_homepage] = ogdch_license_ref
+
+        except Exception as e:
+            raise ValueError("SKOSXL.prefLabel is missing in the RDF-file: %s"
+                             % e)
+
+    return (license_homepages_literal_mapping, license_ref_literal_mapping,
+            license_homepage_ref_mapping)
 
 
 def get_theme_mapping():
