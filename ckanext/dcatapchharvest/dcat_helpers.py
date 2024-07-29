@@ -13,7 +13,7 @@ log = logging.getLogger(__name__)
 DCT = Namespace("http://purl.org/dc/terms/")
 EUTHEMES = \
     Namespace("http://publications.europa.eu/resource/authority/data-theme/")
-FOAF = Namespace("http://xmlns.com/foaf/0.1/") # noqa
+FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 
 SKOSXL = Namespace("http://www.w3.org/2008/05/skos-xl#")

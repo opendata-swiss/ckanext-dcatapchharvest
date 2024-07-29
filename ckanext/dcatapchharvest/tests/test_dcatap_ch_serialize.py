@@ -113,22 +113,22 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             if resource_dict.get('rights') == 'Creative Commons Zero 1.0 Universal (CC0 1.0)':
                 assert self._triple(g, distribution, DCT.rights, URIRef("https://creativecommons.org/publicdomain/zero/1.0/"))
 
-            if resource_dict.get('license') == 'NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired':
+            if resource_dict.get('license') == 'https://opendata.swiss/terms-of-use/#terms_open':
                 assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_open"))
 
             # 28e75e40-e1a1-497b-a1b9-8c1834d60201
-            if resource_dict.get('rights') == "http://dcat-ap.ch/vocabulary/licenses/terms_by":
+            if resource_dict.get('rights') == "https://opendata.swiss/terms-of-use#terms_by":
                 assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"))
 
-            if resource_dict.get('license') == "NonCommercialAllowed-CommercialAllowed-ReferenceRequired":
+            if resource_dict.get('license') == "https://opendata.swiss/terms-of-use#terms_by":
                 assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"))
 
             # 0cfce6ba-28f4-4229-b733-f6492c650395
-            if resource_dict.get('rights') == "http://dcat-ap.ch/vocabulary/licenses/terms_by_ask":
+            if resource_dict.get('rights') == "https://opendata.swiss/terms-of-use#terms_by_ask":
                 assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by_ask"))
 
-            if resource_dict.get('license') == "https://creativecommons.org/licenses/by/4.0/":
-                assert self._triple(g, distribution, DCT.license, URIRef("https://creativecommons.org/licenses/by/4.0/"))
+            if resource_dict.get('rights') == "	http://www.opendefinition.org/licenses/cc-by/":
+                assert self._triple(g, distribution, DCT.rights, URIRef("https://creativecommons.org/licenses/by/4.0/"))
 
             if resource_dict.get('format') == "CSV":
                 assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/CSV"))

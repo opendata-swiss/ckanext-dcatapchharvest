@@ -624,8 +624,12 @@ class SwissDCATAPProfile(MultiLangProfile):
                     resource_dict[key] = value
 
             #  Rights & License save homepage uri
-            rights = self._license_rights_homepage_uri(distribution, DCT.rights)
-            license = self._license_rights_homepage_uri(distribution, DCT.license)
+            rights = self._license_rights_homepage_uri(
+                distribution, DCT.rights
+            )
+            license = self._license_rights_homepage_uri(
+                distribution, DCT.license
+            )
 
             if rights is None and license is not None:
                 resource_dict['license'] = license
