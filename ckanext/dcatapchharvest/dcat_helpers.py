@@ -4,7 +4,7 @@ import os
 from urlparse import urlparse
 from ckantoolkit import config
 from rdflib import URIRef, Graph
-from rdflib.namespace import Namespace, RDF, SKOS, FOAF
+from rdflib.namespace import Namespace, RDF, SKOS
 import xml.etree.ElementTree as ET
 import logging
 
