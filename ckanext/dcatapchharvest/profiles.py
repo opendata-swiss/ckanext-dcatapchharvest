@@ -1035,7 +1035,7 @@ class SwissDCATAPProfile(MultiLangProfile):
     def _rights_and_license_to_graph(self, resource_dict, distribution):
         g = self.g
         if resource_dict.get('rights'):
-            rights_uri = dh.get_license_uri_by_name(
+            rights_uri = dh.get_license_ref_uri_by_homepage_uri(
                 resource_dict.get('rights')
             )
             if rights_uri is not None:
@@ -1043,13 +1043,12 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((rights_ref, RDF.type, DCT.RightsStatement))
                 g.add((distribution, DCT.rights, rights_ref))
             if rights_uri is None:
-                rights_name = dh.get_license_name_by_uri(
+                rights_name = dh.get_license_name_by_homepage_uri(
                     resource_dict.get('rights')
                     )
                 if rights_name is not None:
-                    resource_rights_ref = URIRef(
-                        resource_dict.get('rights')
-                        )
+                    resource_rights_ref = dh.get_license_ref_uri_by_name(
+                        rights_name)
                     g.add((
                         resource_rights_ref,
                         RDF.type,
@@ -1058,7 +1057,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     g.add((distribution, DCT.rights, resource_rights_ref))
 
         if resource_dict.get('license'):
-            license_uri = dh.get_license_uri_by_name(
+            license_uri = dh.get_license_ref_uri_by_homepage_uri(
                 resource_dict.get('license')
             )
             if license_uri is not None:
@@ -1066,13 +1065,12 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((license_ref, RDF.type, DCT.LicenseDocument))
                 g.add((distribution, DCT.license, license_ref))
             if license_uri is None:
-                license_name = dh.get_license_name_by_uri(
+                license_name = dh.get_license_name_by_homepage_uri(
                     resource_dict.get('license')
                     )
                 if license_name is not None:
-                    resource_license_ref = URIRef(
-                        resource_dict.get('license')
-                        )
+                    resource_license_ref = dh.get_license_ref_uri_by_name(
+                        license_name)
                     g.add((
                         resource_license_ref,
                         RDF.type,
