@@ -1054,7 +1054,6 @@ class SwissDCATAPProfile(MultiLangProfile):
             g.add((license_ref, RDF.type, DCT.LicenseDocument))
             g.add((distribution, DCT.license, license_ref))
 
-
     def _format_and_media_type_to_graph(self, resource_dict, distribution):
         g = self.g
         # Export format value if it matches EU vocabulary
