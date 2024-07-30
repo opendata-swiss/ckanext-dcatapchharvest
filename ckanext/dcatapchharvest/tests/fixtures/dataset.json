@@ -121,8 +121,8 @@
         "https://example.com/documentation-resource-1",
         "https://example.com/documentation-resource-2"
       ],
-      "rights": "Creative Commons Zero 1.0 Universell (CC0 1.0)",
-      "license": "NonCommercialAllowed-CommercialAllowed-ReferenceNotRequired",
+      "rights": "http://www.opendefinition.org/licenses/cc-zero",
+      "license": "https://opendata.swiss/terms-of-use/#terms_open",
       "format": "CSV",
       "issued": "2015-06-26T15:21:09.034694",
       "modified": "2015-06-30T15:21:09.000000"
@@ -135,7 +135,7 @@
         "https://example.com/documentation-resource-2"
       ],
       "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by",
-      "license": "NonCommercialAllowed-CommercialAllowed-ReferenceRequired",
+      "license": "https://opendata.swiss/en/terms-of-use/#terms_by",
       "format": "HTML"
     },
     {
