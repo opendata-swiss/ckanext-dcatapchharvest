@@ -169,56 +169,109 @@ def get_frequency_values():
     return frequency_mapping
 
 
-def get_license_ref_uri_by_name(vocabulary_name):
-    _, license_ref_literal_vocabulary, _ = get_license_values()
-    for key, value in license_ref_literal_vocabulary.items():
-        if unicode(vocabulary_name) == value:
-            return key
-    return None
+class LicenseHandler:
+    def __init__(self):
+        self._license_cache = None
 
+    def _get_license_values(self):
+        if self._license_cache is None:
+            try:
+                g = Graph()
+                license_ref_literal_mapping = {}
+                license_homepages_literal_mapping = {}
+                license_homepage_ref_mapping = {}
 
-def get_license_ref_uri_by_homepage_uri(vocabulary_name):
-    _, _, license_homepage_ref_vocabulary = get_license_values()
-    for key, value in license_homepage_ref_vocabulary.items():
-        if unicode(vocabulary_name) == key:
-            return value
-    return None
+                for prefix, namespace in license_namespaces.items():
+                    g.bind(prefix, namespace)
+                file = os.path.join(__location__, 'license.ttl')
+                g.parse(file, format='turtle')
+                for ogdch_license_ref in g.subjects(predicate=RDF.type,
+                                                    object=SKOS.Concept):
+                    license_homepage = None
+                    for homepage in g.objects(subject=ogdch_license_ref,
+                                              predicate=FOAF.homepage):
+                        license_homepage = homepage
+                        break  # Assume one homepage per concept
 
+                    license_literal = None
+                    try:
+                        for license_pref_label in g.objects(
+                                subject=ogdch_license_ref,
+                                predicate=SKOSXL.prefLabel):
+                            license_literal = next(
+                                g.objects(subject=license_pref_label,
+                                          predicate=SKOSXL.literalForm))
+                            if license_literal is not None:
+                                break  # Assume one literal per concept
 
-def get_license_name_by_ref_uri(vocabulary_uri):
-    _, license_ref_literal_vocabulary, _ = get_license_values()
-    for key, value in license_ref_literal_vocabulary.items():
-        if unicode(vocabulary_uri) == key:
-            return value
-    return None
+                        license_homepages_literal_mapping[
+                            unicode(license_homepage)] = \
+                            unicode(license_literal)
+                        license_ref_literal_mapping[
+                            unicode(ogdch_license_ref)] = \
+                            unicode(license_literal)
+                        license_homepage_ref_mapping[
+                            unicode(license_homepage)] = \
+                            unicode(ogdch_license_ref)
 
+                    except Exception as e:
+                        raise ValueError(
+                            "SKOSXL.prefLabel is missing in the RDF-file: %s"
+                            % e)
 
-def get_license_name_by_homepage_uri(vocabulary_uri):
-    license_homepages_literal_vocabulary, _, _ = get_license_values()
-    for key, value in license_homepages_literal_vocabulary.items():
-        if unicode(vocabulary_uri) == key:
-            return value
-    return None
+                self._license_cache = (license_homepages_literal_mapping,
+                                       license_ref_literal_mapping,
+                                       license_homepage_ref_mapping)
+            except Exception as e:
+                raise RuntimeError("Failed to load license values: %s"
+                                   % e)
+        return self._license_cache
 
-
-def get_license_homepage_uri_by_name(vocabulary_name):
-    license_homepages_literal_vocabulary, _, _ = get_license_values()
-    for key, value in license_homepages_literal_vocabulary.items():
-        if unicode(vocabulary_name) == value:
-            return key
-    return None
-
-
-def get_license_homepage_uri_by_uri(vocabulary_uri):
-    _, _, license_homepage_ref_vocabulary = get_license_values()
-    license_homepages = list(license_homepage_ref_vocabulary.keys())
-    if unicode(vocabulary_uri) in license_homepages:
-        return unicode(vocabulary_uri)
-    else:
-        for key, value in license_homepage_ref_vocabulary.items():
-            if unicode(vocabulary_uri) == value:
+    def get_license_ref_uri_by_name(self, vocabulary_name):
+        _, license_ref_literal_vocabulary, _ = self._get_license_values()
+        for key, value in license_ref_literal_vocabulary.items():
+            if unicode(vocabulary_name) == value:
                 return key
-    return None
+        return None
+
+    def get_license_ref_uri_by_homepage_uri(self, vocabulary_name):
+        _, _, license_homepage_ref_vocabulary = self._get_license_values()
+        for key, value in license_homepage_ref_vocabulary.items():
+            if unicode(vocabulary_name) == key:
+                return value
+        return None
+
+    def get_license_name_by_ref_uri(self, vocabulary_uri):
+        _, license_ref_literal_vocabulary, _ = self._get_license_values()
+        for key, value in license_ref_literal_vocabulary.items():
+            if unicode(vocabulary_uri) == key:
+                return value
+        return None
+
+    def get_license_name_by_homepage_uri(self, vocabulary_uri):
+        license_homepages_literal_vocabulary, _, _ = self._get_license_values()
+        for key, value in license_homepages_literal_vocabulary.items():
+            if unicode(vocabulary_uri) == key:
+                return value
+        return None
+
+    def get_license_homepage_uri_by_name(self, vocabulary_name):
+        license_homepages_literal_vocabulary, _, _ = self._get_license_values()
+        for key, value in license_homepages_literal_vocabulary.items():
+            if unicode(vocabulary_name) == value:
+                return key
+        return None
+
+    def get_license_homepage_uri_by_uri(self, vocabulary_uri):
+        _, _, license_homepage_ref_vocabulary = self._get_license_values()
+        license_homepages = list(license_homepage_ref_vocabulary.keys())
+        if unicode(vocabulary_uri) in license_homepages:
+            return unicode(vocabulary_uri)
+        else:
+            for key, value in license_homepage_ref_vocabulary.items():
+                if unicode(vocabulary_uri) == value:
+                    return key
+        return None
 
 
 def get_license_values():

@@ -13,9 +13,8 @@ import ckanext.dcatapchharvest.dcat_helpers as dh
 from ckanext.dcat.profiles import CleanedURIRef, RDFProfile, SchemaOrgProfile
 
 log = logging.getLogger(__name__)
-
+license_handler = dh.LicenseHandler()
 valid_frequencies = dh.get_frequency_values()
-valid_licenses = dh.get_license_values()
 eu_theme_mapping = dh.get_theme_mapping()
 valid_formats = dh.get_format_values()
 valid_media_types = dh.get_iana_media_type_values()
@@ -281,9 +280,9 @@ class SwissDCATAPProfile(MultiLangProfile):
         for node in self.g.objects(subject, predicate):
             # DCAT-AP CH v2 compatible license has to be a URI.
             if isinstance(node, Literal):
-                return dh.get_license_homepage_uri_by_name(node)
+                return license_handler.get_license_homepage_uri_by_name(node)
             if isinstance(node, URIRef):
-                return dh.get_license_homepage_uri_by_uri(node)
+                return license_handler.get_license_homepage_uri_by_uri(node)
         return None
 
     def _keywords(self, subject):
@@ -1046,13 +1045,13 @@ class SwissDCATAPProfile(MultiLangProfile):
         if not homepage_uri:
             return None
 
-        uri = dh.get_license_ref_uri_by_homepage_uri(homepage_uri)
+        uri = license_handler.get_license_ref_uri_by_homepage_uri(homepage_uri)
         if uri is not None:
             return URIRef(uri)
 
-        name = dh.get_license_name_by_homepage_uri(homepage_uri)
+        name = license_handler.get_license_name_by_homepage_uri(homepage_uri)
         if name is not None:
-            uri = dh.get_license_ref_uri_by_name(name)
+            uri = license_handler.get_license_ref_uri_by_name(name)
             if uri is not None:
                 return URIRef(uri)
 
