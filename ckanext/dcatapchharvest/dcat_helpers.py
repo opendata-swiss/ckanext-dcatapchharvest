@@ -284,48 +284,6 @@ class LicenseHandler:
                     None)
 
 
-def get_license_values():
-    g = Graph()
-    license_ref_literal_mapping = {}
-    license_homepages_literal_mapping = {}
-    license_homepage_ref_mapping = {}
-
-    for prefix, namespace in license_namespaces.items():
-        g.bind(prefix, namespace)
-    file = os.path.join(__location__, 'license.ttl')
-    g.parse(file, format='turtle')
-    for ogdch_license_ref in g.subjects(predicate=RDF.type,
-                                        object=SKOS.Concept):
-        license_homepage = None
-        for homepage in g.objects(subject=ogdch_license_ref,
-                                  predicate=FOAF.homepage):
-            license_homepage = homepage
-            break  # Assume one homepage per concept
-
-        license_literal = None
-        try:
-            for license_pref_label in g.objects(subject=ogdch_license_ref,
-                                                predicate=SKOSXL.prefLabel):
-                license_literal = next(g.objects(subject=license_pref_label,
-                                                 predicate=SKOSXL.literalForm))
-                if license_literal is not None:
-                    break  # Assume one literal per concept
-
-            license_homepages_literal_mapping[unicode(license_homepage)] = \
-                unicode(license_literal)
-            license_ref_literal_mapping[unicode(ogdch_license_ref)] = \
-                unicode(license_literal)
-            license_homepage_ref_mapping[unicode(license_homepage)] = \
-                unicode(ogdch_license_ref)
-
-        except Exception as e:
-            raise ValueError("SKOSXL.prefLabel is missing in the RDF-file: %s"
-                             % e)
-
-    return (license_homepages_literal_mapping, license_ref_literal_mapping,
-            license_homepage_ref_mapping)
-
-
 def get_theme_mapping():
     g = Graph()
     theme_mapping = {}
