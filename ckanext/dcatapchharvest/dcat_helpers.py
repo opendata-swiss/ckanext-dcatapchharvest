@@ -247,24 +247,17 @@ class LicenseHandler:
 
     def get_license_ref_uri_by_homepage_uri(self, vocabulary_name):
         _, _, license_homepage_ref_vocabulary = self._get_license_values()
-        return next((value for key, value in
-                     license_homepage_ref_vocabulary.items()
-                     if unicode(vocabulary_name) == key),
-                    None)
+        return license_homepage_ref_vocabulary.get(unicode(vocabulary_name))
 
     def get_license_name_by_ref_uri(self, vocabulary_uri):
         _, license_ref_literal_vocabulary, _ = self._get_license_values()
-        return next((value for key, value in
-                     license_ref_literal_vocabulary.items()
-                     if unicode(vocabulary_uri) == key),
-                    None)
+        return license_ref_literal_vocabulary.get(
+            unicode(vocabulary_uri))
 
     def get_license_name_by_homepage_uri(self, vocabulary_uri):
         license_homepages_literal_vocabulary, _, _ = self._get_license_values()
-        return next((value for key, value in
-                     license_homepages_literal_vocabulary.items()
-                     if unicode(vocabulary_uri) == key),
-                    None)
+        return license_homepages_literal_vocabulary.get(
+            unicode(vocabulary_uri))
 
     def get_license_homepage_uri_by_name(self, vocabulary_name):
         license_homepages_literal_vocabulary, _, _ = self._get_license_values()
