@@ -172,7 +172,7 @@ def get_frequency_values():
 def get_license_ref_uri_by_name(vocabulary_name):
     _, license_ref_literal_vocabulary, _ = get_license_values()
     for key, value in license_ref_literal_vocabulary.items():
-        if vocabulary_name == value:
+        if unicode(vocabulary_name) == value:
             return key
     return None
 
@@ -180,7 +180,7 @@ def get_license_ref_uri_by_name(vocabulary_name):
 def get_license_ref_uri_by_homepage_uri(vocabulary_name):
     _, _, license_homepage_ref_vocabulary = get_license_values()
     for key, value in license_homepage_ref_vocabulary.items():
-        if vocabulary_name == key:
+        if unicode(vocabulary_name) == key:
             return value
     return None
 
@@ -188,7 +188,7 @@ def get_license_ref_uri_by_homepage_uri(vocabulary_name):
 def get_license_name_by_ref_uri(vocabulary_uri):
     _, license_ref_literal_vocabulary, _ = get_license_values()
     for key, value in license_ref_literal_vocabulary.items():
-        if vocabulary_uri == key:
+        if unicode(vocabulary_uri) == key:
             return value
     return None
 
@@ -196,7 +196,7 @@ def get_license_name_by_ref_uri(vocabulary_uri):
 def get_license_name_by_homepage_uri(vocabulary_uri):
     license_homepages_literal_vocabulary, _, _ = get_license_values()
     for key, value in license_homepages_literal_vocabulary.items():
-        if vocabulary_uri == key:
+        if unicode(vocabulary_uri) == key:
             return value
     return None
 
@@ -204,7 +204,7 @@ def get_license_name_by_homepage_uri(vocabulary_uri):
 def get_license_homepage_uri_by_name(vocabulary_name):
     license_homepages_literal_vocabulary, _, _ = get_license_values()
     for key, value in license_homepages_literal_vocabulary.items():
-        if vocabulary_name == value:
+        if unicode(vocabulary_name) == value:
             return key
     return None
 
@@ -212,11 +212,11 @@ def get_license_homepage_uri_by_name(vocabulary_name):
 def get_license_homepage_uri_by_uri(vocabulary_uri):
     _, _, license_homepage_ref_vocabulary = get_license_values()
     license_homepages = list(license_homepage_ref_vocabulary.keys())
-    if vocabulary_uri in license_homepages:
-        return vocabulary_uri
+    if unicode(vocabulary_uri) in license_homepages:
+        return unicode(vocabulary_uri)
     else:
         for key, value in license_homepage_ref_vocabulary.items():
-            if vocabulary_uri == value:
+            if unicode(vocabulary_uri) == value:
                 return key
     return None
 
