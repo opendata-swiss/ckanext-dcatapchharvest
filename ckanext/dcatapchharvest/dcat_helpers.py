@@ -219,7 +219,6 @@ class LicenseHandler:
         return (license_homepages_literal_mapping,
                 license_ref_literal_mapping, license_homepage_ref_mapping)
 
-
     def _get_license_values(self):
         if self._license_cache is None:
             try:
@@ -227,9 +226,10 @@ class LicenseHandler:
                 self._bind_namespaces(g)
                 self._parse_graph(g)
 
-                license_homepages_literal_mapping, \
-                license_ref_literal_mapping, \
-                license_homepage_ref_mapping = self._process_graph(g)
+                (license_homepages_literal_mapping,
+                 license_ref_literal_mapping,
+                 license_homepage_ref_mapping) = self._process_graph(g)
+
                 self._license_cache = (license_homepages_literal_mapping,
                                        license_ref_literal_mapping,
                                        license_homepage_ref_mapping)
