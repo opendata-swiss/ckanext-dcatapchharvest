@@ -646,6 +646,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 if 'cc' in license and 'cc' not in rights:
                     resource_dict['license'] = rights
                     resource_dict['rights'] = license
+                elif 'cc' in license and 'cc' in rights:
+                    resource_dict['license'] = None
             else:
                 resource_dict['license'] = None
                 resource_dict['rights'] = None
