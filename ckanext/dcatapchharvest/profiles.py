@@ -1027,6 +1027,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 ('issued', DCT.issued, None, Literal),
                 ('modified', DCT.modified, None, Literal),
             ]
+            self._add_date_triples_from_dict(resource_dict, distribution,
+                                             items)
 
             # ByteSize
             if resource_dict.get('byte_size'):

@@ -161,6 +161,11 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
                 expected_literal = Literal("P1D", datatype=XSD.duration)
                 assert self._triple(g, distribution, DCAT.temporalResolution, expected_literal)
 
+            if resource_dict.get('issued'):
+                assert self._triple(g, distribution, DCT.issued, resource_dict["issued"], XSD.dateTime)
+
+            if resource_dict.get('modified'):
+                assert self._triple(g, distribution, DCT.modified, resource_dict["modified"], XSD.dateTime)
 
     def test_graph_from_dataset_uri(self):
         """Tests that datasets (resources) with a uri from the test system
