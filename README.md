@@ -36,7 +36,7 @@ To install ckanext-dcatapchharvest for development, activate your CKAN virtualen
 do:
 
     git clone https://github.com/ogdch/ckanext-dcatapchharvest.git
-    cd ckanext-switzerland
+    cd ckanext-dcatapchharvest
     python setup.py develop
     pip install -r dev-requirements.txt
     pip install -r requirements.txt
