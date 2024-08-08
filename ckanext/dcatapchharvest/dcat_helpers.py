@@ -13,6 +13,7 @@ log = logging.getLogger(__name__)
 DCT = Namespace("http://purl.org/dc/terms/")
 EUTHEMES = \
     Namespace("http://publications.europa.eu/resource/authority/data-theme/")
+FOAF = Namespace("http://xmlns.com/foaf/0.1/")
 HYDRA = Namespace('http://www.w3.org/ns/hydra/core#')
 
 SKOSXL = Namespace("http://www.w3.org/2008/05/skos-xl#")
@@ -38,6 +39,7 @@ license_namespaces = {
   "skosxl": SKOSXL,
   "rdf": RDF,
   "rdfs": RDFS,
+  "foaf": FOAF,
 }
 
 theme_namespaces = {
@@ -167,38 +169,112 @@ def get_frequency_values():
     return frequency_mapping
 
 
-def get_license_uri_by_name(vocabulary_name):
-    license_vocabulary = get_license_values()
-    for key, value in license_vocabulary.items():
-        if unicode(vocabulary_name) == unicode(value):
-            return key
-    return None
+class LicenseHandler:
+    def __init__(self):
+        self._license_cache = None
 
+    def _bind_namespaces(self, graph):
+        for prefix, namespace in license_namespaces.items():
+            graph.bind(prefix, namespace)
 
-def get_license_name_by_uri(vocabulary_uri):
-    license_vocabulary = get_license_values()
-    for key, value in license_vocabulary.items():
-        if unicode(vocabulary_uri) == unicode(key):
-            return unicode(value)
-    return None
+    def _parse_graph(self, graph):
+        file = os.path.join(__location__, 'license.ttl')
+        graph.parse(file, format='turtle')
 
+    def _get_license_homepage(self, graph, license_ref):
+        for homepage in graph.objects(subject=license_ref,
+                                      predicate=FOAF.homepage):
+            return homepage
+        return None
 
-def get_license_values():
-    g = Graph()
-    license_mapping = {}
-    for prefix, namespace in license_namespaces.items():
-        g.bind(prefix, namespace)
-    file = os.path.join(__location__, 'license.ttl')
-    g.parse(file, format='turtle')
-    for ogdch_license_ref in g.subjects(predicate=RDF.type,
-                                        object=SKOS.Concept):
-        license_mapping[ogdch_license_ref] = None
-        for license_pref_label in g.objects(subject=ogdch_license_ref,
-                                            predicate=SKOSXL.prefLabel):
-            for license_literal in g.objects(subject=license_pref_label,
-                                             predicate=SKOSXL.literalForm):
-                license_mapping[ogdch_license_ref] = license_literal
-    return license_mapping
+    def _get_license_literal(self, graph, license_ref):
+        for license_pref_label in graph.objects(subject=license_ref,
+                                                predicate=SKOSXL.prefLabel):
+            try:
+                return next(graph.objects(subject=license_pref_label,
+                                          predicate=SKOSXL.literalForm))
+            except StopIteration:
+                continue
+        return None
+
+    def _process_graph(self, graph):
+        license_ref_literal_mapping = {}
+        license_homepages_literal_mapping = {}
+        license_homepage_ref_mapping = {}
+
+        for ogdch_license_ref in graph.subjects(predicate=RDF.type,
+                                                object=SKOS.Concept):
+            license_homepage = self._get_license_homepage(graph,
+                                                          ogdch_license_ref)
+            license_literal = self._get_license_literal(graph,
+                                                        ogdch_license_ref)
+
+            license_homepages_literal_mapping[unicode(license_homepage)] = \
+                unicode(license_literal)
+            license_ref_literal_mapping[unicode(ogdch_license_ref)] = \
+                unicode(license_literal)
+            license_homepage_ref_mapping[unicode(license_homepage)] = \
+                unicode(ogdch_license_ref)
+
+        return (license_homepages_literal_mapping,
+                license_ref_literal_mapping, license_homepage_ref_mapping)
+
+    def _get_license_values(self):
+        if self._license_cache is None:
+            try:
+                g = Graph()
+                self._bind_namespaces(g)
+                self._parse_graph(g)
+
+                (license_homepages_literal_mapping,
+                 license_ref_literal_mapping,
+                 license_homepage_ref_mapping) = self._process_graph(g)
+
+                self._license_cache = (license_homepages_literal_mapping,
+                                       license_ref_literal_mapping,
+                                       license_homepage_ref_mapping)
+            except Exception as e:
+                raise RuntimeError("Failed to load license values: %s"
+                                   % e)
+        return self._license_cache
+
+    def get_license_ref_uri_by_name(self, vocabulary_name):
+        _, license_ref_literal_vocabulary, _ = self._get_license_values()
+        return next((key for key, value in
+                     license_ref_literal_vocabulary.items()
+                     if unicode(vocabulary_name) == value),
+                    None)
+
+    def get_license_ref_uri_by_homepage_uri(self, vocabulary_name):
+        _, _, license_homepage_ref_vocabulary = self._get_license_values()
+        return license_homepage_ref_vocabulary.get(unicode(vocabulary_name))
+
+    def get_license_name_by_ref_uri(self, vocabulary_uri):
+        _, license_ref_literal_vocabulary, _ = self._get_license_values()
+        return license_ref_literal_vocabulary.get(
+            unicode(vocabulary_uri))
+
+    def get_license_name_by_homepage_uri(self, vocabulary_uri):
+        license_homepages_literal_vocabulary, _, _ = self._get_license_values()
+        return license_homepages_literal_vocabulary.get(
+            unicode(vocabulary_uri))
+
+    def get_license_homepage_uri_by_name(self, vocabulary_name):
+        license_homepages_literal_vocabulary, _, _ = self._get_license_values()
+        return next((key for key, value in
+                     license_homepages_literal_vocabulary.items()
+                     if unicode(vocabulary_name) == value),
+                    None)
+
+    def get_license_homepage_uri_by_uri(self, vocabulary_uri):
+        _, _, license_homepage_ref_vocabulary = self._get_license_values()
+        license_homepages = list(license_homepage_ref_vocabulary.keys())
+        if unicode(vocabulary_uri) in license_homepages:
+            return unicode(vocabulary_uri)
+        return next((key for key, value in
+                     license_homepage_ref_vocabulary.items()
+                     if unicode(vocabulary_uri) == value),
+                    None)
 
 
 def get_theme_mapping():

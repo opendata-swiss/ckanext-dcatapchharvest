@@ -13,9 +13,8 @@ import ckanext.dcatapchharvest.dcat_helpers as dh
 from ckanext.dcat.profiles import CleanedURIRef, RDFProfile, SchemaOrgProfile
 
 log = logging.getLogger(__name__)
-
+license_handler = dh.LicenseHandler()
 valid_frequencies = dh.get_frequency_values()
-valid_licenses = dh.get_license_values()
 eu_theme_mapping = dh.get_theme_mapping()
 valid_formats = dh.get_format_values()
 valid_media_types = dh.get_iana_media_type_values()
@@ -277,23 +276,13 @@ class SwissDCATAPProfile(MultiLangProfile):
             if media_type_key in valid_media_types:
                 return media_type_key
 
-    def _license_rights_name(self, subject, predicate):
-        for node in self.g.objects(subject, predicate):
-            # DCAT-AP CH v1: the license as a literal (should be
-            # the code for one of the DCAT-AP CH licenses)
-            if isinstance(node, Literal):
-                return unicode(node)
-            if isinstance(node, URIRef):
-                return dh.get_license_name_by_uri(node)
-        return None
-
-    def _license_rights_uri(self, subject, predicate):
+    def _license_rights_homepage_uri(self, subject, predicate):
         for node in self.g.objects(subject, predicate):
             # DCAT-AP CH v2 compatible license has to be a URI.
             if isinstance(node, Literal):
-                return dh.get_license_uri_by_name(node)
+                return license_handler.get_license_homepage_uri_by_name(node)
             if isinstance(node, URIRef):
-                return node
+                return license_handler.get_license_homepage_uri_by_uri(node)
         return None
 
     def _keywords(self, subject):
@@ -633,21 +622,34 @@ class SwissDCATAPProfile(MultiLangProfile):
                 if value:
                     resource_dict[key] = value
 
-            #  Rights & License save name
-            rights = self._license_rights_name(distribution, DCT.rights)
-            license = self._license_rights_name(distribution, DCT.license)
+            #  Rights & License save homepage uri
+            rights = self._license_rights_homepage_uri(
+                distribution, DCT.rights
+            )
+            license = self._license_rights_homepage_uri(
+                distribution, DCT.license
+            )
+
             if rights is None and license is not None:
                 resource_dict['license'] = license
                 resource_dict['rights'] = license
-            if rights is not None and license is None:
-                resource_dict['license'] = rights
+            elif rights is not None and license is None:
                 resource_dict['rights'] = rights
-            if license is not None and rights is not None:
+                if 'cc' not in rights:
+                    resource_dict['license'] = rights
+                else:
+                    resource_dict['license'] = None
+            elif license is not None and rights is not None:
                 resource_dict['license'] = license
                 resource_dict['rights'] = rights
-                if 'cc' in rights:
+                if 'cc' in license and 'cc' not in rights:
                     resource_dict['license'] = rights
                     resource_dict['rights'] = license
+                elif 'cc' in license and 'cc' in rights:
+                    resource_dict['license'] = None
+            else:
+                resource_dict['license'] = None
+                resource_dict['rights'] = None
 
             # Format & Media type
             resource_dict['format'] = \
@@ -1035,55 +1037,40 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((distribution, DCAT.byteSize,
                        Literal(resource_dict['byte_size'])))
 
+    def _get_rights_and_license_uri(self, resource_dict, property='license'):
+        if property not in ['license', 'rights']:
+            raise ValueError("Property must be 'license' or 'rights'")
+
+        homepage_uri = resource_dict.get(property)
+        if not homepage_uri:
+            return None
+
+        uri = license_handler.get_license_ref_uri_by_homepage_uri(homepage_uri)
+        if uri is not None:
+            return URIRef(uri)
+
+        name = license_handler.get_license_name_by_homepage_uri(homepage_uri)
+        if name is not None:
+            uri = license_handler.get_license_ref_uri_by_name(name)
+            if uri is not None:
+                return URIRef(uri)
+
+        return None
+
     def _rights_and_license_to_graph(self, resource_dict, distribution):
         g = self.g
-        if resource_dict.get('rights'):
-            rights_uri = dh.get_license_uri_by_name(
-                resource_dict.get('rights')
-            )
-            if rights_uri is not None:
-                rights_ref = URIRef(rights_uri)
-                g.add((rights_ref, RDF.type, DCT.RightsStatement))
-                g.add((distribution, DCT.rights, rights_ref))
-            if rights_uri is None:
-                rights_name = dh.get_license_name_by_uri(
-                    resource_dict.get('rights')
-                    )
-                if rights_name is not None:
-                    resource_rights_ref = URIRef(
-                        resource_dict.get('rights')
-                        )
-                    g.add((
-                        resource_rights_ref,
-                        RDF.type,
-                        DCT.RightsStatement)
-                        )
-                    g.add((distribution, DCT.rights, resource_rights_ref))
 
-        if resource_dict.get('license'):
-            license_uri = dh.get_license_uri_by_name(
-                resource_dict.get('license')
-            )
-            if license_uri is not None:
-                license_ref = URIRef(license_uri)
-                g.add((license_ref, RDF.type, DCT.LicenseDocument))
-                g.add((distribution, DCT.license, license_ref))
-            if license_uri is None:
-                license_name = dh.get_license_name_by_uri(
-                    resource_dict.get('license')
-                    )
-                if license_name is not None:
-                    resource_license_ref = URIRef(
-                        resource_dict.get('license')
-                        )
-                    g.add((
-                        resource_license_ref,
-                        RDF.type,
-                        DCT.LicenseDocument)
-                        )
-                    g.add(
-                        (distribution, DCT.license, resource_license_ref)
-                        )
+        rights_uri_ref = self._get_rights_and_license_uri(resource_dict,
+                                                          'rights')
+        if rights_uri_ref is not None:
+            g.add((rights_uri_ref, RDF.type, DCT.RightsStatement))
+            g.add((distribution, DCT.rights, rights_uri_ref))
+
+        license_uri_ref = self._get_rights_and_license_uri(resource_dict,
+                                                           'license')
+        if license_uri_ref is not None:
+            g.add((license_uri_ref, RDF.type, DCT.LicenseDocument))
+            g.add((distribution, DCT.license, license_uri_ref))
 
     def _format_and_media_type_to_graph(self, resource_dict, distribution):
         g = self.g

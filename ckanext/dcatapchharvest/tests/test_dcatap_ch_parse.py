@@ -32,8 +32,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
              # Resources
             eq_(len(dataset['resources']), 1)
             resource = dataset['resources'][0]
-            eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
-            eq_(resource['license'], u'NonCommercialAllowed-CommercialWithPermission-ReferenceRequired')
+            eq_(unicode(resource['rights']), u'https://opendata.swiss/terms-of-use/#terms_by')
+            eq_(unicode(resource['license']), u'https://opendata.swiss/terms-of-use/#terms_by_ask')
 
     def test_dataset_all_fields(self):
 
@@ -146,8 +146,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(resource['format'], u'html')
         eq_(resource['media_type'], u'text/html')
         eq_(resource['identifier'], u'346265-fr@bundesamt-fur-statistik-bfs')
-        eq_(resource['rights'], u'NonCommercialAllowed-CommercialAllowed-ReferenceRequired')
-        eq_(resource['license'], u'Creative Commons Zero 1.0 Universal (CC0 1.0)')
+        eq_(resource['license'], u'https://opendata.swiss/terms-of-use/#terms_by')
+        eq_(resource['rights'], u'http://www.opendefinition.org/licenses/cc-zero')
         eq_(resource['language'], [u'fr'])
         eq_(resource['issued'], u'1900-12-31T00:00:00')
         eq_(resource['temporal_resolution'], u'P1D')
@@ -402,7 +402,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         dataset = [d for d in p.datasets()][0]
         resource = dataset["resources"][0]
 
-        eq_(resource['rights'], u"NonCommercialAllowed-CommercialWithPermission-ReferenceRequired")
+        eq_(unicode(resource['rights']), u"https://opendata.swiss/terms-of-use/#terms_by_ask")
 
     def test_eu_themes_mapping(self):
         contents = self._get_file_contents('catalog-themes.xml')
