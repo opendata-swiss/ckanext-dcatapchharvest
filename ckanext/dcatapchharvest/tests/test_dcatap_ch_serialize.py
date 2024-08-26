@@ -113,7 +113,7 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             if resource_dict.get('rights') == "http://www.opendefinition.org/licenses/cc-zero":
                 assert self._triple(g, distribution, DCT.rights, URIRef("https://creativecommons.org/publicdomain/zero/1.0/"))
 
-            if resource_dict.get('license') == "https://opendata.swiss/terms-of-use/#terms_open":
+            if resource_dict.get('license') == "https://opendata.swiss/terms-of-use#terms_open":
                 assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_open"))
 
             # 28e75e40-e1a1-497b-a1b9-8c1834d60201
