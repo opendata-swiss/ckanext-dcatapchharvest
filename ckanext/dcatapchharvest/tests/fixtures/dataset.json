@@ -122,7 +122,7 @@
         "https://example.com/documentation-resource-2"
       ],
       "rights": "http://www.opendefinition.org/licenses/cc-zero",
-      "license": "https://opendata.swiss/terms-of-use/#terms_open",
+      "license": "https://opendata.swiss/terms-of-use#terms_open",
       "format": "CSV",
       "issued": "2015-06-26T15:21:09.034694",
       "modified": "2015-06-30T15:21:09.000000"
@@ -135,7 +135,7 @@
         "https://example.com/documentation-resource-2"
       ],
       "rights": "http://dcat-ap.ch/vocabulary/licenses/terms_by",
-      "license": "https://opendata.swiss/terms-of-use/#terms_by",
+      "license": "https://opendata.swiss/terms-of-use#terms_by",
       "format": "HTML"
     },
     {
