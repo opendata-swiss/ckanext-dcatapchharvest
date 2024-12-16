@@ -169,11 +169,14 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _publisher(self, subject, identifier):
         """
-        Returns a dict with details about a dct:publisher entity, a foaf:Agent
+        Returns a dict with details about a dct:publisher entity,
+        represented as a foaf:Agent.
 
-        Both subject and predicate must be rdflib URIRef or BNode objects
+        Both `subject` and `predicate` must be rdflib URIRef or BNode objects.
 
-        Examples:
+        Examples of supported RDF structures:
+
+        1. Basic Organization Representation (Legacy):
 
         <dct:publisher>
             <foaf:Organization rdf:about="http://orgs.vocab.org/some-org">
@@ -181,19 +184,45 @@ class SwissDCATAPProfile(MultiLangProfile):
             </foaf:Organization>
         </dct:publisher>
 
+        Output:
         {
             'url': 'http://orgs.vocab.org/some-org',
             'name': 'Publishing Organization for dataset 1',
         }
 
-        Returns keys for url, name with the values set to
-        an empty string if they could not be found
+        2. Multilingual Agent Representation:
+
+        <dct:publisher>
+            <foaf:Agent rdf:about="http://orgs.vocab.org/some-org">
+                <foaf:name xml:lang="de">Wirtschaftsamt</foaf:name>
+                <foaf:name xml:lang="it">Ufficio economico</foaf:name>
+                <foaf:name xml:lang="fr">Bureau des economiques</foaf:name>
+                <foaf:mbox rdf:resource="mailto:wirtschaftsamt@sh.ch"/>
+                <foaf:homepage rdf:resource="https://some-org.org/info"/>
+            </foaf:Agent>
+        </dct:publisher>
+
+        The `name` field resolves directly using `multilang=True`,
+        allowing for prioritized language selection.
+        The `url` field prioritizes the `foaf:homepage` property and falls back
+        to the `rdf:about` attribute of the Agent.
+
+        Returns:
+        A JSON-encoded dictionary with keys:
+        - `url`: The URL of the publisher (from `foaf:homepage` or `rdf:about`)
+        - `name`: The resolved multilingual name using the `multilang=True`
+
+        If no valid data is found, the values for `url` and `name` will default
+        to empty strings.
         """
         publisher = {}
         for agent in self.g.objects(subject, DCT.publisher):
-            publisher['url'] = (str(agent) if isinstance(agent,
-                                URIRef) else '')
-            publisher_name = self._object_value(agent, FOAF.name)
+            publisher['url'] = (
+                    self._object_value(agent, FOAF.homepage) or
+                    (str(agent) if isinstance(agent, URIRef) else '')
+            )
+            publisher_name = self._object_value(agent, FOAF.name,
+                                                multilang=True)
             publisher_deprecated = self._object_value(agent, RDFS.label)
             if publisher_name:
                 publisher['name'] = publisher_name
@@ -571,7 +600,8 @@ class SwissDCATAPProfile(MultiLangProfile):
             dataset_ref,
             dataset_dict.get('identifier', '')
         )
-
+        log.info("harvested publisher dict")
+        log.info(dataset_dict['publisher'])
         # Relations
         dataset_dict['relations'] = self._relations(dataset_ref)
         for relation in dataset_dict['relations']:
