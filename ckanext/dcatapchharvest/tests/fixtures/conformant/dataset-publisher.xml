@@ -7,11 +7,13 @@
   <dcat:Dataset rdf:about="https://swisstopo/123">
     <dct:identifier>346265-fr@bundesamt-fur-statistik-bfs</dct:identifier>
     <dct:publisher>
-      <foaf:Organization rdf:about="https://swisstopo">
-        <foaf:name xml:lang="de">Landesamt Topographie Swisstopo</foaf:name>
-      </foaf:Organization>
+      <foaf:Agent rdf:about="http://orgs.vocab.org/some-org">
+        <foaf:name xml:lang="de">Wirtschaftsamt</foaf:name>
+        <foaf:name xml:lang="it">Ufficio economico</foaf:name>
+        <foaf:name xml:lang="fr">Bureau des economiques</foaf:name>
+        <foaf:mbox rdf:resource="mailto:wirtschaftsamt@sh.ch"/>
+        <foaf:homepage rdf:resource="https://some-org.org/info"/>
+      </foaf:Agent>
     </dct:publisher>
-
   </dcat:Dataset>
-
 </rdf:RDF>
