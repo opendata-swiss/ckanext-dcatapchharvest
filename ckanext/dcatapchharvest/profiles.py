@@ -1166,18 +1166,33 @@ class SwissDCATAPProfile(MultiLangProfile):
             ))
 
     def _publisher_to_graph(self, dataset_ref, dataset_dict):
+        """ Supporting both FOAF.Agent (with multilingual names)
+        and FOAF.Organization (with a single name)
+        """
         g = self.g
         publisher_uri, publisher_name = \
             dh.get_publisher_dict_from_dataset(
                 dataset_dict.get('publisher')
             )
-        if publisher_uri:
-            publisher_ref = URIRef(publisher_uri)
+
+        # determine publisher structure FOAF.Agent or FOAF.Organization
+        if isinstance(publisher_name, dict):
+            entity_type = FOAF.Agent
+            publisher_ref = URIRef(publisher_uri) if publisher_uri else BNode()
+
+            g.add((publisher_ref, RDF.type, entity_type))
+            for lang, name in publisher_name.items():
+                if name:  # check if the name is not empty
+                    g.add((publisher_ref, FOAF.name, Literal(name, lang=lang)))
         else:
-            publisher_ref = BNode()
-        g.add((publisher_ref, RDF.type, FOAF.Organization))
-        if publisher_name:
-            g.add((publisher_ref, FOAF.name, Literal(publisher_name)))
+            entity_type = FOAF.Organization
+            publisher_ref = URIRef(publisher_uri) if publisher_uri else BNode()
+
+            g.add((publisher_ref, RDF.type, entity_type))
+            if publisher_name:
+                g.add((publisher_ref, FOAF.name, Literal(publisher_name)))
+
+        # link the publisher to the dataset
         g.add((dataset_ref, DCT.publisher, publisher_ref))
 
 
