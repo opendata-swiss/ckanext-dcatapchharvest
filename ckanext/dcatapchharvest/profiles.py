@@ -221,8 +221,21 @@ class SwissDCATAPProfile(MultiLangProfile):
                     self._object_value(agent, FOAF.homepage) or
                     (str(agent) if isinstance(agent, URIRef) else '')
             )
-            publisher_name = self._object_value(agent, FOAF.name,
-                                                multilang=True)
+            # detect if the agent is a foaf:Agent or foaf:Organization
+            is_agent = (FOAF.Agent in self.g.objects(agent, RDF.type))
+            is_organization = (
+                        FOAF.Organization in self.g.objects(agent, RDF.type))
+
+            if is_agent:
+                # handle multilingual name for foaf:Agent
+                publisher_name = self._object_value(agent, FOAF.name,
+                                                    multilang=True)
+            elif is_organization:
+                # handle single name for foaf:Organization
+                publisher_name = self._object_value(agent, FOAF.name)
+            else:
+                publisher_name = None
+
             publisher_deprecated = self._object_value(agent, RDFS.label)
             if publisher_name:
                 publisher['name'] = publisher_name
@@ -600,8 +613,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             dataset_ref,
             dataset_dict.get('identifier', '')
         )
-        log.info("harvested publisher dict")
-        log.info(dataset_dict['publisher'])
+
         # Relations
         dataset_dict['relations'] = self._relations(dataset_ref)
         for relation in dataset_dict['relations']:
