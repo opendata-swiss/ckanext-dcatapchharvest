@@ -169,11 +169,14 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _publisher(self, subject, identifier):
         """
-        Returns a dict with details about a dct:publisher entity, a foaf:Agent
+        Returns a dict with details about a dct:publisher entity,
+        represented as a foaf:Agent.
 
-        Both subject and predicate must be rdflib URIRef or BNode objects
+        Both `subject` and `predicate` must be rdflib URIRef or BNode objects.
 
-        Examples:
+        Examples of supported RDF structures:
+
+        1. Basic Organization Representation (Legacy):
 
         <dct:publisher>
             <foaf:Organization rdf:about="http://orgs.vocab.org/some-org">
@@ -181,19 +184,58 @@ class SwissDCATAPProfile(MultiLangProfile):
             </foaf:Organization>
         </dct:publisher>
 
+        Output:
         {
             'url': 'http://orgs.vocab.org/some-org',
             'name': 'Publishing Organization for dataset 1',
         }
 
-        Returns keys for url, name with the values set to
-        an empty string if they could not be found
+        2. Multilingual Agent Representation:
+
+        <dct:publisher>
+            <foaf:Agent rdf:about="http://orgs.vocab.org/some-org">
+                <foaf:name xml:lang="de">Wirtschaftsamt</foaf:name>
+                <foaf:name xml:lang="it">Ufficio economico</foaf:name>
+                <foaf:name xml:lang="fr">Bureau des economiques</foaf:name>
+                <foaf:mbox rdf:resource="mailto:wirtschaftsamt@sh.ch"/>
+                <foaf:homepage rdf:resource="https://some-org.org/info"/>
+            </foaf:Agent>
+        </dct:publisher>
+
+        The `name` field resolves directly using `multilang=True`,
+        allowing for prioritized language selection.
+        The `url` field prioritizes the `foaf:homepage` property and falls back
+        to the `rdf:about` attribute of the Agent.
+
+        Returns:
+        A JSON-encoded dictionary with keys:
+        - `url`: The URL of the publisher (from `foaf:homepage` or `rdf:about`)
+        - `name`: The resolved multilingual name using the `multilang=True`
+
+        If no valid data is found, the values for `url` and `name` will default
+        to empty strings.
         """
         publisher = {}
         for agent in self.g.objects(subject, DCT.publisher):
-            publisher['url'] = (str(agent) if isinstance(agent,
-                                URIRef) else '')
-            publisher_name = self._object_value(agent, FOAF.name)
+            publisher['url'] = (
+                    self._object_value(agent, FOAF.homepage) or
+                    (str(agent) if isinstance(agent, URIRef) else '')
+            )
+            # detect if the agent is a foaf:Agent or foaf:Organization
+            is_agent = (FOAF.Agent in self.g.objects(agent, RDF.type))
+            is_organization = (
+                        FOAF.Organization in self.g.objects(agent, RDF.type))
+
+            if is_agent:
+                # handle multilingual name for foaf:Agent
+                publisher_name = self._object_value(agent, FOAF.name,
+                                                    multilang=True)
+            elif is_organization:
+                # handle single name for foaf:Organization
+                publisher_name = self._object_value(agent, FOAF.name)
+            else:
+                publisher_name = None
+
             publisher_deprecated = self._object_value(agent, RDFS.label)
             if publisher_name:
                 publisher['name'] = publisher_name
@@ -1124,18 +1166,33 @@ class SwissDCATAPProfile(MultiLangProfile):
             ))
 
     def _publisher_to_graph(self, dataset_ref, dataset_dict):
+        """ Supporting both FOAF.Agent (with multilingual names)
+        and FOAF.Organization (with a single name)
+        """
         g = self.g
         publisher_uri, publisher_name = \
             dh.get_publisher_dict_from_dataset(
                 dataset_dict.get('publisher')
             )
-        if publisher_uri:
-            publisher_ref = URIRef(publisher_uri)
+
+        # determine publisher structure FOAF.Agent or FOAF.Organization
+        if isinstance(publisher_name, dict):
+            entity_type = FOAF.Agent
+            publisher_ref = URIRef(publisher_uri) if publisher_uri else BNode()
+
+            g.add((publisher_ref, RDF.type, entity_type))
+            for lang, name in publisher_name.items():
+                if name:  # check if the name is not empty
+                    g.add((publisher_ref, FOAF.name, Literal(name, lang=lang)))
         else:
-            publisher_ref = BNode()
-        g.add((publisher_ref, RDF.type, FOAF.Organization))
-        if publisher_name:
-            g.add((publisher_ref, FOAF.name, Literal(publisher_name)))
+            entity_type = FOAF.Organization
+            publisher_ref = URIRef(publisher_uri) if publisher_uri else BNode()
+
+            g.add((publisher_ref, RDF.type, entity_type))
+            if publisher_name:
+                g.add((publisher_ref, FOAF.name, Literal(publisher_name)))
+
+        # link the publisher to the dataset
         g.add((dataset_ref, DCT.publisher, publisher_ref))
 
 

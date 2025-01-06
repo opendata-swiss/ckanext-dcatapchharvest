@@ -22,5 +22,5 @@ class ConformantProfileParseTest(BaseParseTest):
         p.parse(contents)
         dataset = [d for d in p.datasets()][0]
         publisher = json.loads(dataset['publisher'])
-        eq_(publisher['name'], 'Landesamt Topographie Swisstopo')
-        eq_(publisher['url'], 'https://swisstopo')
+        eq_(publisher['name'], {'fr': 'Bureau des economiques', 'de': 'Wirtschaftsamt', 'en': '', 'it': 'Ufficio economico'})
+        eq_(publisher['url'], 'https://some-org.org/info')
