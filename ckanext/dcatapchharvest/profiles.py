@@ -256,7 +256,11 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         for relation_node in self.g.objects(subject, DCT.relation):
             relation = {
-                'label': self._object_value(relation_node, RDFS.label, multilang=True),
+                'label': self._object_value(
+                    relation_node,
+                    RDFS.label,
+                    multilang=True
+                ),
                 'url': relation_node
             }
             relations.append(relation)
