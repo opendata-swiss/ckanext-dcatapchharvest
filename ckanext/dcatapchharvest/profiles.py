@@ -256,7 +256,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         for relation_node in self.g.objects(subject, DCT.relation):
             relation = {
-                'label': self._object_value(relation_node, RDFS.label),
+                'label': self._object_value(relation_node, RDFS.label, multilang=True),
                 'url': relation_node
             }
             relations.append(relation)
@@ -617,8 +617,9 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Relations
         dataset_dict['relations'] = self._relations(dataset_ref)
         for relation in dataset_dict['relations']:
-            if relation['label'] == {}:
-                relation['label'] = str(relation.get('url', ''))
+            for lang in dh.get_langs():
+                if not relation['label'][lang]:
+                    relation['label'][lang] = str(relation.get('url', ''))
 
         # Temporal
         dataset_dict['temporals'] = self._temporals(dataset_ref)
