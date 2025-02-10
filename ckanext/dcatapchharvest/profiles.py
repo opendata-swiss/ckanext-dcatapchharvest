@@ -67,11 +67,11 @@ slug_id_pattern = re.compile('[^/]+(?=/$|$)')
 
 
 class MultiLangProfile(RDFProfile):
-    def _add_multilang_value(self, subject, predicate, dataset_key=None,
-                             dataset_dict=None,
+    def _add_multilang_value(self, subject, predicate, key=None,
+                             data_dict=None,
                              multilang_values=None):  # noqa
-        if not multilang_values and dataset_dict and dataset_key:
-            multilang_values = dataset_dict.get(dataset_key)
+        if not multilang_values and data_dict and key:
+            multilang_values = data_dict.get(key)
         if multilang_values:
             try:
                 for key, values in multilang_values.iteritems():
