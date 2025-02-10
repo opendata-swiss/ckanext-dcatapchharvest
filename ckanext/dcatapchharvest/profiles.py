@@ -863,16 +863,20 @@ class SwissDCATAPProfile(MultiLangProfile):
         if dataset_dict.get('relations'):
             relations = dataset_dict.get('relations')
             for relation in relations:
-                relation_name = relation['label']
                 try:
                     relation_url = dh.uri_to_iri(relation['url'])
                 except ValueError:
                     # skip this relation if the URL is invalid
                     continue
 
-                relation = URIRef(relation_url)
-                g.add((relation, RDFS.label, Literal(relation_name)))
-                g.add((dataset_ref, DCT.relation, relation))
+                relation_uriref = URIRef(relation_url)
+                self._add_multilang_value(
+                    relation_uriref,
+                    RDFS.label,
+                    'label',
+                    relation
+                )
+                g.add((dataset_ref, DCT.relation, relation_uriref))
 
         # References
         if dataset_dict.get('see_alsos'):
