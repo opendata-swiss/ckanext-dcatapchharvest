@@ -251,9 +251,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         return json.dumps(publisher)
 
     def _relations(self, subject):
-
         relations = []
-
         for relation_node in self.g.objects(subject, DCT.relation):
             relation = {
                 'label': self._object_value(
@@ -261,8 +259,15 @@ class SwissDCATAPProfile(MultiLangProfile):
                     RDFS.label,
                     multilang=True
                 ),
-                'url': relation_node
+                'url': unicode(relation_node)
             }
+            # If we don't have a label in any language, use the highest-prio
+            # language where we do have a label, or fall back to the url
+            fallback = (dh.localize_by_language_priority(relation['label']) or
+                        relation.get('url', ''))
+            for lang in dh.get_langs():
+                if not relation['label'][lang]:
+                    relation['label'][lang] = fallback
             relations.append(relation)
 
         return relations
@@ -620,10 +625,6 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Relations
         dataset_dict['relations'] = self._relations(dataset_ref)
-        for relation in dataset_dict['relations']:
-            for lang in dh.get_langs():
-                if not relation['label'][lang]:
-                    relation['label'][lang] = str(relation.get('url', ''))
 
         # Temporal
         dataset_dict['temporals'] = self._temporals(dataset_ref)
