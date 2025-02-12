@@ -103,6 +103,28 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         see_also = dataset['see_alsos'][0]
         eq_(see_also['dataset_identifier'], u'4682791@bundesamt-fur-statistik-bfs')
 
+        relations = sorted(dataset["relations"], key=lambda relation: relation['url'])
+
+        # Relations - only one label given, no language specified
+        eq_(relations[0]['url'], "https://www.admin.ch/opc/de/classified-compilation/19920252/index.html")
+        for lang in self.languages:
+            eq_(relations[0]['label'][lang], 'legal_basis')
+
+        # Relations - multilingual labels
+        eq_(relations[1]['url'], "https://www.example.org/aaa")
+        for lang in self.languages:
+            eq_(relations[1]['label'][lang], 'Text for label ' + lang.upper())
+
+        # Relations - no label given
+        eq_(relations[2]['url'], "https://www.example.org/bbb")
+        for lang in self.languages:
+            eq_(relations[2]['label'][lang], "https://www.example.org/bbb")
+
+        # Relations - label given, language specified but not German
+        eq_(relations[3]['url'], "https://www.example.org/ccc")
+        for lang in self.languages:
+            eq_(relations[3]['label'][lang], 'Text for label IT')
+
         # Qualified relations
         qualified_relations = sorted(dataset["qualified_relations"])
         eq_(
