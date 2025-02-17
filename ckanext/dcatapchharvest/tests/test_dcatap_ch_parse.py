@@ -120,7 +120,11 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         for lang in self.languages:
             eq_(relations[2]['label'][lang], "https://www.example.org/bbb")
 
-        # Relations - label given, language specified but not German
+        # Relations - label given, language specified but not German.
+        # If there is no label given in a language, we try to get one from
+        # another language, in the priority order 'en' -> 'de' -> 'fr' -> 'it'.
+        # Here we test that we end up with a label text in all languages, even
+        # though the source only had a label in Italian.
         eq_(relations[3]['url'], "https://www.example.org/ccc")
         for lang in self.languages:
             eq_(relations[3]['label'][lang], 'Text for label IT')
