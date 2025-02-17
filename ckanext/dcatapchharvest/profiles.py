@@ -67,11 +67,11 @@ slug_id_pattern = re.compile('[^/]+(?=/$|$)')
 
 
 class MultiLangProfile(RDFProfile):
-    def _add_multilang_value(self, subject, predicate, dataset_key=None,
-                             dataset_dict=None,
+    def _add_multilang_value(self, subject, predicate, key=None,
+                             data_dict=None,
                              multilang_values=None):  # noqa
-        if not multilang_values and dataset_dict and dataset_key:
-            multilang_values = dataset_dict.get(dataset_key)
+        if not multilang_values and data_dict and key:
+            multilang_values = data_dict.get(key)
         if multilang_values:
             try:
                 for key, values in multilang_values.iteritems():
@@ -251,14 +251,23 @@ class SwissDCATAPProfile(MultiLangProfile):
         return json.dumps(publisher)
 
     def _relations(self, subject):
-
         relations = []
-
         for relation_node in self.g.objects(subject, DCT.relation):
             relation = {
-                'label': self._object_value(relation_node, RDFS.label),
-                'url': relation_node
+                'label': self._object_value(
+                    relation_node,
+                    RDFS.label,
+                    multilang=True
+                ),
+                'url': unicode(relation_node)
             }
+            # If we don't have a label in any language, use the highest-prio
+            # language where we do have a label, or fall back to the url
+            fallback = (dh.localize_by_language_priority(relation['label']) or
+                        relation.get('url', ''))
+            for lang in dh.get_langs():
+                if not relation['label'][lang]:
+                    relation['label'][lang] = fallback
             relations.append(relation)
 
         return relations
@@ -616,9 +625,6 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Relations
         dataset_dict['relations'] = self._relations(dataset_ref)
-        for relation in dataset_dict['relations']:
-            if relation['label'] == {}:
-                relation['label'] = str(relation.get('url', ''))
 
         # Temporal
         dataset_dict['temporals'] = self._temporals(dataset_ref)
@@ -862,16 +868,20 @@ class SwissDCATAPProfile(MultiLangProfile):
         if dataset_dict.get('relations'):
             relations = dataset_dict.get('relations')
             for relation in relations:
-                relation_name = relation['label']
                 try:
                     relation_url = dh.uri_to_iri(relation['url'])
                 except ValueError:
                     # skip this relation if the URL is invalid
                     continue
 
-                relation = URIRef(relation_url)
-                g.add((relation, RDFS.label, Literal(relation_name)))
-                g.add((dataset_ref, DCT.relation, relation))
+                relation_uriref = URIRef(relation_url)
+                self._add_multilang_value(
+                    relation_uriref,
+                    RDFS.label,
+                    'label',
+                    relation
+                )
+                g.add((dataset_ref, DCT.relation, relation_uriref))
 
         # References
         if dataset_dict.get('see_alsos'):

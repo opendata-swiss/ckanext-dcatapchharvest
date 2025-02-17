@@ -6,6 +6,20 @@
         <rdfs:label>legal_basis</rdfs:label>
       </rdf:Description>
     </dct:relation>
+    <dct:relation>
+        <rdf:Description rdf:about="https://www.example.org/aaa">
+            <rdfs:label xml:lang="it">Text for label IT</rdfs:label>
+            <rdfs:label xml:lang="fr">Text for label FR</rdfs:label>
+            <rdfs:label xml:lang="de">Text for label DE</rdfs:label>
+            <rdfs:label xml:lang="en">Text for label EN</rdfs:label>
+        </rdf:Description>
+    </dct:relation>
+    <dct:relation rdf:resource="https://www.example.org/bbb"/>
+    <dct:relation>
+      <rdf:Description rdf:about="https://www.example.org/ccc">
+        <rdfs:label xml:lang="it">Text for label IT</rdfs:label>
+      </rdf:Description>
+    </dct:relation>
     <dcat:distribution>
       <dcat:Distribution rdf:about="https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585/resource/c8ec6ca0-6923-4cf3-92f2-95a10e6f8e25">
         <dct:title xml:lang="fr">Annuaire statistique de la Suisse 1901</dct:title>

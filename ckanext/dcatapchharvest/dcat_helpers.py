@@ -78,6 +78,13 @@ def get_langs():
     return language_priorities
 
 
+def localize_by_language_priority(multilang_dict):
+    for lang in get_langs():
+        if multilang_dict.get(lang, ''):
+            return multilang_dict[lang]
+    return ''
+
+
 def dataset_uri(dataset_dict, dataset_ref=None):
     """
     Returns a URI for the dataset

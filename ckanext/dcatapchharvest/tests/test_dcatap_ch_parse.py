@@ -8,6 +8,7 @@ from rdflib import Graph, URIRef, Literal
 from rdflib.namespace import RDF
 
 from ckanext.dcat.processors import RDFParser
+from ckanext.dcatapchharvest.dcat_helpers import get_langs
 from ckanext.dcatapchharvest.profiles import (DCAT, DCT)
 from ckanext.dcatapchharvest.tests.base_test_classes import BaseParseTest
 
@@ -16,6 +17,7 @@ assert_true = nose.tools.assert_true
 
 
 class TestSwissDCATAPProfileParsing(BaseParseTest):
+    languages = get_langs()
 
     def test_rights_license(self):
 
@@ -51,16 +53,16 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         extras = self._extras(dataset)
 
         # Basic fields
-        assert all(l in dataset['title'] for l in ['de', 'fr', 'it', 'en']), "title contains all languages"
+        assert all(l in dataset['title'] for l in self.languages), "title contains all languages"
         eq_(dataset['title']['de'], u'Statistisches Jahrbuch der Schweiz 1901')
         eq_(dataset['title']['fr'], u'Annuaire statistique de la Suisse 1901')
 
-        assert all(l in dataset['description'] for l in ['de', 'fr', 'it', 'en']), "description contains all languages"
+        assert all(l in dataset['description'] for l in self.languages), "description contains all languages"
         eq_(dataset['description']['de'], u'')
         eq_(dataset['url'], u'https://www.bfs.admin.ch/bfs/de/home/statistiken.html')
 
         # Keywords
-        assert all(l in dataset['keywords'] for l in ['de', 'fr', 'it', 'en']), "keywords contains all languages"
+        assert all(l in dataset['keywords'] for l in self.languages), "keywords contains all languages"
         eq_(sorted(dataset['keywords']['de']), ['publikation', 'statistische-grundlagen-und-ubersichten'])
         eq_(sorted(dataset['keywords']['fr']), ['bases-statistiques-et-generalites', 'publication'])
         eq_(sorted(dataset['keywords']['it']), ['basi-statistiche-e-presentazioni-generali', 'pubblicazione'])
@@ -101,6 +103,32 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         see_also = dataset['see_alsos'][0]
         eq_(see_also['dataset_identifier'], u'4682791@bundesamt-fur-statistik-bfs')
 
+        relations = sorted(dataset["relations"], key=lambda relation: relation['url'])
+
+        # Relations - only one label given, no language specified
+        eq_(relations[0]['url'], "https://www.admin.ch/opc/de/classified-compilation/19920252/index.html")
+        for lang in self.languages:
+            eq_(relations[0]['label'][lang], 'legal_basis')
+
+        # Relations - multilingual labels
+        eq_(relations[1]['url'], "https://www.example.org/aaa")
+        for lang in self.languages:
+            eq_(relations[1]['label'][lang], 'Text for label ' + lang.upper())
+
+        # Relations - no label given
+        eq_(relations[2]['url'], "https://www.example.org/bbb")
+        for lang in self.languages:
+            eq_(relations[2]['label'][lang], "https://www.example.org/bbb")
+
+        # Relations - label given, language specified but not German.
+        # If there is no label given in a language, we try to get one from
+        # another language, in the priority order 'en' -> 'de' -> 'fr' -> 'it'.
+        # Here we test that we end up with a label text in all languages, even
+        # though the source only had a label in Italian.
+        eq_(relations[3]['url'], "https://www.example.org/ccc")
+        for lang in self.languages:
+            eq_(relations[3]['label'][lang], 'Text for label IT')
+
         # Qualified relations
         qualified_relations = sorted(dataset["qualified_relations"])
         eq_(
@@ -138,10 +166,10 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         resource = dataset['resources'][0]
 
         #  Simple values
-        assert all(l in resource['title'] for l in ['de', 'fr', 'it', 'en']), "resource title contains all languages"
+        assert all(l in resource['title'] for l in self.languages), "resource title contains all languages"
         eq_(resource['title']['fr'], u'Annuaire statistique de la Suisse 1901')
         eq_(resource['title']['de'], u'')
-        assert all(l in resource['description'] for l in ['de', 'fr', 'it', 'en']), "resource description contains all languages"
+        assert all(l in resource['description'] for l in self.languages), "resource description contains all languages"
         eq_(resource['description']['de'], u'')
         eq_(resource['format'], u'html')
         eq_(resource['media_type'], u'text/html')
