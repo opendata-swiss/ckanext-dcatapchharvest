@@ -866,9 +866,16 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Languages
         languages = dataset_dict.get('language', [])
         for lang in languages:
-            uri = language_uri_map.get(lang)
-            if uri:
-                g.add((dataset_ref, DCT.language, URIRef(uri)))
+            if lang.startswith('http://') or lang.startswith('https://'):
+                # lang is already a full IRI, use directly
+                g.add((dataset_ref, DCT.language, URIRef(lang)))
+            else:
+                uri = language_uri_map.get(lang)
+                if uri:
+                    g.add((dataset_ref, DCT.language, URIRef(uri)))
+                else:
+                    log.debug("Language '{}' not found in"
+                              " language_uri_map".format(lang))
 
         # Relations
         if dataset_dict.get('relations'):
@@ -1034,6 +1041,20 @@ class SwissDCATAPProfile(MultiLangProfile):
                 uri = language_uri_map.get(lang)
                 if uri:
                     g.add((distribution, DCT.language, URIRef(uri)))
+
+            # Language
+            languages = resource_dict.get('language', [])
+            for lang in languages:
+                if lang.startswith('http://') or lang.startswith('https://'):
+                    # lang is already a full IRI, use directly
+                    g.add((distribution, DCT.language, URIRef(lang)))
+                else:
+                    uri = language_uri_map.get(lang)
+                    if uri:
+                        g.add((distribution, DCT.language, URIRef(uri)))
+                    else:
+                        log.debug("Language '{}' not found in"
+                                  " language_uri_map".format(lang))
 
             # Download URL & Access URL
             download_url = resource_dict.get('download_url')
@@ -1407,12 +1428,19 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 distribution, DCT.description, "description", resource_dict
             )  # noqa
 
-            #  Language
+            # Language
             languages = resource_dict.get('language', [])
             for lang in languages:
-                uri = language_uri_map.get(lang)
-                if uri:
-                    g.add((distribution, DCT.language, URIRef(uri)))
+                if lang.startswith('http://') or lang.startswith('https://'):
+                    # lang is already a full IRI, use directly
+                    g.add((distribution, DCT.language, URIRef(lang)))
+                else:
+                    uri = language_uri_map.get(lang)
+                    if uri:
+                        g.add((distribution, DCT.language, URIRef(uri)))
+                    else:
+                        log.debug("Language '{}' not found in"
+                                  " language_uri_map".format(lang))
 
             # Download URL & Access URL
             self.download_access_url(resource_dict, distribution, g)
