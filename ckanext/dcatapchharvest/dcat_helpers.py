@@ -388,3 +388,28 @@ def get_iana_media_type_values():
                 media_types_namespaces['ns'] + '/media-types/' + uri_suffix
 
     return media_type_values
+
+def get_language_uri_map():
+    """
+    Parses language.xml and builds a mapping:
+    { 'de': 'http://publications.europa.eu/resource/authority/language/DEU', ... }
+    """
+    xml_file = os.path.join(__location__, 'language.xml')
+    tree = ET.parse(xml_file)
+    root = tree.getroot()
+
+    ns = {
+        'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+        'skos': 'http://www.w3.org/2004/02/skos/core#'
+    }
+
+    lang_map = {}
+
+    for desc in root.findall('.//rdf:Description', ns):
+        uri = desc.attrib.get('{{{}}}about'.format(ns["rdf"]))
+        notation = desc.find('skos:notation', ns)
+        if uri and notation is not None:
+            lang_code = notation.text.strip().lower()
+            lang_map[lang_code] = uri
+
+    return lang_map
