@@ -18,7 +18,7 @@ valid_frequencies = dh.get_frequency_values()
 eu_theme_mapping = dh.get_theme_mapping()
 valid_formats = dh.get_format_values()
 valid_media_types = dh.get_iana_media_type_values()
-
+language_uri_map = dh.get_language_uri_map()
 
 DCT = dh.DCT
 DCAT = Namespace('http://www.w3.org/ns/dcat#')
@@ -854,7 +854,6 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Lists
         items = [
-            ('language', DCT.language, None, Literal),
             ('theme', DCAT.theme, None, URIRef),
             ('alternate_identifier', ADMS.identifier, None, Literal),
             ('has_version', DCT.hasVersion, None, Literal),
@@ -863,6 +862,13 @@ class SwissDCATAPProfile(MultiLangProfile):
             ('sample', ADMS.sample, None, Literal),
         ]
         self._add_list_triples_from_dict(dataset_dict, dataset_ref, items)
+
+        # Languages
+        languages = dataset_dict.get('language', [])
+        for lang in languages:
+            uri = language_uri_map.get(lang)
+            if uri:
+                g.add((dataset_ref, DCT.language, URIRef(uri)))
 
         # Relations
         if dataset_dict.get('relations'):
@@ -1022,12 +1028,12 @@ class SwissDCATAPProfile(MultiLangProfile):
             self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
             self._add_multilang_value(distribution, DCT.description, 'description', resource_dict)  # noqa
 
-            #  Lists
-            items = [
-                ('language', DCT.language, None, Literal),
-            ]
-            self._add_list_triples_from_dict(resource_dict, distribution,
-                                             items)
+            #  Language
+            languages = resource_dict.get('language', [])
+            for lang in languages:
+                uri = language_uri_map.get(lang)
+                if uri:
+                    g.add((distribution, DCT.language, URIRef(uri)))
 
             # Download URL & Access URL
             download_url = resource_dict.get('download_url')
@@ -1224,12 +1230,6 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         ]
         self._add_multilang_triples_from_dict(dataset_dict, dataset_ref, items)
 
-    def _list_fields_graph(self, dataset_ref, dataset_dict):
-        items = [
-            ('language', SCHEMA.inLanguage, None, Literal),
-        ]
-        self._add_list_triples_from_dict(dataset_dict, dataset_ref, items)
-
     def _publisher_graph(self, dataset_ref, dataset_dict):
         if any([
             self._get_dataset_value(dataset_dict, 'publisher_uri'),
@@ -1407,12 +1407,12 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 distribution, DCT.description, "description", resource_dict
             )  # noqa
 
-            #  Lists
-            items = [
-                ("language", DCT.language, None, Literal),
-            ]
-            self._add_list_triples_from_dict(resource_dict, distribution,
-                                             items)
+            #  Language
+            languages = resource_dict.get('language', [])
+            for lang in languages:
+                uri = language_uri_map.get(lang)
+                if uri:
+                    g.add((distribution, DCT.language, URIRef(uri)))
 
             # Download URL & Access URL
             self.download_access_url(resource_dict, distribution, g)
