@@ -50,5 +50,11 @@
     <skos:prefLabel xml:lang="fr">Français</skos:prefLabel>
     <skos:notation>fr</skos:notation>
   </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/language/ROH">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:prefLabel xml:lang="de">Rumantsch</skos:prefLabel>
+    <skos:notation>rm</skos:notation>
+  </rdf:Description>
 </rdf:RDF>
 
