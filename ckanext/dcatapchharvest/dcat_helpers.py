@@ -392,7 +392,9 @@ def get_iana_media_type_values():
 def get_language_uri_map():
     """
     Parses language.xml and builds a mapping:
-    { 'de': 'http://publications.europa.eu/resource/authority/language/DEU', ... }
+    { 'de': 'http://publications.europa.eu/resource/authority/language/DEU',
+    'en': 'http://publications.europa.eu/resource/authority/language/ENG',
+    ...}
     """
     xml_file = os.path.join(__location__, 'language.xml')
     tree = ET.parse(xml_file)
