@@ -409,7 +409,7 @@ def get_language_uri_map():
     lang_map = {}
 
     for desc in root.findall('.//rdf:Description', ns):
-        uri = desc.attrib.get('{' + ns["rdf"] + '}about'.format(ns["rdf"]))
+        uri = desc.attrib.get('{' + ns["rdf"] + '}about')
         notation = desc.find('skos:notation', ns)
         if uri and notation is not None:
             lang_code = notation.text.strip().lower()
