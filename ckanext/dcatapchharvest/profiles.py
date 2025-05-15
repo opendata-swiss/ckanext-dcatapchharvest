@@ -866,11 +866,11 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Languages
         languages = dataset_dict.get('language', [])
         for lang in languages:
-            if lang.startswith('http://') or lang.startswith('https://'):
-                # lang is already a full IRI, use directly
+            if 'https://publications.europa.eu/resource/authority' in lang:
+                # Already a valid EU language URI
                 g.add((dataset_ref, DCT.language, URIRef(lang)))
             else:
-                uri = language_uri_map.get(lang)
+                uri = language_uri_map.get(lang, None)
                 if uri:
                     g.add((dataset_ref, DCT.language, URIRef(uri)))
                 else:
@@ -1045,11 +1045,11 @@ class SwissDCATAPProfile(MultiLangProfile):
             # Language
             languages = resource_dict.get('language', [])
             for lang in languages:
-                if lang.startswith('http://') or lang.startswith('https://'):
-                    # lang is already a full IRI, use directly
+                if 'https://publications.europa.eu/resource/authority' in lang:
+                    # Already a valid EU language URI
                     g.add((distribution, DCT.language, URIRef(lang)))
                 else:
-                    uri = language_uri_map.get(lang)
+                    uri = language_uri_map.get(lang, None)
                     if uri:
                         g.add((distribution, DCT.language, URIRef(uri)))
                     else:
@@ -1431,11 +1431,11 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             # Language
             languages = resource_dict.get('language', [])
             for lang in languages:
-                if lang.startswith('http://') or lang.startswith('https://'):
-                    # lang is already a full IRI, use directly
+                if 'https://publications.europa.eu/resource/authority' in lang:
+                    # Already a valid EU language URI
                     g.add((distribution, DCT.language, URIRef(lang)))
                 else:
-                    uri = language_uri_map.get(lang)
+                    uri = language_uri_map.get(lang, None)
                     if uri:
                         g.add((distribution, DCT.language, URIRef(uri)))
                     else:
