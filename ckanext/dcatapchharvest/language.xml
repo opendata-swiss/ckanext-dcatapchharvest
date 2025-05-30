@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<rdf:RDF
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  xmlns:dcterms="http://purl.org/dc/terms/"
+  xmlns:owl="http://www.w3.org/2002/07/owl#"
+  xmlns:skos="http://www.w3.org/2004/02/skos/core#"
+  xmlns:ns5="http://publications.europa.eu/ontology/euvoc#"
+  xmlns:ns6="http://www.w3.org/2008/05/skos-xl#"
+  xmlns:ns7="http://publications.europa.eu/ontology/authority/">
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/language">
+    <rdf:type rdf:resource="http://www.w3.org/2004/02/skos/core#ConceptScheme"/>
+    <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#Ontology"/>
+    <dcterms:created rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-04-01</dcterms:created>
+    <rdfs:label xml:lang="en">Language</rdfs:label>
+    <owl:imports rdf:resource="http://publications.europa.eu/ontology/euvoc"/>
+    <rdfs:comment rdf:datatype="http://www.w3.org/2000/01/rdf-schema#Literal">Language</rdfs:comment>
+    <owl:versionInfo>20250319-0</owl:versionInfo>
+    <skos:prefLabel xml:lang="en">Language</skos:prefLabel>
+    <dcterms:title xml:lang="en">Language</dcterms:title>
+    <ns5:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2009-04-01</ns5:startDate>
+    <dcterms:identifier>http://publications.europa.eu/resource/authority/language</dcterms:identifier>
+    <ns6:prefLabel rdf:resource="http://publications.europa.eu/resource/authority/language/d4e14131"/>
+    <ns7:prefLabel xml:lang="en">Language</ns7:prefLabel>
+    <ns7:table.id>language</ns7:table.id>
+    <ns7:table.version.number>20250319-0</ns7:table.version.number>
+    <owl:versionIRI rdf:resource="http://publications.europa.eu/resource/authority/language/20250319-0"/>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/language/ENG">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:prefLabel xml:lang="en">English</skos:prefLabel>
+    <skos:notation>en</skos:notation>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/language/ITA">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:prefLabel xml:lang="it">Italiano</skos:prefLabel>
+    <skos:notation>it</skos:notation>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/language/DEU">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:prefLabel xml:lang="de">Deutsch</skos:prefLabel>
+    <skos:notation>de</skos:notation>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/language/FRA">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:prefLabel xml:lang="fr">Français</skos:prefLabel>
+    <skos:notation>fr</skos:notation>
+  </rdf:Description>
+  <rdf:Description rdf:about="http://publications.europa.eu/resource/authority/language/ROH">
+    <skos:inScheme rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:topConceptOf rdf:resource="http://publications.europa.eu/resource/authority/language"/>
+    <skos:prefLabel xml:lang="de">Rumantsch</skos:prefLabel>
+    <skos:notation>rm</skos:notation>
+  </rdf:Description>
+</rdf:RDF>
+
