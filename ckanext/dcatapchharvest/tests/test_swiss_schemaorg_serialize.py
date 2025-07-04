@@ -32,7 +32,7 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        eq_(unicode(dataset_ref), utils.dataset_uri(dataset))
+        eq_(str(dataset_ref), utils.dataset_uri(dataset))
 
         # Basic fields
         assert self._triple(g, dataset_ref, RDF.type, SCHEMA.Dataset)
@@ -55,14 +55,14 @@ class TestSchemaOrgProfileSerializeDataset(BaseSerializeTest):
         assert self._triple(g, dataset_ref, SCHEMA.datePublished, dataset['issued'])
         assert len(list(g.objects(dataset_ref, SCHEMA.dateModified))) == 0
 
-        for key, value in dataset['description'].iteritems():
+        for key, value in dataset['description'].items():
             if dataset['description'].get(key):
                 assert self._triple(g, dataset_ref, SCHEMA.description, Literal(value, lang=key))
         eq_(len([t for t in g.triples((dataset_ref, SCHEMA.description, None))]), 2)
 
         # Tags
         eq_(len([t for t in g.triples((dataset_ref, SCHEMA.keywords, None))]), 3)
-        for key, keywords in dataset['keywords'].iteritems():
+        for key, keywords in dataset['keywords'].items():
             if dataset['keywords'].get(key):
                 for keyword in keywords:
                     assert self._triple(g, dataset_ref, SCHEMA.keywords, Literal(keyword, lang=key))

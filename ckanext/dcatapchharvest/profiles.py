@@ -74,7 +74,7 @@ class MultiLangProfile(RDFProfile):
             multilang_values = data_dict.get(key)
         if multilang_values:
             try:
-                for key, values in multilang_values.iteritems():
+                for key, values in multilang_values.items():
                     if values:
                         # the values can be either a multilang-dict or they are
                         # nested in another iterable (e.g. keywords)
@@ -137,11 +137,11 @@ class SwissDCATAPProfile(MultiLangProfile):
         lang_dict = {}
         for o in self.g.objects(subject, predicate):
             if multilang and o.language:
-                lang_dict[o.language] = unicode(o)
+                lang_dict[o.language] = str(o)
             elif multilang:
-                lang_dict[default_lang] = unicode(o)
+                lang_dict[default_lang] = str(o)
             else:
-                return unicode(o)
+                return str(o)
         if multilang:
             # when translation does not exist, create an empty one
             for lang in dh.get_langs():
@@ -157,8 +157,8 @@ class SwissDCATAPProfile(MultiLangProfile):
         """
         for o in self.g.objects(subject, predicate):
             if isinstance(o, Literal):
-                return unicode(o), o.datatype
-            return unicode(o), None
+                return str(o), o.datatype
+            return str(o), None
         return None, None
 
     def _get_publisher_url_from_identifier(self, identifier):
@@ -259,7 +259,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     RDFS.label,
                     multilang=True
                 ),
-                'url': unicode(relation_node)
+                'url': str(relation_node)
             }
             # If we don't have a label in any language, use the highest-prio
             # language where we do have a label, or fall back to the url
@@ -344,7 +344,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         for keyword_node in self.g.objects(subject, DCAT.keyword):
             lang = keyword_node.language
-            keyword = munge_tag(unicode(keyword_node))
+            keyword = munge_tag(str(keyword_node))
             keywords.setdefault(lang, []).append(keyword)
 
         return keywords
@@ -488,7 +488,7 @@ class SwissDCATAPProfile(MultiLangProfile):
     def _get_eu_accrual_periodicity(self, subject):
         ogdch_value = self._object_value(subject, DCT.accrualPeriodicity)
         ogdch_value = URIRef(ogdch_value)
-        for key, value in valid_frequencies.items():
+        for key, value in list(valid_frequencies.items()):
             if ogdch_value == value:
                 ogdch_value = key
                 return ogdch_value
@@ -599,7 +599,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Tags
         keywords = self._object_value_list(dataset_ref, DCAT.keyword) or []
         for keyword in keywords:
-            dataset_dict['tags'].append({'name': munge_tag(unicode(keyword))})
+            dataset_dict['tags'].append({'name': munge_tag(str(keyword))})
 
         # Keywords
         dataset_dict['keywords'] = self._keywords(dataset_ref)
@@ -790,7 +790,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         g = self.g
 
-        for prefix, namespace in namespaces.iteritems():
+        for prefix, namespace in namespaces.items():
             g.bind(prefix, namespace)
 
         g.add((dataset_ref, RDF.type, DCAT.Dataset))
@@ -1190,10 +1190,8 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
         g = self.g
-        old_valid_frequencies = filter(
-            lambda i: i != URIRef(
-                "http://purl.org/cld/freq/completelyIrregular"),
-            list(valid_frequencies.values()))
+        old_valid_frequencies = [i for i in list(valid_frequencies.values()) if i != URIRef(
+                "http://purl.org/cld/freq/completelyIrregular")]
         if URIRef(accrual_periodicity) in \
                 old_valid_frequencies + list(valid_frequencies.keys()):
             g.add((
@@ -1218,7 +1216,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             publisher_ref = URIRef(publisher_uri) if publisher_uri else BNode()
 
             g.add((publisher_ref, RDF.type, entity_type))
-            for lang, name in publisher_name.items():
+            for lang, name in list(publisher_name.items()):
                 if name:  # check if the name is not empty
                     g.add((publisher_ref, FOAF.name, Literal(name, lang=lang)))
         else:
