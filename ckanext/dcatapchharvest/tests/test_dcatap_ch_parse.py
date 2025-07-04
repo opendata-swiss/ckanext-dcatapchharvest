@@ -34,8 +34,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
              # Resources
             eq_(len(dataset['resources']), 1)
             resource = dataset['resources'][0]
-            eq_(unicode(resource['rights']), u'https://opendata.swiss/terms-of-use#terms_by')
-            eq_(unicode(resource['license']), u'https://opendata.swiss/terms-of-use#terms_by_ask')
+            eq_(str(resource['rights']), 'https://opendata.swiss/terms-of-use#terms_by')
+            eq_(str(resource['license']), 'https://opendata.swiss/terms-of-use#terms_by_ask')
 
     def test_dataset_all_fields(self):
 
@@ -54,12 +54,12 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         # Basic fields
         assert all(l in dataset['title'] for l in self.languages), "title contains all languages"
-        eq_(dataset['title']['de'], u'Statistisches Jahrbuch der Schweiz 1901')
-        eq_(dataset['title']['fr'], u'Annuaire statistique de la Suisse 1901')
+        eq_(dataset['title']['de'], 'Statistisches Jahrbuch der Schweiz 1901')
+        eq_(dataset['title']['fr'], 'Annuaire statistique de la Suisse 1901')
 
         assert all(l in dataset['description'] for l in self.languages), "description contains all languages"
-        eq_(dataset['description']['de'], u'')
-        eq_(dataset['url'], u'https://www.bfs.admin.ch/bfs/de/home/statistiken.html')
+        eq_(dataset['description']['de'], '')
+        eq_(dataset['url'], 'https://www.bfs.admin.ch/bfs/de/home/statistiken.html')
 
         # Keywords
         assert all(l in dataset['keywords'] for l in self.languages), "keywords contains all languages"
@@ -78,16 +78,16 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
                                                                {'name': 'statistische-grundlagen-und-ubersichten'}])
 
         #  Simple values
-        eq_(dataset['issued'], u'1900-12-31T00:00:00')
-        eq_(dataset['modified'], u'2018-04-24T19:30:57.197374')
-        eq_(dataset['identifier'], u'346266@bundesamt-fur-statistik-bfs')
+        eq_(dataset['issued'], '1900-12-31T00:00:00')
+        eq_(dataset['modified'], '2018-04-24T19:30:57.197374')
+        eq_(dataset['identifier'], '346266@bundesamt-fur-statistik-bfs')
         eq_(dataset['spatial'], 'Schweiz')
 
         # Temporals
         temporal = dataset['temporals'][0]
-        eq_(temporal['end_date'], u'1901-12-31T00:00:00')
+        eq_(temporal['end_date'], '1901-12-31T00:00:00')
 
-        eq_(temporal['start_date'], u'1901-01-01T00:00:00')
+        eq_(temporal['start_date'], '1901-01-01T00:00:00')
 
         # Publisher
         publisher = json.loads(dataset['publisher'])
@@ -101,7 +101,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         # See alsos
         see_also = dataset['see_alsos'][0]
-        eq_(see_also['dataset_identifier'], u'4682791@bundesamt-fur-statistik-bfs')
+        eq_(see_also['dataset_identifier'], '4682791@bundesamt-fur-statistik-bfs')
 
         relations = sorted(dataset["relations"], key=lambda relation: relation['url'])
 
@@ -147,19 +147,19 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         )
 
         #  Lists
-        eq_(sorted(dataset['language']), [u'de', u'fr'])
-        eq_(sorted(dataset['groups']), [{'name': u'gove'}])
+        eq_(sorted(dataset['language']), ['de', 'fr'])
+        eq_(sorted(dataset['groups']), [{'name': 'gove'}])
         eq_(
             sorted(dataset['documentation']),
             ['https://example.com/documentation-dataset-1', 'https://example.com/documentation-dataset-2']
         )
         eq_(
             sorted(dataset['conforms_to']),
-            [u'http://resource.geosciml.org/ontology/timescale/gts', u'https://inspire.ec.europa.eu/documents']
+            ['http://resource.geosciml.org/ontology/timescale/gts', 'https://inspire.ec.europa.eu/documents']
         )
 
         # Dataset URI
-        eq_(extras['uri'], u'https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585')
+        eq_(extras['uri'], 'https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585')
 
         # Resources
         eq_(len(dataset['resources']), 1)
@@ -167,39 +167,39 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         #  Simple values
         assert all(l in resource['title'] for l in self.languages), "resource title contains all languages"
-        eq_(resource['title']['fr'], u'Annuaire statistique de la Suisse 1901')
-        eq_(resource['title']['de'], u'')
+        eq_(resource['title']['fr'], 'Annuaire statistique de la Suisse 1901')
+        eq_(resource['title']['de'], '')
         assert all(l in resource['description'] for l in self.languages), "resource description contains all languages"
-        eq_(resource['description']['de'], u'')
-        eq_(resource['format'], u'html')
-        eq_(resource['media_type'], u'text/html')
-        eq_(resource['identifier'], u'346265-fr@bundesamt-fur-statistik-bfs')
-        eq_(resource['license'], u'https://opendata.swiss/terms-of-use#terms_by')
-        eq_(resource['rights'], u'http://www.opendefinition.org/licenses/cc-zero')
-        eq_(resource['language'], [u'fr'])
-        eq_(resource['issued'], u'1900-12-31T00:00:00')
-        eq_(resource['temporal_resolution'], u'P1D')
-        eq_(resource['url'], u'https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901')
+        eq_(resource['description']['de'], '')
+        eq_(resource['format'], 'html')
+        eq_(resource['media_type'], 'text/html')
+        eq_(resource['identifier'], '346265-fr@bundesamt-fur-statistik-bfs')
+        eq_(resource['license'], 'https://opendata.swiss/terms-of-use#terms_by')
+        eq_(resource['rights'], 'http://www.opendefinition.org/licenses/cc-zero')
+        eq_(resource['language'], ['fr'])
+        eq_(resource['issued'], '1900-12-31T00:00:00')
+        eq_(resource['temporal_resolution'], 'P1D')
+        eq_(resource['url'], 'https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901')
         assert 'download_url' not in resource, "download_url not available on resource"
 
         # Lists
         eq_(
             sorted(resource['documentation']),
             [
-                u'https://example.com/documentation-distribution-1',
-                u'https://example.com/documentation-distribution-2'
+                'https://example.com/documentation-distribution-1',
+                'https://example.com/documentation-distribution-2'
             ]
         )
         eq_(
             sorted(resource['access_services']),
             [
-                u'https://example.com/my-great-data-service-1',
-                u'https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700'
+                'https://example.com/my-great-data-service-1',
+                'https://geoportal.sachsen.de/md/685a4409-a026-430e-afad-1fa2881f9700'
             ]
         )
 
         # Distribution URI
-        eq_(resource['uri'], u'https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585/resource/c8ec6ca0-6923-4cf3-92f2-95a10e6f8e25')
+        eq_(resource['uri'], 'https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585/resource/c8ec6ca0-6923-4cf3-92f2-95a10e6f8e25')
 
     def test_dataset_issued_with_year_before_1900(self):
 
@@ -216,9 +216,9 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         dataset = datasets[0]
 
         # Check date values
-        eq_(dataset['issued'], u'1893-12-31T00:00:00')
+        eq_(dataset['issued'], '1893-12-31T00:00:00')
 
-        eq_(dataset['modified'], u'2018-04-24T19:30:57.197374')
+        eq_(dataset['modified'], '2018-04-24T19:30:57.197374')
 
     def test_catalog(self):
 
@@ -252,7 +252,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         resource = datasets[0]['resources'][0]
 
-        eq_(resource['url'], u'http://access.url.org')
+        eq_(resource['url'], 'http://access.url.org')
         assert 'download_url' not in resource
 
     def test_distribution_download_url(self):
@@ -275,8 +275,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         resource = datasets[0]['resources'][0]
 
-        eq_(resource['url'], u'http://download.url.org')
-        eq_(resource['download_url'], u'http://download.url.org')
+        eq_(resource['url'], 'http://download.url.org')
+        eq_(resource['download_url'], 'http://download.url.org')
 
     def test_distribution_both_access_and_download_url(self):
         g = Graph()
@@ -299,8 +299,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         resource = datasets[0]['resources'][0]
 
-        eq_(resource['url'], u'http://access.url.org')
-        eq_(resource['download_url'], u'http://download.url.org')
+        eq_(resource['url'], 'http://access.url.org')
+        eq_(resource['download_url'], 'http://download.url.org')
 
     def test_distribution_format_format_only(self):
         g = Graph()
@@ -332,13 +332,13 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(
             sorted(dataset['temporals']),
             [
-                {'start_date': u'1990-01-01T00:00:00', 'end_date': u'1991-04-04T12:30:30'},
+                {'start_date': '1990-01-01T00:00:00', 'end_date': '1991-04-04T12:30:30'},
                 {'start_date': '1992-01-02T00:00:00', 'end_date': '1993-12-03T23:59:59.999999'},
-                {'start_date': u'1994-01-01T00:00:00', 'end_date': u'1995-04-04T12:30:30'},
+                {'start_date': '1994-01-01T00:00:00', 'end_date': '1995-04-04T12:30:30'},
                 {'start_date': '1996-01-02T00:00:00', 'end_date': '1997-12-03T23:59:59.999999'},
                 {'start_date': '1998-04-01T00:00:00', 'end_date': '1999-06-30T23:59:59.999999'},
                 {'start_date': '2000-01-01T00:00:00', 'end_date': '2001-12-31T23:59:59.999999'},
-                {'start_date': u'2002-01-01T00:00:00', 'end_date': u'2003-04-04T12:30:30'},
+                {'start_date': '2002-01-01T00:00:00', 'end_date': '2003-04-04T12:30:30'},
                 {'start_date': '2004-01-02T00:00:00', 'end_date': '2005-12-03T23:59:59.999999'},
                 {'start_date': '2006-04-01T00:00:00', 'end_date': '2007-06-30T23:59:59.999999'},
                 {'start_date': '2008-01-01T00:00:00', 'end_date': '2009-12-31T23:59:59.999999'}
@@ -375,7 +375,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(
             sorted(issued_dates),
             [
-                u'1990-01-01T00:00:00',
+                '1990-01-01T00:00:00',
                 '1992-01-02T00:00:00',
                 '1994-04-01T00:00:00',
                 '1996-01-01T00:00:00'
@@ -385,7 +385,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(
             sorted(modified_dates),
             [
-                u'1991-04-04T12:30:30',
+                '1991-04-04T12:30:30',
                 '1993-12-03T00:00:00',
                 '1995-06-01T00:00:00',
                 '1997-01-01T00:00:00'
@@ -403,7 +403,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(
             sorted(issued_dates),
             [
-                u'1990-12-31T23:00:00+00:00',
+                '1990-12-31T23:00:00+00:00',
                 '1992-12-31T00:00:00',
                 '1994-12-01T00:00:00',
                 '1996-01-01T00:00:00'
@@ -413,7 +413,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         eq_(
             sorted(modified_dates),
             [
-                u'1991-02-19T23:00:00+00:00',
+                '1991-02-19T23:00:00+00:00',
                 '1993-02-19T00:00:00',
                 '1995-02-01T00:00:00',
                 '1997-01-01T00:00:00'
@@ -430,7 +430,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         dataset = [d for d in p.datasets()][0]
         resource = dataset["resources"][0]
 
-        eq_(unicode(resource['rights']), u"https://opendata.swiss/terms-of-use#terms_by_ask")
+        eq_(str(resource['rights']), "https://opendata.swiss/terms-of-use#terms_by_ask")
 
     def test_eu_themes_mapping(self):
         contents = self._get_file_contents('catalog-themes.xml')
@@ -441,9 +441,9 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
             eq_(
                 sorted(dataset['groups']),
                 [
-                    {'name': u'econ'},
-                    {'name': u'gove'},
-                    {'name': u'soci'},
+                    {'name': 'econ'},
+                    {'name': 'gove'},
+                    {'name': 'soci'},
                 ],
                 "Groups not mapped correctly for dataset {}".format(
                     dataset['identifier']

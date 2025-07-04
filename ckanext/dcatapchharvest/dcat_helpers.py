@@ -1,7 +1,7 @@
 import iribaker
 import json
 import os
-from urlparse import urlparse
+from urllib.parse import urlparse
 from ckantoolkit import config
 from rdflib import URIRef, Graph
 from rdflib.namespace import Namespace, RDF, SKOS
@@ -94,7 +94,7 @@ def dataset_uri(dataset_dict, dataset_ref=None):
     to the production site. In that case, the dataset uris will contain the
     url of the test environment, so we have to replace it with the prod one.
     """
-    uri = (unicode(dataset_ref)
+    uri = (str(dataset_ref)
            if isinstance(dataset_ref, URIRef)
            else '')
     if not uri:
@@ -119,7 +119,7 @@ def dataset_uri(dataset_dict, dataset_ref=None):
 
 def get_permalink(identifier):
     site_url = config.get('ckan.site_url')
-    return u'{0}/perma/{1}'.format(site_url, identifier)
+    return '{0}/perma/{1}'.format(site_url, identifier)
 
 
 def resource_uri(resource_dict, distribution=None):
@@ -136,7 +136,7 @@ def resource_uri(resource_dict, distribution=None):
     resource haven't been saved. This is all right as it will be generated
     when the dataset is output in RDF format.
     """
-    uri = (unicode(distribution)
+    uri = (str(distribution)
            if isinstance(distribution, URIRef)
            else '')
     if not uri:
@@ -163,7 +163,7 @@ def resource_uri(resource_dict, distribution=None):
 def get_frequency_values():
     g = Graph()
     frequency_mapping = {}
-    for prefix, namespace in frequency_namespaces.items():
+    for prefix, namespace in list(frequency_namespaces.items()):
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'frequency.ttl')
     g.parse(file, format='turtle')
@@ -181,7 +181,7 @@ class LicenseHandler:
         self._license_cache = None
 
     def _bind_namespaces(self, graph):
-        for prefix, namespace in license_namespaces.items():
+        for prefix, namespace in list(license_namespaces.items()):
             graph.bind(prefix, namespace)
 
     def _parse_graph(self, graph):
@@ -216,12 +216,12 @@ class LicenseHandler:
             license_literal = self._get_license_literal(graph,
                                                         ogdch_license_ref)
 
-            license_homepages_literal_mapping[unicode(license_homepage)] = \
-                unicode(license_literal)
-            license_ref_literal_mapping[unicode(ogdch_license_ref)] = \
-                unicode(license_literal)
-            license_homepage_ref_mapping[unicode(license_homepage)] = \
-                unicode(ogdch_license_ref)
+            license_homepages_literal_mapping[str(license_homepage)] = \
+                str(license_literal)
+            license_ref_literal_mapping[str(ogdch_license_ref)] = \
+                str(license_literal)
+            license_homepage_ref_mapping[str(license_homepage)] = \
+                str(ogdch_license_ref)
 
         return (license_homepages_literal_mapping,
                 license_ref_literal_mapping, license_homepage_ref_mapping)
@@ -248,46 +248,46 @@ class LicenseHandler:
     def get_license_ref_uri_by_name(self, vocabulary_name):
         _, license_ref_literal_vocabulary, _ = self._get_license_values()
         return next((key for key, value in
-                     license_ref_literal_vocabulary.items()
-                     if unicode(vocabulary_name) == value),
+                     list(license_ref_literal_vocabulary.items())
+                     if str(vocabulary_name) == value),
                     None)
 
     def get_license_ref_uri_by_homepage_uri(self, vocabulary_name):
         _, _, license_homepage_ref_vocabulary = self._get_license_values()
-        return license_homepage_ref_vocabulary.get(unicode(vocabulary_name))
+        return license_homepage_ref_vocabulary.get(str(vocabulary_name))
 
     def get_license_name_by_ref_uri(self, vocabulary_uri):
         _, license_ref_literal_vocabulary, _ = self._get_license_values()
         return license_ref_literal_vocabulary.get(
-            unicode(vocabulary_uri))
+            str(vocabulary_uri))
 
     def get_license_name_by_homepage_uri(self, vocabulary_uri):
         license_homepages_literal_vocabulary, _, _ = self._get_license_values()
         return license_homepages_literal_vocabulary.get(
-            unicode(vocabulary_uri))
+            str(vocabulary_uri))
 
     def get_license_homepage_uri_by_name(self, vocabulary_name):
         license_homepages_literal_vocabulary, _, _ = self._get_license_values()
         return next((key for key, value in
-                     license_homepages_literal_vocabulary.items()
-                     if unicode(vocabulary_name) == value),
+                     list(license_homepages_literal_vocabulary.items())
+                     if str(vocabulary_name) == value),
                     None)
 
     def get_license_homepage_uri_by_uri(self, vocabulary_uri):
         _, _, license_homepage_ref_vocabulary = self._get_license_values()
         license_homepages = list(license_homepage_ref_vocabulary.keys())
-        if unicode(vocabulary_uri) in license_homepages:
-            return unicode(vocabulary_uri)
+        if str(vocabulary_uri) in license_homepages:
+            return str(vocabulary_uri)
         return next((key for key, value in
-                     license_homepage_ref_vocabulary.items()
-                     if unicode(vocabulary_uri) == value),
+                     list(license_homepage_ref_vocabulary.items())
+                     if str(vocabulary_uri) == value),
                     None)
 
 
 def get_theme_mapping():
     g = Graph()
     theme_mapping = {}
-    for prefix, namespace in theme_namespaces.items():
+    for prefix, namespace in list(theme_namespaces.items()):
         g.bind(prefix, namespace)
     file = os.path.join(__location__, 'themes.ttl')
     g.parse(file, format='turtle')
@@ -315,7 +315,7 @@ def get_pagination(catalog_graph):
         ]
         for key, ref in items:
             for obj in catalog_graph.objects(pagination_node, ref):
-                pagination[key] = unicode(obj)
+                pagination[key] = str(obj)
     return pagination
 
 
@@ -329,7 +329,7 @@ def get_format_values():
     characters replaced by '_', for use as keys in this dict.
     """
     g = Graph()
-    for prefix, namespace in format_namespaces.items():
+    for prefix, namespace in list(format_namespaces.items()):
         g.bind(prefix, namespace)
     formats_file = os.path.join(__location__, 'formats.xml')
     g.parse(formats_file, format='xml')
