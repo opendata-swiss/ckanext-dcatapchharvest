@@ -1,3 +1,6 @@
 # This file lists the dependencies of this extension.
 # Install with a command like: pip install -r requirements.txt 
-flake8==3.0.4
+flake8>=5.0.0
+iribaker==0.1.2
+python-dateutil==2.8.1
+rdflib==5.0.0
