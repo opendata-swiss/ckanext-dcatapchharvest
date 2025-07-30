@@ -490,8 +490,8 @@ class SwissDCATAPProfile(MultiLangProfile):
                 return ogdch_value
 
         log.info(
-            "There is no such frequency as '%s' "
-            "in the official list of frequencies" % ogdch_value
+            f"There is no such frequency as '{ogdch_value}' in the official list of "
+            f"frequencies"
         )
         return ""
 
@@ -530,8 +530,8 @@ class SwissDCATAPProfile(MultiLangProfile):
 
                 if eu_theme_url is None:
                     log.info(
-                        "Could not find an EU theme that matched the "
-                        "given theme: {}".format(dcat_theme_url)
+                        f"Could not find an EU theme that matched the given theme: "
+                        f"{dcat_theme_url}"
                     )
                     continue
 
@@ -543,7 +543,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         return [{"name": name} for name in list(set(group_names))]
 
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
-        log.debug("Parsing dataset '%r'" % dataset_ref)
+        log.debug(f"Parsing dataset '{dataset_ref!r}'")
 
         dataset_dict["temporals"] = []
         dataset_dict["tags"] = []
@@ -756,13 +756,13 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             dataset_dict["resources"].append(resource_dict)
 
-        log.debug("Parsed dataset '%r': %s" % (dataset_ref, dataset_dict))
+        log.debug(f"Parsed dataset '{dataset_ref!r}': {dataset_dict}")
 
         return dataset_dict
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):  # noqa
 
-        log.debug("Create graph from dataset '%s'" % dataset_dict["name"])
+        log.debug(f"Create graph from dataset '{dataset_dict['name']}'")
 
         dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
         dataset_ref = URIRef(dataset_uri)
@@ -839,9 +839,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                 if uri:
                     g.add((dataset_ref, DCT.language, URIRef(uri)))
                 else:
-                    log.debug(
-                        "Language '{}' not found in" " language_uri_map".format(lang)
-                    )
+                    log.debug(f"Language '{lang}' not found in language_uri_map")
 
         # Relations
         if dataset_dict.get("relations"):
@@ -995,10 +993,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                     if uri:
                         g.add((distribution, DCT.language, URIRef(uri)))
                     else:
-                        log.debug(
-                            "Language '{}' not found in"
-                            " language_uri_map".format(lang)
-                        )
+                        log.debug(f"Language '{lang}' not found in language_uri_map")
 
             # Download URL & Access URL
             download_url = resource_dict.get("download_url")
@@ -1269,7 +1264,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                     (
                         dataset_ref,
                         SCHEMA.temporalCoverage,
-                        Literal("%s/%s" % (start, end)),
+                        Literal(f"{start}/{end}"),
                     )
                 )  # noqa
             elif start:
@@ -1388,10 +1383,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                     if uri:
                         g.add((distribution, DCT.language, URIRef(uri)))
                     else:
-                        log.debug(
-                            "Language '{}' not found in"
-                            " language_uri_map".format(lang)
-                        )
+                        log.debug(f"Language '{lang}' not found in language_uri_map")
 
             # Download URL & Access URL
             self.download_access_url(resource_dict, distribution, g)

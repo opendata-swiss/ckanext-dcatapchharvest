@@ -67,7 +67,7 @@ def uri_to_iri(uri):
         iri = iribaker.to_iri(uri)
         return iri
     except Exception as e:
-        raise ValueError("Provided URI can't be converted to IRI: %s" % e)
+        raise ValueError(f"Provided URI can't be converted to IRI: {e}")
 
 
 def get_langs():
@@ -113,7 +113,7 @@ def dataset_uri(dataset_dict, dataset_ref=None):
 
 def get_permalink(identifier):
     site_url = config.get("ckan.site_url")
-    return "{0}/perma/{1}".format(site_url, identifier)
+    return f"{site_url}/perma/{identifier}"
 
 
 def resource_uri(resource_dict, distribution=None):
@@ -147,9 +147,7 @@ def resource_uri(resource_dict, distribution=None):
         dataset_id = resource_dict.get("package_id")
         resource_id = resource_dict.get("id")
         if dataset_id and resource_id:
-            uri = "{0}/dataset/{1}/resource/{2}".format(
-                site_url.rstrip("/"), dataset_id, resource_dict["id"]
-            )
+            uri = f"{site_url.rstrip('/')}/dataset/{dataset_id}/resource/{resource_dict['id']}"
     return uri
 
 
@@ -240,7 +238,7 @@ class LicenseHandler:
                     license_homepage_ref_mapping,
                 )
             except Exception as e:
-                raise RuntimeError("Failed to load license values: %s" % e)
+                raise RuntimeError(f"Failed to load license values: {e}")
         return self._license_cache
 
     def get_license_ref_uri_by_name(self, vocabulary_name):
@@ -388,7 +386,7 @@ def get_iana_media_type_values():
                 uri_suffix = registry_type + "/" + name
 
             media_type_values[registry_type + "/" + name] = (
-                media_types_namespaces["ns"] + "/media-types/" + uri_suffix
+                f"{media_types_namespaces['ns']}/media-types/{uri_suffix}"
             )
 
     return media_type_values
@@ -413,7 +411,7 @@ def get_language_uri_map():
     lang_map = {}
 
     for desc in root.findall(".//rdf:Description", ns):
-        uri = desc.attrib.get("{" + ns["rdf"] + "}about")
+        uri = desc.attrib.get(f"{{{ns['rdf']}}}about")
         notation = desc.find("skos:notation", ns)
         if uri and notation is not None:
             lang_code = notation.text.strip().lower()

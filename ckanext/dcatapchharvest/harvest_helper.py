@@ -52,13 +52,13 @@ def create_activity(package_id, message):
 
 def check_package_change(existing_pkg, dataset_dict):
     if _changes_in_date(existing_pkg.get("modified"), dataset_dict.get("modified")):
-        msg = "dataset modified date changed: {}".format(dataset_dict.get("modified"))
+        msg = f"dataset modified date changed: {dataset_dict.get('modified')}"
         return True, msg
     resources = dataset_dict.get("resources", [])
     existing_resources = existing_pkg.get("resources", [])
     resource_count_changed = len(existing_resources) != len(resources)
     if resource_count_changed:
-        msg = "resource count changed: {}".format(len(resources))
+        msg = f"resource count changed: {len(resources)}"
         return True, msg
     for resource in resources:
         matching_existing_resource_with_same_url = [
@@ -67,21 +67,19 @@ def check_package_change(existing_pkg, dataset_dict):
             if existing_resource.get("url") == resource.get("url")
         ]
         if not matching_existing_resource_with_same_url:
-            msg = "resource access url changed: {}".format(resource.get("url"))
+            msg = f"resource access url changed: {resource.get('url')}"
             return True, msg
         matching_existing_resource = matching_existing_resource_with_same_url[0]
         download_url_changed = matching_existing_resource.get(
             "download_url"
         ) != resource.get("download_url")
         if download_url_changed:
-            msg = "resource download url changed: {}".format(
-                resource.get("download_url")
-            )
+            msg = f"resource download url changed: {resource.get('download_url')}"
             return True, msg
         if _changes_in_date(
             matching_existing_resource.get("modified"), resource.get("modified")
         ):
-            msg = "resource modified date changed: {}".format(resource.get("modified"))
+            msg = f"resource modified date changed: {resource.get('modified')}"
             return True, msg
     return False, None
 
@@ -101,22 +99,17 @@ def _changes_in_date(existing_datetime, new_datetime):
         if existing.tzinfo is None:
             existing = existing.replace(tzinfo=DEFAULT_TIMEZONE)
             log.debug(
-                "Datetime %s has no time zone info: assuming Europe/Zurich"
-                % existing_datetime
+                f"Datetime {existing_datetime} has no time zone info: "
+                f"assuming Europe/Zurich"
             )
         new = dateutil_parse(new_datetime)
         if new.tzinfo is None:
             new = new.replace(tzinfo=DEFAULT_TIMEZONE)
             log.debug(
-                "Datetime %s has no time zone info: assuming Europe/Zurich"
-                % new_datetime
+                f"Datetime {new_datetime} has no time zone info: assuming Europe/Zurich"
             )
     except (ParserError, OverflowError) as e:
-        log.info(
-            "Error when parsing dates {}, {}: {}".format(
-                existing_datetime, new_datetime, e
-            )
-        )
+        log.info(f"Error when parsing dates {existing_datetime}, {new_datetime}: {e}")
         return False
 
     if new == existing:

@@ -140,7 +140,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         # Relations - multilingual labels
         eq_(relations[1]["url"], "https://www.example.org/aaa")
         for lang in self.languages:
-            eq_(relations[1]["label"][lang], "Text for label " + lang.upper())
+            eq_(relations[1]["label"][lang], f"Text for label {lang.upper()}")
 
         # Relations - no label given
         eq_(relations[2]["url"], "https://www.example.org/bbb")
@@ -535,9 +535,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
                     {"name": "gove"},
                     {"name": "soci"},
                 ],
-                "Groups not mapped correctly for dataset {}".format(
-                    dataset["identifier"]
-                ),
+                f"Groups not mapped correctly for dataset {dataset['identifier']}",
             )
 
     def test_format_media_type(self):

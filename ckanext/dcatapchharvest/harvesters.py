@@ -94,8 +94,8 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
                     org = model.Group.by_name(org_name)
                     if not org:
                         error_msg = (
-                            "The organization in the dataset identifier (%s) "
-                            "does not not exist. " % org_name
+                            f"The organization in the dataset identifier "
+                            f"({org_name}) does not not exist. "
                         )
                         log.error(error_msg)
                         self._save_gather_error(error_msg, self.harvest_job)
@@ -103,15 +103,15 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
 
                     if org.id != dataset_dict["owner_org"]:
                         error_msg = (
-                            "The organization in the dataset identifier (%s) "
-                            "does not match the organization in the harvester "
-                            "config (%s)" % (org.id, dataset_dict["owner_org"])
+                            f"The organization in the dataset identifier "
+                            f"({org.id}) does not match the organization in the "
+                            f"harvester config ({dataset_dict['owner_org']})"
                         )
                         log.error(error_msg)
                         self._save_gather_error(error_msg, self.harvest_job)
                         return None
             except Exception as e:
-                log.exception("Error when getting identifier: %s" % e)
+                log.exception(f"Error when getting identifier: {e}")
                 return None
             return dataset_dict["identifier"]
 
@@ -133,7 +133,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         if dataset_dict.get("name"):
             guid = dataset_dict["name"]
             if source_url:
-                guid = source_url.rstrip("/") + "/" + guid
+                guid = f"{source_url.rstrip('/')}/{guid}"
 
         return guid
 
@@ -172,9 +172,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
     def after_download(self, content, harvest_job):
         if not content:
             after_download_error_msg = (
-                "The content of page-url {} could not be read".format(
-                    self.current_page_url
-                )
+                f"The content of page-url {self.current_page_url} could not be read"
             )
             log.info(after_download_error_msg)
             return False, [after_download_error_msg]
@@ -184,16 +182,15 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         parsed_content = rdf_parser.datasets()
         dataset_identifiers = [dataset.get("identifier") for dataset in parsed_content]
         pagination = get_pagination(rdf_parser.g)
-        log.debug("pagination-info: {}".format(pagination))
+        log.debug(f"pagination-info: {pagination}")
         if not dataset_identifiers:
             after_parsing_error_msg = (
-                "The content of page-url {} could not be parsed. "
-                "Therefore the harvesting was stopped."
-                "Pagination info: {}".format(self.page_url, pagination)
+                f"The content of page-url {self.page_url} could not be parsed. "
+                f"Therefore the harvesting was stopped. Pagination info: {pagination}"
             )
             log.info(after_parsing_error_msg)
             return False, [after_parsing_error_msg]
-        log.debug("datasets parsed: {}".format(",".join(dataset_identifiers)))
+        log.debug(f"datasets parsed: {','.join(dataset_identifiers)}")
         return rdf_parser, []
 
 
@@ -247,7 +244,7 @@ class SwissDCATI14YRDFHarvester(SwissDCATRDFHarvester):
         ):
             dataset_dict["identifier_i14y"] = dataset_dict["identifier"]
             dataset_dict["identifier"] = (
-                dataset_dict["identifier"] + "@" + dataset_organization_name
+                f"{dataset_dict['identifier']}@{dataset_organization_name}"
             )
 
         return dataset_dict["identifier"]
