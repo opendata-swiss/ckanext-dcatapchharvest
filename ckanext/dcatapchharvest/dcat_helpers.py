@@ -346,14 +346,14 @@ def get_format_values():
     # Add special cases that aren't so easy to map.
     format_values.update(
         {
-            "api": "http://publications.europa.eu/resource/authority/file-type/REST",  # noqa
-            "esri_ascii_grid": "http://publications.europa.eu/resource/authority/file-type/GRID_ASCII",  # noqa
-            "sparql": "http://publications.europa.eu/resource/authority/file-type/SPARQLQ",  # noqa
-            "wcs": "http://publications.europa.eu/resource/authority/file-type/WCS_SRVC",  # noqa
-            "wfs": "http://publications.europa.eu/resource/authority/file-type/WFS_SRVC",  # noqa
-            "wms": "http://publications.europa.eu/resource/authority/file-type/WMS_SRVC",  # noqa
-            "wmts": "http://publications.europa.eu/resource/authority/file-type/WMTS_SRVC",  # noqa
-            "worldfile": "http://publications.europa.eu/resource/authority/file-type/WORLD",  # noqa
+            "api": "http://publications.europa.eu/resource/authority/file-type/REST",
+            "esri_ascii_grid": "http://publications.europa.eu/resource/authority/file-type/GRID_ASCII",
+            "sparql": "http://publications.europa.eu/resource/authority/file-type/SPARQLQ",
+            "wcs": "http://publications.europa.eu/resource/authority/file-type/WCS_SRVC",
+            "wfs": "http://publications.europa.eu/resource/authority/file-type/WFS_SRVC",
+            "wms": "http://publications.europa.eu/resource/authority/file-type/WMS_SRVC",
+            "wmts": "http://publications.europa.eu/resource/authority/file-type/WMTS_SRVC",
+            "worldfile": "http://publications.europa.eu/resource/authority/file-type/WORLD",
         }
     )
 

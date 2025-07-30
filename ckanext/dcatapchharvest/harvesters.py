@@ -27,13 +27,13 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         return {
             "name": "dcat_ch_rdf",
             "title": "DCAT-AP Switzerland RDF Harvester",
-            "description": "Harvester for DCAT-AP Switzerland datasets from an RDF graph",  # noqa
+            "description": "Harvester for DCAT-AP Switzerland datasets from an RDF graph",
         }
 
     def validate_config(self, source_config):
         source_config = super(SwissDCATRDFHarvester, self).validate_config(
             source_config
-        )  # noqa
+        )
 
         if not source_config:
             return source_config
@@ -43,7 +43,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         if "excluded_dataset_identifiers" in source_config_obj:
             excluded_dataset_identifiers = source_config_obj[
                 "excluded_dataset_identifiers"
-            ]  # noqa
+            ]
             if not isinstance(excluded_dataset_identifiers, list):
                 raise ValueError(
                     "excluded_dataset_identifiers must be " "a list of strings"
@@ -71,7 +71,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         url = url.replace("ogd.global.szh.loc", "data.stadt-zuerich.ch")
         return url, []
 
-    def _get_guid(self, dataset_dict, source_url=None):  # noqa
+    def _get_guid(self, dataset_dict, source_url=None):
         """
         Try to get a unique identifier for a harvested dataset
         It will be the first found of:
@@ -140,25 +140,21 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
     def _gen_new_name(self, title):
         return super(SwissDCATRDFHarvester, self)._gen_new_name(
             _derive_flat_title(title)
-        )  # noqa
+        )
 
     def before_create(self, harvest_object, dataset_dict, temp_dict):
         try:
             source_config_obj = json.loads(harvest_object.job.source.config)
             for excluded_dataset_identifier in source_config_obj.get(
                 "excluded_dataset_identifiers", []
-            ):  # noqa
-                if excluded_dataset_identifier == dataset_dict.get(
-                    "identifier"
-                ):  # noqa
+            ):
+                if excluded_dataset_identifier == dataset_dict.get("identifier"):
                     dataset_dict.clear()
             excluded_license = source_config_obj.get("excluded_license", [])
             dataset_license = set(
                 [res.get("license") for res in dataset_dict.get("resources", [])]
-            )  # noqa
-            if [
-                license for license in dataset_license if license in excluded_license
-            ]:  # noqa
+            )
+            if [license for license in dataset_license if license in excluded_license]:
                 dataset_dict.clear()
         except ValueError:
             pass
@@ -202,7 +198,7 @@ def _derive_flat_title(title_dict):
         or title_dict.get("en")
         or title_dict.get("it")
         or ""
-    )  # noqa
+    )
 
 
 class SwissDCATI14YRDFHarvester(SwissDCATRDFHarvester):

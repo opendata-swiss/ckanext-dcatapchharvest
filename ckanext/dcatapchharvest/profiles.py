@@ -69,7 +69,7 @@ slug_id_pattern = re.compile("[^/]+(?=/$|$)")
 class MultiLangProfile(RDFProfile):
     def _add_multilang_value(
         self, subject, predicate, key=None, data_dict=None, multilang_values=None
-    ):  # noqa
+    ):
         if not multilang_values and data_dict and key:
             multilang_values = data_dict.get(key)
         if multilang_values:
@@ -84,7 +84,7 @@ class MultiLangProfile(RDFProfile):
                             if value:
                                 self.g.add(
                                     (subject, predicate, Literal(value, lang=key))
-                                )  # noqa
+                                )
             # if multilang_values is not iterable, it is simply added as a non-
             # translated Literal
             except AttributeError:
@@ -99,7 +99,7 @@ class MultiLangProfile(RDFProfile):
 
     def _add_multilang_triple_from_dict(
         self, _dict, subject, predicate, key, fallbacks=None
-    ):  # noqa
+    ):
         """
         Adds a new multilang triple to the graph with the provided parameters
 
@@ -542,7 +542,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Deduplicate group names before returning list of group dicts
         return [{"name": name} for name in list(set(group_names))]
 
-    def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
+    def parse_dataset(self, dataset_dict, dataset_ref):
         log.debug(f"Parsing dataset '{dataset_ref!r}'")
 
         dataset_dict["temporals"] = []
@@ -760,7 +760,7 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return dataset_dict
 
-    def graph_from_dataset(self, dataset_dict, dataset_ref):  # noqa
+    def graph_from_dataset(self, dataset_dict, dataset_ref):
 
         log.debug(f"Create graph from dataset '{dataset_dict['name']}'")
 
@@ -970,10 +970,10 @@ class SwissDCATAPProfile(MultiLangProfile):
             self._add_triples_from_dict(resource_dict, distribution, items)
             self._add_multilang_value(
                 distribution, DCT.title, "display_name", resource_dict
-            )  # noqa
+            )
             self._add_multilang_value(
                 distribution, DCT.description, "description", resource_dict
-            )  # noqa
+            )
 
             #  Language
             languages = resource_dict.get("language", [])
@@ -1200,9 +1200,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             self.g.add((publisher_details, RDF.type, SCHEMA.Organization))
             self.g.add((dataset_ref, SCHEMA.publisher, publisher_details))
-            self.g.add(
-                (dataset_ref, SCHEMA.sourceOrganization, publisher_details)
-            )  # noqa
+            self.g.add((dataset_ref, SCHEMA.sourceOrganization, publisher_details))
 
             if not publisher_name and dataset_dict.get("organization"):
                 publisher_name = dataset_dict["organization"]["title"]
@@ -1210,24 +1208,18 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                     publisher_details, SCHEMA.name, multilang_values=publisher_name
                 )
             else:
-                self.g.add(
-                    (publisher_details, SCHEMA.name, Literal(publisher_name))
-                )  # noqa
+                self.g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))
 
             contact_point = BNode()
             self.g.add((publisher_details, SCHEMA.contactPoint, contact_point))
 
-            self.g.add(
-                (contact_point, SCHEMA.contactType, Literal("customer service"))
-            )  # noqa
+            self.g.add((contact_point, SCHEMA.contactType, Literal("customer service")))
 
-            publisher_url = self._get_dataset_value(
-                dataset_dict, "publisher_url"
-            )  # noqa
+            publisher_url = self._get_dataset_value(dataset_dict, "publisher_url")
             if not publisher_url and dataset_dict.get("organization"):
                 publisher_url = dataset_dict["organization"].get("url") or config.get(
                     "ckan.site_url", ""
-                )  # noqa
+                )
 
             self.g.add((contact_point, SCHEMA.url, Literal(publisher_url)))
             items = [
@@ -1236,13 +1228,13 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                     SCHEMA.email,
                     ["contact_email", "maintainer_email", "author_email"],
                     Literal,
-                ),  # noqa
+                ),
                 (
                     "publisher_name",
                     SCHEMA.name,
                     ["contact_name", "maintainer", "author"],
                     Literal,
-                ),  # noqa
+                ),
             ]
 
             self._add_triples_from_dict(dataset_dict, contact_point, items)
@@ -1266,13 +1258,11 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                         SCHEMA.temporalCoverage,
                         Literal(f"{start}/{end}"),
                     )
-                )  # noqa
+                )
             elif start:
-                self._add_date_triple(
-                    dataset_ref, SCHEMA.temporalCoverage, start
-                )  # noqa
+                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, start)
             elif end:
-                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, end)  # noqa
+                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, end)
 
     def _tags_graph(self, dataset_ref, dataset_dict):
         for tag in dataset_dict.get("keywords", []):
@@ -1307,9 +1297,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 contact_point_name = contact_point["name"]
 
                 g.add((contact_details, RDF.type, VCARD.Organization))
-                g.add(
-                    (contact_details, VCARD.hasEmail, URIRef(contact_point_email))
-                )  # noqa
+                g.add((contact_details, VCARD.hasEmail, URIRef(contact_point_email)))
                 g.add((contact_details, VCARD.fn, Literal(contact_point_name)))
 
                 g.add((dataset_ref, SCHEMA.contactPoint, contact_details))
@@ -1367,10 +1355,10 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             self._add_multilang_value(
                 distribution, DCT.title, "display_name", resource_dict
-            )  # noqa
+            )
             self._add_multilang_value(
                 distribution, DCT.description, "description", resource_dict
-            )  # noqa
+            )
 
             # Language
             languages = resource_dict.get("language", [])
