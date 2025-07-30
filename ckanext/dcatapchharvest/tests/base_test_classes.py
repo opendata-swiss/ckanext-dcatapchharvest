@@ -1,20 +1,18 @@
 import os
 
-from rdflib import URIRef, BNode, Literal
+from rdflib import BNode, Literal, URIRef
 
 
 class BaseParseTest(object):
     def _extras(self, dataset):
         extras = {}
-        for extra in dataset.get('extras'):
-            extras[extra['key']] = extra['value']
+        for extra in dataset.get("extras"):
+            extras[extra["key"]] = extra["value"]
         return extras
 
     def _get_file_contents(self, file_name):
-        path = os.path.join(os.path.dirname(__file__),
-                            'fixtures',
-                            file_name)
-        with open(path, 'r') as f:
+        path = os.path.join(os.path.dirname(__file__), "fixtures", file_name)
+        with open(path, "r") as f:
             return f.read()
 
 
@@ -22,7 +20,9 @@ class BaseSerializeTest(BaseParseTest):
 
     def _triples(self, graph, subject, predicate, _object, data_type=None):
 
-        if not (isinstance(_object, URIRef) or isinstance(_object, BNode) or _object is None):
+        if not (
+            isinstance(_object, URIRef) or isinstance(_object, BNode) or _object is None
+        ):
             if data_type:
                 _object = Literal(_object, datatype=data_type)
             else:
