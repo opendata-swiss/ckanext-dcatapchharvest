@@ -3,14 +3,17 @@ on: [push, pull_request]
 jobs:
   lint:
     runs-on: ubuntu-latest
-    container:
-      image: python:2.7.18-buster
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
       - name: Install requirements
-        run: pip install flake8 pycodestyle
+        run: pip install flake8 pycodestyle black isort
       - name: Check syntax
-        run: flake8 --statistics --show-source --exclude ckanext/dcatapchharvest/tests,setup.py ckanext
+        run: flake8 . --count --select=C901,E721,E901,E999,F401,F821,F822,F823,F841 --show-source --statistics --extend-exclude ckan
+      - name: Check codestyle
+        run: |
+          isort --diff --check ckanext/
+          black --diff --check ckanext/
 
   test:
     needs: lint
