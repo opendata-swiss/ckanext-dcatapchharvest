@@ -1,8 +1,7 @@
 from codecs import open  # To use a consistent encoding
 from os import path
 
-from setuptools import (  # Always prefer setuptools over distutils
-    find_packages, setup)
+from setuptools import find_packages, setup  # Always prefer setuptools over distutils
 
 here = path.abspath(path.dirname(__file__))
 

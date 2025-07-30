@@ -8,9 +8,11 @@ import ckan.plugins.toolkit as tk
 from ckanext.dcat.harvesters.rdf import DCATRDFHarvester
 from ckanext.dcat.interfaces import IDCATRDFHarvester
 from ckanext.dcatapchharvest.dcat_helpers import get_pagination
-from ckanext.dcatapchharvest.harvest_helper import (check_package_change,
-                                                    create_activity,
-                                                    map_resources_to_ids)
+from ckanext.dcatapchharvest.harvest_helper import (
+    check_package_change,
+    create_activity,
+    map_resources_to_ids,
+)
 
 log = logging.getLogger(__name__)
 
