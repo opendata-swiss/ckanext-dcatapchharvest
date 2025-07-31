@@ -3,9 +3,9 @@ import logging
 import re
 from datetime import datetime, timedelta
 
+import isodate
 from ckan.lib.munge import munge_tag
 from ckantoolkit import config
-import isodate
 from rdflib import BNode, Literal, URIRef
 from rdflib.namespace import RDF, RDFS, SKOS, Namespace
 
@@ -21,55 +21,55 @@ valid_media_types = dh.get_iana_media_type_values()
 language_uri_map = dh.get_language_uri_map()
 
 DCT = dh.DCT
-DCAT = Namespace('http://www.w3.org/ns/dcat#')
-VCARD = Namespace('http://www.w3.org/2006/vcard/ns#')
-SCHEMA = Namespace('http://schema.org/')
-ADMS = Namespace('http://www.w3.org/ns/adms#')
-FOAF = Namespace('http://xmlns.com/foaf/0.1/')
-TIME = Namespace('http://www.w3.org/2006/time')
-LOCN = Namespace('http://www.w3.org/ns/locn#')
-GSP = Namespace('http://www.opengis.net/ont/geosparql#')
-OWL = Namespace('http://www.w3.org/2002/07/owl#')
-SPDX = Namespace('http://spdx.org/rdf/terms#')
-XSD = Namespace('http://www.w3.org/2001/XMLSchema#')
+DCAT = Namespace("http://www.w3.org/ns/dcat#")
+VCARD = Namespace("http://www.w3.org/2006/vcard/ns#")
+SCHEMA = Namespace("http://schema.org/")
+ADMS = Namespace("http://www.w3.org/ns/adms#")
+FOAF = Namespace("http://xmlns.com/foaf/0.1/")
+TIME = Namespace("http://www.w3.org/2006/time")
+LOCN = Namespace("http://www.w3.org/ns/locn#")
+GSP = Namespace("http://www.opengis.net/ont/geosparql#")
+OWL = Namespace("http://www.w3.org/2002/07/owl#")
+SPDX = Namespace("http://spdx.org/rdf/terms#")
+XSD = Namespace("http://www.w3.org/2001/XMLSchema#")
 EUTHEMES = dh.EUTHEMES
-ODRS = Namespace('http://schema.theodi.org/odrs#')
+ODRS = Namespace("http://schema.theodi.org/odrs#")
 
-EMAIL_MAILTO_PREFIX = 'mailto:'
-ORGANIZATION_BASE_URL = 'https://opendata.swiss/organization/'
+EMAIL_MAILTO_PREFIX = "mailto:"
+ORGANIZATION_BASE_URL = "https://opendata.swiss/organization/"
 
 DATE_FORMAT = "%Y-%m-%d"
 YEAR_MONTH_FORMAT = "%Y-%m"
 YEAR_FORMAT = "%Y"
 
 namespaces = {
-    'dct': DCT,
-    'dcat': DCAT,
-    'adms': ADMS,
-    'vcard': VCARD,
-    'foaf': FOAF,
-    'schema': SCHEMA,
-    'time': TIME,
-    'skos': SKOS,
-    'locn': LOCN,
-    'gsp': GSP,
-    'owl': OWL,
-    'xsd': XSD,
-    'euthemes': EUTHEMES,
-    'odrs': ODRS,
+    "dct": DCT,
+    "dcat": DCAT,
+    "adms": ADMS,
+    "vcard": VCARD,
+    "foaf": FOAF,
+    "schema": SCHEMA,
+    "time": TIME,
+    "skos": SKOS,
+    "locn": LOCN,
+    "gsp": GSP,
+    "owl": OWL,
+    "xsd": XSD,
+    "euthemes": EUTHEMES,
+    "odrs": ODRS,
 }
 
-OGD_THEMES_URI = 'http://opendata.swiss/themes/'
-CHTHEMES_URI = 'http://dcat-ap.ch/vocabulary/themes/'
-EUTHEMES_URI = 'http://publications.europa.eu/resource/authority/data-theme/'
+OGD_THEMES_URI = "http://opendata.swiss/themes/"
+CHTHEMES_URI = "http://dcat-ap.ch/vocabulary/themes/"
+EUTHEMES_URI = "http://publications.europa.eu/resource/authority/data-theme/"
 
-slug_id_pattern = re.compile('[^/]+(?=/$|$)')
+slug_id_pattern = re.compile("[^/]+(?=/$|$)")
 
 
 class MultiLangProfile(RDFProfile):
-    def _add_multilang_value(self, subject, predicate, key=None,
-                             data_dict=None,
-                             multilang_values=None):  # noqa
+    def _add_multilang_value(
+        self, subject, predicate, key=None, data_dict=None, multilang_values=None
+    ):
         if not multilang_values and data_dict and key:
             multilang_values = data_dict.get(key)
         if multilang_values:
@@ -78,11 +78,13 @@ class MultiLangProfile(RDFProfile):
                     if values:
                         # the values can be either a multilang-dict or they are
                         # nested in another iterable (e.g. keywords)
-                        if not hasattr(values, '__iter__'):
+                        if not hasattr(values, "__iter__"):
                             values = [values]
                         for value in values:
                             if value:
-                                self.g.add((subject, predicate, Literal(value, lang=key)))  # noqa
+                                self.g.add(
+                                    (subject, predicate, Literal(value, lang=key))
+                                )
             # if multilang_values is not iterable, it is simply added as a non-
             # translated Literal
             except AttributeError:
@@ -92,48 +94,42 @@ class MultiLangProfile(RDFProfile):
         for item in items:
             key, predicate, fallbacks, _type = item
             self._add_multilang_triple_from_dict(
-                _dict,
-                subject,
-                predicate,
-                key,
-                fallbacks=fallbacks
+                _dict, subject, predicate, key, fallbacks=fallbacks
             )
 
-    def _add_multilang_triple_from_dict(self, _dict, subject, predicate, key, fallbacks=None):  # noqa
-        '''
+    def _add_multilang_triple_from_dict(
+        self, _dict, subject, predicate, key, fallbacks=None
+    ):
+        """
         Adds a new multilang triple to the graph with the provided parameters
 
         The subject and predicate of the triple are passed as the relevant
         RDFLib objects (URIRef or BNode). The object is always a literal value,
         which is extracted from the dict using the provided key (see
         `_get_dict_value`).
-        '''
+        """
         value = self._get_dict_value(_dict, key)
 
         if value:
-            self._add_multilang_value(
-                subject,
-                predicate,
-                multilang_values=value
-            )
+            self._add_multilang_value(subject, predicate, multilang_values=value)
 
 
 class SwissDCATAPProfile(MultiLangProfile):
-    '''
+    """
     An RDF profile for the DCAT-AP Switzerland recommendation for data portals
 
     It requires the European DCAT-AP profile (`euro_dcat_ap`)
-    '''
+    """
 
     def _object_value(self, subject, predicate, multilang=False):
-        '''
+        """
         Given a subject and a predicate, returns the value of the object
 
         Both subject and predicate must be rdflib URIRef or BNode objects
 
         If found, the unicode representation is returned, else None
-        '''
-        default_lang = 'de'
+        """
+        default_lang = "de"
         lang_dict = {}
         for o in self.g.objects(subject, predicate):
             if multilang and o.language:
@@ -146,7 +142,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             # when translation does not exist, create an empty one
             for lang in dh.get_langs():
                 if lang not in lang_dict:
-                    lang_dict[lang] = ''
+                    lang_dict[lang] = ""
         return lang_dict
 
     def _object_value_and_datatype(self, subject, predicate):
@@ -162,10 +158,10 @@ class SwissDCATAPProfile(MultiLangProfile):
         return None, None
 
     def _get_publisher_url_from_identifier(self, identifier):
-        identifier_split = identifier.split('@')
+        identifier_split = identifier.split("@")
         if len(identifier_split) > 1:
             return ORGANIZATION_BASE_URL + identifier_split[1]
-        return ''
+        return ""
 
     def _publisher(self, subject, identifier):
         """
@@ -217,19 +213,16 @@ class SwissDCATAPProfile(MultiLangProfile):
         """
         publisher = {}
         for agent in self.g.objects(subject, DCT.publisher):
-            publisher['url'] = (
-                    self._object_value(agent, FOAF.homepage) or
-                    (str(agent) if isinstance(agent, URIRef) else '')
+            publisher["url"] = self._object_value(agent, FOAF.homepage) or (
+                str(agent) if isinstance(agent, URIRef) else ""
             )
             # detect if the agent is a foaf:Agent or foaf:Organization
-            is_agent = (FOAF.Agent in self.g.objects(agent, RDF.type))
-            is_organization = (
-                        FOAF.Organization in self.g.objects(agent, RDF.type))
+            is_agent = FOAF.Agent in self.g.objects(agent, RDF.type)
+            is_organization = FOAF.Organization in self.g.objects(agent, RDF.type)
 
             if is_agent:
                 # handle multilingual name for foaf:Agent
-                publisher_name = self._object_value(agent, FOAF.name,
-                                                    multilang=True)
+                publisher_name = self._object_value(agent, FOAF.name, multilang=True)
             elif is_organization:
                 # handle single name for foaf:Organization
                 publisher_name = self._object_value(agent, FOAF.name)
@@ -238,36 +231,31 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             publisher_deprecated = self._object_value(agent, RDFS.label)
             if publisher_name:
-                publisher['name'] = publisher_name
+                publisher["name"] = publisher_name
             elif publisher_deprecated:
-                publisher['name'] = publisher_deprecated
+                publisher["name"] = publisher_deprecated
             else:
-                publisher['name'] = ''
+                publisher["name"] = ""
 
-        if not publisher.get('url'):
-            publisher['url'] = self._get_publisher_url_from_identifier(
-                identifier
-            )
+        if not publisher.get("url"):
+            publisher["url"] = self._get_publisher_url_from_identifier(identifier)
         return json.dumps(publisher)
 
     def _relations(self, subject):
         relations = []
         for relation_node in self.g.objects(subject, DCT.relation):
             relation = {
-                'label': self._object_value(
-                    relation_node,
-                    RDFS.label,
-                    multilang=True
-                ),
-                'url': str(relation_node)
+                "label": self._object_value(relation_node, RDFS.label, multilang=True),
+                "url": str(relation_node),
             }
             # If we don't have a label in any language, use the highest-prio
             # language where we do have a label, or fall back to the url
-            fallback = (dh.localize_by_language_priority(relation['label']) or
-                        relation.get('url', ''))
+            fallback = dh.localize_by_language_priority(
+                relation["label"]
+            ) or relation.get("url", "")
             for lang in dh.get_langs():
-                if not relation['label'][lang]:
-                    relation['label'][lang] = fallback
+                if not relation["label"][lang]:
+                    relation["label"][lang] = fallback
             relations.append(relation)
 
         return relations
@@ -276,10 +264,12 @@ class SwissDCATAPProfile(MultiLangProfile):
         qualified_relations = []
 
         for relation_node in self.g.objects(subject, DCAT.qualifiedRelation):
-            qualified_relations.append({
-                "relation": self._object_value(relation_node, DCT.relation),
-                "had_role": self._object_value(relation_node, DCAT.hadRole),
-            })
+            qualified_relations.append(
+                {
+                    "relation": self._object_value(relation_node, DCT.relation),
+                    "had_role": self._object_value(relation_node, DCAT.hadRole),
+                }
+            )
 
         return qualified_relations
 
@@ -287,9 +277,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         """Munge a distribution format into a form that matches the keys in
         the valid_formats dict.
         """
-        return format_string.lower().split('/')[-1] \
-            .replace(' ', '_') \
-            .replace('-', '_')
+        return format_string.lower().split("/")[-1].replace(" ", "_").replace("-", "_")
 
     def _munge_media_type(self, media_type_string):
         """Munge a distribution media-type or format into a form that matches
@@ -297,7 +285,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         """
         # This matches either a URI (http://example.com/foo/bar) or
         # a string (foo/bar)
-        pattern = r'(.*\/|^)(.+\/.+)$'
+        pattern = r"(.*\/|^)(.+\/.+)$"
         media_type_value_re = re.search(pattern, media_type_string)
         if media_type_value_re:
             media_type_value = media_type_value_re.group(2)
@@ -307,15 +295,14 @@ class SwissDCATAPProfile(MultiLangProfile):
         return media_type_value.lower()
 
     def _get_eu_or_iana_format(self, subject):
-        format_value = self._object_value(subject, DCT['format'])
+        format_value = self._object_value(subject, DCT["format"])
         if isinstance(format_value, dict):
             log.debug("The format object is a dictionary type.")
         else:
             format_key = self._munge_format(format_value)
             media_type_key = self._munge_media_type(format_value)
 
-            if format_key in valid_formats \
-                    or media_type_key in valid_media_types:
+            if format_key in valid_formats or media_type_key in valid_media_types:
                 return format_key
 
     def _get_iana_media_type(self, subject):
@@ -356,12 +343,12 @@ class SwissDCATAPProfile(MultiLangProfile):
         for contact_node in self.g.objects(subject, DCAT.contactPoint):
             email = self._object_value(contact_node, VCARD.hasEmail)
             if email:
-                email_clean = email.replace(EMAIL_MAILTO_PREFIX, '')
+                email_clean = email.replace(EMAIL_MAILTO_PREFIX, "")
             else:
-                email_clean = ''
+                email_clean = ""
             contact = {
-                'name': self._object_value(contact_node, VCARD.fn),
-                'email': email_clean
+                "name": self._object_value(contact_node, VCARD.fn),
+                "email": email_clean,
             }
 
             contact_points.append(contact)
@@ -375,29 +362,33 @@ class SwissDCATAPProfile(MultiLangProfile):
         for temporal_node in self.g.objects(subject, DCT.temporal):
             # Currently specified properties in DCAT-AP.
             start_date, start_date_type = self._object_value_and_datatype(
-                temporal_node, DCAT.startDate)
+                temporal_node, DCAT.startDate
+            )
             end_date, end_date_type = self._object_value_and_datatype(
-                temporal_node, DCAT.endDate)
+                temporal_node, DCAT.endDate
+            )
             if not start_date or not end_date:
                 # Previously specified properties in DCAT-AP. Should still be
                 # accepted.
                 start_date, start_date_type = self._object_value_and_datatype(
-                    temporal_node, SCHEMA.startDate)
+                    temporal_node, SCHEMA.startDate
+                )
                 end_date, end_date_type = self._object_value_and_datatype(
-                    temporal_node, SCHEMA.endDate)
+                    temporal_node, SCHEMA.endDate
+                )
             if not start_date or not end_date:
                 continue
 
-            cleaned_start_date = self._clean_datetime(
-                start_date, start_date_type)
-            cleaned_end_date = self._clean_end_datetime(
-                end_date, end_date_type)
+            cleaned_start_date = self._clean_datetime(start_date, start_date_type)
+            cleaned_end_date = self._clean_end_datetime(end_date, end_date_type)
             if not cleaned_start_date or not cleaned_end_date:
                 continue
-            temporals.append({
-                'start_date': cleaned_start_date,
-                'end_date': cleaned_end_date,
-            })
+            temporals.append(
+                {
+                    "start_date": cleaned_start_date,
+                    "end_date": cleaned_end_date,
+                }
+            )
 
         return temporals
 
@@ -425,12 +416,12 @@ class SwissDCATAPProfile(MultiLangProfile):
 
                 return dt.isoformat()
             elif data_type == XSD.gYearMonth:
-                datetime_value = datetime_value[:len('YYYY-MM')]
+                datetime_value = datetime_value[: len("YYYY-MM")]
                 dt = datetime.strptime(datetime_value, YEAR_MONTH_FORMAT)
 
                 return dt.isoformat()
             elif data_type == XSD.gYear:
-                datetime_value = datetime_value[:len('YYYY')]
+                datetime_value = datetime_value[: len("YYYY")]
                 dt = datetime.strptime(datetime_value, YEAR_FORMAT)
 
                 return dt.isoformat()
@@ -463,21 +454,23 @@ class SwissDCATAPProfile(MultiLangProfile):
             elif data_type == XSD.date or data_type == SCHEMA.Date:
                 dt = datetime.strptime(datetime_value, DATE_FORMAT)
                 end_datetime = datetime.max.replace(
-                    year=dt.year, month=dt.month, day=dt.day)
+                    year=dt.year, month=dt.month, day=dt.day
+                )
 
                 return end_datetime.isoformat()
             elif data_type == XSD.gYearMonth:
-                datetime_value = datetime_value[:len('YYYY-MM')]
+                datetime_value = datetime_value[: len("YYYY-MM")]
                 dt = datetime.strptime(datetime_value, YEAR_MONTH_FORMAT)
                 # We need to calculate the last day of the month, which varies.
                 d = dt.replace(month=dt.month + 1) + timedelta(days=-1)
 
                 end_datetime = datetime.max.replace(
-                    year=d.year, month=d.month, day=d.day)
+                    year=d.year, month=d.month, day=d.day
+                )
 
                 return end_datetime.isoformat()
             elif data_type == XSD.gYear:
-                datetime_value = datetime_value[:len('YYYY')]
+                datetime_value = datetime_value[: len("YYYY")]
                 dt = datetime.strptime(datetime_value, YEAR_FORMAT)
                 end_datetime = datetime.max.replace(year=dt.year)
 
@@ -496,8 +489,10 @@ class SwissDCATAPProfile(MultiLangProfile):
                 log.info("EU frequencies are already used.")
                 return ogdch_value
 
-        log.info("There is no such frequency as '%s' "
-                 "in the official list of frequencies" % ogdch_value)
+        log.info(
+            f"There is no such frequency as '{ogdch_value}' in the official list of "
+            f"frequencies"
+        )
         return ""
 
     def _get_groups(self, subject):
@@ -515,17 +510,18 @@ class SwissDCATAPProfile(MultiLangProfile):
                 #         the base url with the dcat-ap.ch base url, so we can
                 #         look it up in the theme mapping.
                 if dcat_theme_url.startswith(OGD_THEMES_URI):
-                    new_theme_url = dcat_theme_url.replace(
-                        OGD_THEMES_URI, CHTHEMES_URI)
-                    eu_theme_url = eu_theme_mapping.get(
-                        URIRef(new_theme_url), [None])[0]
+                    new_theme_url = dcat_theme_url.replace(OGD_THEMES_URI, CHTHEMES_URI)
+                    eu_theme_url = eu_theme_mapping.get(URIRef(new_theme_url), [None])[
+                        0
+                    ]
 
                 # Case 2: We get a dcat-ap.ch theme (the same as the
                 #         opendata.swiss themes, but different base url). Get
                 #         the correct EU theme from the theme mapping.
                 elif dcat_theme_url.startswith(CHTHEMES_URI):
-                    eu_theme_url = eu_theme_mapping.get(
-                        URIRef(dcat_theme_url), [None])[0]
+                    eu_theme_url = eu_theme_mapping.get(URIRef(dcat_theme_url), [None])[
+                        0
+                    ]
 
                 # Case 3: We get an EU theme and don't need to look it up in
                 #         the mapping.
@@ -533,8 +529,10 @@ class SwissDCATAPProfile(MultiLangProfile):
                     eu_theme_url = dcat_theme_url
 
                 if eu_theme_url is None:
-                    log.info("Could not find an EU theme that matched the "
-                             "given theme: {}".format(dcat_theme_url))
+                    log.info(
+                        f"Could not find an EU theme that matched the given theme: "
+                        f"{dcat_theme_url}"
+                    )
                     continue
 
                 search_result = slug_id_pattern.search(eu_theme_url)
@@ -542,25 +540,25 @@ class SwissDCATAPProfile(MultiLangProfile):
                 group_names.append(eu_theme_slug)
 
         # Deduplicate group names before returning list of group dicts
-        return [{'name': name} for name in list(set(group_names))]
+        return [{"name": name} for name in list(set(group_names))]
 
-    def parse_dataset(self, dataset_dict, dataset_ref):  # noqa
-        log.debug("Parsing dataset '%r'" % dataset_ref)
+    def parse_dataset(self, dataset_dict, dataset_ref):
+        log.debug(f"Parsing dataset '{dataset_ref!r}'")
 
-        dataset_dict['temporals'] = []
-        dataset_dict['tags'] = []
-        dataset_dict['extras'] = []
-        dataset_dict['resources'] = []
-        dataset_dict['relations'] = []
-        dataset_dict['see_alsos'] = []
-        dataset_dict['qualified_relations'] = []
+        dataset_dict["temporals"] = []
+        dataset_dict["tags"] = []
+        dataset_dict["extras"] = []
+        dataset_dict["resources"] = []
+        dataset_dict["relations"] = []
+        dataset_dict["see_alsos"] = []
+        dataset_dict["qualified_relations"] = []
 
         # Basic fields
         for key, predicate in (
-                ('identifier', DCT.identifier),
-                ('spatial_uri', DCT.spatial),
-                ('spatial', DCT.spatial),
-                ('url', DCAT.landingPage),
+            ("identifier", DCT.identifier),
+            ("spatial_uri", DCT.spatial),
+            ("spatial", DCT.spatial),
+            ("url", DCAT.landingPage),
         ):
             value = self._object_value(dataset_ref, predicate)
             if value:
@@ -568,20 +566,19 @@ class SwissDCATAPProfile(MultiLangProfile):
             # Ensure to clear the basic key values if they are not
             # in the new harvester source xml
             elif key not in dataset_dict or not dataset_dict[key]:
-                dataset_dict[key] = ''
+                dataset_dict[key] = ""
 
         # Accrual periodicity
-        dataset_dict['accrual_periodicity'] = self._get_eu_accrual_periodicity(
+        dataset_dict["accrual_periodicity"] = self._get_eu_accrual_periodicity(
             dataset_ref
         )
 
         # Timestamp fields
         for key, predicate in (
-                ('issued', DCT.issued),
-                ('modified', DCT.modified),
+            ("issued", DCT.issued),
+            ("modified", DCT.modified),
         ):
-            value, datatype = self._object_value_and_datatype(
-                dataset_ref, predicate)
+            value, datatype = self._object_value_and_datatype(dataset_ref, predicate)
             if value:
                 cleaned_value = self._clean_datetime(value, datatype)
                 if cleaned_value:
@@ -589,8 +586,8 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Multilingual basic fields
         for key, predicate in (
-                ('title', DCT.title),
-                ('description', DCT.description),
+            ("title", DCT.title),
+            ("description", DCT.description),
         ):
             value = self._object_value(dataset_ref, predicate, multilang=True)
             if value:
@@ -599,144 +596,132 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Tags
         keywords = self._object_value_list(dataset_ref, DCAT.keyword) or []
         for keyword in keywords:
-            dataset_dict['tags'].append({'name': munge_tag(str(keyword))})
+            dataset_dict["tags"].append({"name": munge_tag(str(keyword))})
 
         # Keywords
-        dataset_dict['keywords'] = self._keywords(dataset_ref)
+        dataset_dict["keywords"] = self._keywords(dataset_ref)
 
         # Themes
-        dataset_dict['groups'] = self._get_groups(dataset_ref)
+        dataset_dict["groups"] = self._get_groups(dataset_ref)
 
         #  Languages
         languages = self._object_value_list(dataset_ref, DCT.language)
         if languages:
-            dataset_dict['language'] = languages
+            dataset_dict["language"] = languages
 
         # Contact details
-        dataset_dict['contact_points'] = self._contact_points(
+        dataset_dict["contact_points"] = self._contact_points(
             dataset_ref,
         )
 
         # Publisher
-        dataset_dict['publisher'] = self._publisher(
-            dataset_ref,
-            dataset_dict.get('identifier', '')
+        dataset_dict["publisher"] = self._publisher(
+            dataset_ref, dataset_dict.get("identifier", "")
         )
 
         # Relations
-        dataset_dict['relations'] = self._relations(dataset_ref)
+        dataset_dict["relations"] = self._relations(dataset_ref)
 
         # Temporal
-        dataset_dict['temporals'] = self._temporals(dataset_ref)
+        dataset_dict["temporals"] = self._temporals(dataset_ref)
 
         # References
         see_alsos = self._object_value_list(dataset_ref, RDFS.seeAlso)
         for see_also in see_alsos:
-            dataset_dict['see_alsos'].append({'dataset_identifier': see_also})
+            dataset_dict["see_alsos"].append({"dataset_identifier": see_also})
 
-        dataset_dict["qualified_relations"] = self._qualified_relations(
-            dataset_ref
-        )
+        dataset_dict["qualified_relations"] = self._qualified_relations(dataset_ref)
 
         # Dataset URI
         dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
-        dataset_dict['extras'].append({'key': 'uri', 'value': dataset_uri})
+        dataset_dict["extras"].append({"key": "uri", "value": dataset_uri})
 
         # Documentation
-        dataset_dict['documentation'] = self._object_value_list(
-            dataset_ref, FOAF.page
-        )
+        dataset_dict["documentation"] = self._object_value_list(dataset_ref, FOAF.page)
 
         # Conformance
-        dataset_dict['conforms_to'] = self._object_value_list(
+        dataset_dict["conforms_to"] = self._object_value_list(
             dataset_ref, DCT.conformsTo
         )
 
         # Resources
         for distribution in self._distributions(dataset_ref):
             resource_dict = {
-                'media_type': '',
-                'language': [],
+                "media_type": "",
+                "language": [],
             }
 
             #  Simple values
             for key, predicate in (
-                    ('identifier', DCT.identifier),
-                    ('download_url', DCAT.downloadURL),
-                    ('url', DCAT.accessURL),
-                    ('coverage', DCT.coverage),
+                ("identifier", DCT.identifier),
+                ("download_url", DCAT.downloadURL),
+                ("url", DCAT.accessURL),
+                ("coverage", DCT.coverage),
             ):
                 value = self._object_value(distribution, predicate)
                 if value:
                     resource_dict[key] = value
 
             #  Rights & License save homepage uri
-            rights = self._license_rights_homepage_uri(
-                distribution, DCT.rights
-            )
-            license = self._license_rights_homepage_uri(
-                distribution, DCT.license
-            )
+            rights = self._license_rights_homepage_uri(distribution, DCT.rights)
+            license = self._license_rights_homepage_uri(distribution, DCT.license)
 
             if rights is None and license is not None:
-                resource_dict['license'] = license
-                resource_dict['rights'] = license
+                resource_dict["license"] = license
+                resource_dict["rights"] = license
             elif rights is not None and license is None:
-                resource_dict['rights'] = rights
-                if 'cc' not in rights:
-                    resource_dict['license'] = rights
+                resource_dict["rights"] = rights
+                if "cc" not in rights:
+                    resource_dict["license"] = rights
                 else:
-                    resource_dict['license'] = None
+                    resource_dict["license"] = None
             elif license is not None and rights is not None:
-                resource_dict['license'] = license
-                resource_dict['rights'] = rights
-                if 'cc' in license and 'cc' not in rights:
-                    resource_dict['license'] = rights
-                    resource_dict['rights'] = license
-                elif 'cc' in license and 'cc' in rights:
-                    resource_dict['license'] = None
+                resource_dict["license"] = license
+                resource_dict["rights"] = rights
+                if "cc" in license and "cc" not in rights:
+                    resource_dict["license"] = rights
+                    resource_dict["rights"] = license
+                elif "cc" in license and "cc" in rights:
+                    resource_dict["license"] = None
             else:
-                resource_dict['license'] = None
-                resource_dict['rights'] = None
+                resource_dict["license"] = None
+                resource_dict["rights"] = None
 
             # Format & Media type
-            resource_dict['format'] = \
-                self._get_eu_or_iana_format(distribution)
-            resource_dict['media_type'] = \
-                self._get_iana_media_type(distribution)
+            resource_dict["format"] = self._get_eu_or_iana_format(distribution)
+            resource_dict["media_type"] = self._get_iana_media_type(distribution)
             # Set 'media_type' as 'format'
             # if 'media_type' is not set but 'format' exists
-            if not resource_dict.get('media_type') \
-                    and resource_dict.get('format'):
-                resource_dict['media_type'] = resource_dict['format']
+            if not resource_dict.get("media_type") and resource_dict.get("format"):
+                resource_dict["media_type"] = resource_dict["format"]
             # Set 'format' as 'media_type'
             # if 'format' is not set but 'media_type' exists
-            elif not resource_dict.get('format') \
-                    and resource_dict.get('media_type'):
-                resource_dict['format'] = resource_dict['media_type']
+            elif not resource_dict.get("format") and resource_dict.get("media_type"):
+                resource_dict["format"] = resource_dict["media_type"]
 
             # Documentation
-            resource_dict['documentation'] = self._object_value_list(
+            resource_dict["documentation"] = self._object_value_list(
                 distribution, FOAF.page
             )
 
             # Access services
-            resource_dict['access_services'] = self._object_value_list(
+            resource_dict["access_services"] = self._object_value_list(
                 distribution, DCAT.accessService
             )
 
             # Temporal resolution
-            resource_dict['temporal_resolution'] = self._object_value(
+            resource_dict["temporal_resolution"] = self._object_value(
                 distribution, DCAT.temporalResolution
             )
 
             # Timestamp fields
             for key, predicate in (
-                    ('issued', DCT.issued),
-                    ('modified', DCT.modified),
+                ("issued", DCT.issued),
+                ("modified", DCT.modified),
             ):
                 value, datatype = self._object_value_and_datatype(
-                    distribution, predicate)
+                    distribution, predicate
+                )
                 if value:
                     cleaned_value = self._clean_datetime(value, datatype)
                     if cleaned_value:
@@ -744,46 +729,40 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             # Multilingual fields
             for key, predicate in (
-                    ('title', DCT.title),
-                    ('description', DCT.description),
+                ("title", DCT.title),
+                ("description", DCT.description),
             ):
-                value = self._object_value(
-                    distribution,
-                    predicate,
-                    multilang=True)
+                value = self._object_value(distribution, predicate, multilang=True)
                 if value:
                     resource_dict[key] = value
 
-            resource_dict['url'] = (self._object_value(distribution,
-                                                       DCAT.accessURL) or
-                                    self._object_value(distribution,
-                                                       DCAT.downloadURL) or '')
+            resource_dict["url"] = (
+                self._object_value(distribution, DCAT.accessURL)
+                or self._object_value(distribution, DCAT.downloadURL)
+                or ""
+            )
 
             # languages
-            for language in self._object_value_list(
-                    distribution,
-                    DCT.language
-            ):
-                resource_dict['language'].append(language)
+            for language in self._object_value_list(distribution, DCT.language):
+                resource_dict["language"].append(language)
 
             # byteSize
             byte_size = self._object_value_int(distribution, DCAT.byteSize)
             if byte_size is not None:
-                resource_dict['byte_size'] = byte_size
+                resource_dict["byte_size"] = byte_size
 
             # Distribution URI (explicitly show the missing ones)
-            resource_dict['uri'] = dh.resource_uri(
-                resource_dict, distribution)
+            resource_dict["uri"] = dh.resource_uri(resource_dict, distribution)
 
-            dataset_dict['resources'].append(resource_dict)
+            dataset_dict["resources"].append(resource_dict)
 
-        log.debug("Parsed dataset '%r': %s" % (dataset_ref, dataset_dict))
+        log.debug(f"Parsed dataset '{dataset_ref!r}': {dataset_dict}")
 
         return dataset_dict
 
-    def graph_from_dataset(self, dataset_dict, dataset_ref):  # noqa
+    def graph_from_dataset(self, dataset_dict, dataset_ref):
 
-        log.debug("Create graph from dataset '%s'" % dataset_dict['name'])
+        log.debug(f"Create graph from dataset '{dataset_dict['name']}'")
 
         dataset_uri = dh.dataset_uri(dataset_dict, dataset_ref)
         dataset_ref = URIRef(dataset_uri)
@@ -797,32 +776,24 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Basic fields
         items = [
-            ('identifier', DCT.identifier, ['guid', 'id'], Literal),
-            ('version', OWL.versionInfo, ['dcat_version'], Literal),
-            ('version_notes', ADMS.versionNotes, None, Literal),
-            ('frequency', DCT.accrualPeriodicity, None, Literal),
-            ('access_rights', DCT.accessRights, None, Literal),
-            ('dcat_type', DCT.type, None, Literal),
-            ('provenance', DCT.provenance, None, Literal),
-            ('spatial', DCT.spatial, None, Literal),
+            ("identifier", DCT.identifier, ["guid", "id"], Literal),
+            ("version", OWL.versionInfo, ["dcat_version"], Literal),
+            ("version_notes", ADMS.versionNotes, None, Literal),
+            ("frequency", DCT.accrualPeriodicity, None, Literal),
+            ("access_rights", DCT.accessRights, None, Literal),
+            ("dcat_type", DCT.type, None, Literal),
+            ("provenance", DCT.provenance, None, Literal),
+            ("spatial", DCT.spatial, None, Literal),
         ]
         self._add_triples_from_dict(dataset_dict, dataset_ref, items)
 
         self._add_multilang_value(
-            dataset_ref,
-            DCT.description,
-            'description',
-            dataset_dict
+            dataset_ref, DCT.description, "description", dataset_dict
         )
-        self._add_multilang_value(
-            dataset_ref,
-            DCT.title,
-            'title',
-            dataset_dict
-        )
+        self._add_multilang_value(dataset_ref, DCT.title, "title", dataset_dict)
 
         # LandingPage
-        landing_page_url = dataset_dict.get('url')
+        landing_page_url = dataset_dict.get("url")
         if landing_page_url:
             try:
                 landing_page = dh.uri_to_iri(landing_page_url)
@@ -832,41 +803,35 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((dataset_ref, DCAT.landingPage, URIRef(landing_page)))
 
         # Keywords
-        self._add_multilang_value(
-            dataset_ref,
-            DCAT.keyword,
-            'keywords',
-            dataset_dict
-        )
+        self._add_multilang_value(dataset_ref, DCAT.keyword, "keywords", dataset_dict)
 
         # Dates
         items = [
-            ('issued', DCT.issued, None, Literal),
-            ('modified', DCT.modified, None, Literal),
+            ("issued", DCT.issued, None, Literal),
+            ("modified", DCT.modified, None, Literal),
         ]
         self._add_date_triples_from_dict(dataset_dict, dataset_ref, items)
 
         # Update Interval
-        accrual_periodicity = dataset_dict.get('accrual_periodicity')
+        accrual_periodicity = dataset_dict.get("accrual_periodicity")
         if accrual_periodicity:
-            self._accrual_periodicity_to_graph(dataset_ref,
-                                               accrual_periodicity)
+            self._accrual_periodicity_to_graph(dataset_ref, accrual_periodicity)
 
         # Lists
         items = [
-            ('theme', DCAT.theme, None, URIRef),
-            ('alternate_identifier', ADMS.identifier, None, Literal),
-            ('has_version', DCT.hasVersion, None, Literal),
-            ('is_version_of', DCT.isVersionOf, None, Literal),
-            ('source', DCT.source, None, Literal),
-            ('sample', ADMS.sample, None, Literal),
+            ("theme", DCAT.theme, None, URIRef),
+            ("alternate_identifier", ADMS.identifier, None, Literal),
+            ("has_version", DCT.hasVersion, None, Literal),
+            ("is_version_of", DCT.isVersionOf, None, Literal),
+            ("source", DCT.source, None, Literal),
+            ("sample", ADMS.sample, None, Literal),
         ]
         self._add_list_triples_from_dict(dataset_dict, dataset_ref, items)
 
         # Languages
-        languages = dataset_dict.get('language', [])
+        languages = dataset_dict.get("language", [])
         for lang in languages:
-            if 'https://publications.europa.eu/resource/authority' in lang:
+            if "https://publications.europa.eu/resource/authority" in lang:
                 # Already a valid EU language URI
                 g.add((dataset_ref, DCT.language, URIRef(lang)))
             else:
@@ -874,42 +839,34 @@ class SwissDCATAPProfile(MultiLangProfile):
                 if uri:
                     g.add((dataset_ref, DCT.language, URIRef(uri)))
                 else:
-                    log.debug("Language '{}' not found in"
-                              " language_uri_map".format(lang))
+                    log.debug(f"Language '{lang}' not found in language_uri_map")
 
         # Relations
-        if dataset_dict.get('relations'):
-            relations = dataset_dict.get('relations')
+        if dataset_dict.get("relations"):
+            relations = dataset_dict.get("relations")
             for relation in relations:
                 try:
-                    relation_url = dh.uri_to_iri(relation['url'])
+                    relation_url = dh.uri_to_iri(relation["url"])
                 except ValueError:
                     # skip this relation if the URL is invalid
                     continue
 
                 relation_uriref = URIRef(relation_url)
                 self._add_multilang_value(
-                    relation_uriref,
-                    RDFS.label,
-                    'label',
-                    relation
+                    relation_uriref, RDFS.label, "label", relation
                 )
                 g.add((dataset_ref, DCT.relation, relation_uriref))
 
         # References
-        if dataset_dict.get('see_alsos'):
-            references = dataset_dict.get('see_alsos')
+        if dataset_dict.get("see_alsos"):
+            references = dataset_dict.get("see_alsos")
             for reference in references:
                 # we only expect dicts here
                 if not isinstance(reference, dict):
                     continue
-                reference_identifier = reference.get('dataset_identifier')
+                reference_identifier = reference.get("dataset_identifier")
                 if reference_identifier:
-                    g.add((
-                        dataset_ref,
-                        RDFS.seeAlso,
-                        Literal(reference_identifier)
-                    ))
+                    g.add((dataset_ref, RDFS.seeAlso, Literal(reference_identifier)))
 
         if dataset_dict.get("qualified_relations"):
             for reference in dataset_dict["qualified_relations"]:
@@ -918,103 +875,82 @@ class SwissDCATAPProfile(MultiLangProfile):
 
                 qualified_relation = BNode()
                 g.add((qualified_relation, RDF.type, DCAT.Relationship))
-                g.add((
-                    qualified_relation,
-                    DCT.relation,
-                    URIRef(reference["relation"])
-                ))
+                g.add((qualified_relation, DCT.relation, URIRef(reference["relation"])))
 
                 if reference.get("had_role"):
-                    g.add((
-                        qualified_relation,
-                        DCAT.hadRole,
-                        URIRef(reference["had_role"])
-                    ))
+                    g.add(
+                        (
+                            qualified_relation,
+                            DCAT.hadRole,
+                            URIRef(reference["had_role"]),
+                        )
+                    )
 
-                g.add((
-                    dataset_ref,
-                    DCAT.qualifiedRelation,
-                    qualified_relation
-                ))
+                g.add((dataset_ref, DCAT.qualifiedRelation, qualified_relation))
 
         # Contact details
-        if dataset_dict.get('contact_points'):
-            contact_points = self._get_dataset_value(
-                dataset_dict, 'contact_points'
-            )
+        if dataset_dict.get("contact_points"):
+            contact_points = self._get_dataset_value(dataset_dict, "contact_points")
             for contact_point in contact_points:
-                if not contact_point.get('email') \
-                        or not contact_point.get('name'):
+                if not contact_point.get("email") or not contact_point.get("name"):
                     continue
 
                 contact_details = BNode()
-                contact_point_email = \
-                    EMAIL_MAILTO_PREFIX + contact_point['email']
-                contact_point_name = contact_point['name']
+                contact_point_email = EMAIL_MAILTO_PREFIX + contact_point["email"]
+                contact_point_name = contact_point["name"]
 
                 g.add((contact_details, RDF.type, VCARD.Organization))
-                g.add((
-                    contact_details,
-                    VCARD.hasEmail,
-                    URIRef(contact_point_email)
-                ))
+                g.add((contact_details, VCARD.hasEmail, URIRef(contact_point_email)))
                 g.add((contact_details, VCARD.fn, Literal(contact_point_name)))
 
                 g.add((dataset_ref, DCAT.contactPoint, contact_details))
 
         # Publisher
-        self._publisher_to_graph(dataset_ref,
-                                 dataset_dict)
+        self._publisher_to_graph(dataset_ref, dataset_dict)
 
         # Temporals
-        temporals = dataset_dict.get('temporals')
+        temporals = dataset_dict.get("temporals")
         if temporals:
             for temporal in temporals:
-                start = temporal['start_date']
-                end = temporal['end_date']
+                start = temporal["start_date"]
+                end = temporal["end_date"]
                 if start or end:
                     temporal_extent = BNode()
                     g.add((temporal_extent, RDF.type, DCT.PeriodOfTime))
                     if start:
-                        self._add_date_triple(
-                            temporal_extent,
-                            DCAT.startDate,
-                            start
-                        )
+                        self._add_date_triple(temporal_extent, DCAT.startDate, start)
                     if end:
-                        self._add_date_triple(
-                            temporal_extent,
-                            DCAT.endDate,
-                            end
-                        )
+                        self._add_date_triple(temporal_extent, DCAT.endDate, end)
                     g.add((dataset_ref, DCT.temporal, temporal_extent))
 
         # Documentation
-        documentation = dataset_dict.get('documentation', [])
+        documentation = dataset_dict.get("documentation", [])
         for link in documentation:
             doc = URIRef(link)
             g.add((doc, RDF.type, FOAF.Document))
             g.add((dataset_ref, FOAF.page, doc))
 
         # Conformance
-        conformance_uris = dataset_dict.get('conforms_to', [])
+        conformance_uris = dataset_dict.get("conforms_to", [])
         for uri in conformance_uris:
             ref = URIRef(uri)
             g.add((dataset_ref, DCT.conformsTo, ref))
 
         # Themes
-        groups = self._get_dataset_value(dataset_dict, 'groups', [])
+        groups = self._get_dataset_value(dataset_dict, "groups", [])
         for group_name in groups:
-            eu_theme_slug = group_name.get('name').upper()
+            eu_theme_slug = group_name.get("name").upper()
             eu_theme_ref = URIRef(EUTHEMES_URI + eu_theme_slug)
-            g.add((
-                dataset_ref,
-                DCAT.theme,
-                eu_theme_ref,
-            ))
+            g.add(
+                (
+                    dataset_ref,
+                    DCAT.theme,
+                    eu_theme_ref,
+                )
+            )
 
         # Resources
-        for resource_dict in dataset_dict.get('resources', []):
+        for resource_dict in dataset_dict.get("resources", []):
             distribution = URIRef(dh.resource_uri(resource_dict))
 
             g.add((dataset_ref, DCAT.distribution, distribution))
@@ -1022,30 +958,34 @@ class SwissDCATAPProfile(MultiLangProfile):
 
             #  Simple values
             items = [
-                ('status', ADMS.status, None, Literal),
-                ('coverage', DCT.coverage, None, Literal),
-                ('identifier', DCT.identifier, None, Literal),
-                ('spatial', DCT.spatial, None, Literal),
+                ("status", ADMS.status, None, Literal),
+                ("coverage", DCT.coverage, None, Literal),
+                ("identifier", DCT.identifier, None, Literal),
+                ("spatial", DCT.spatial, None, Literal),
             ]
 
             self._rights_and_license_to_graph(resource_dict, distribution)
             self._format_and_media_type_to_graph(resource_dict, distribution)
 
             self._add_triples_from_dict(resource_dict, distribution, items)
-            self._add_multilang_value(distribution, DCT.title, 'display_name', resource_dict)  # noqa
-            self._add_multilang_value(distribution, DCT.description, 'description', resource_dict)  # noqa
+            self._add_multilang_value(
+                distribution, DCT.title, "display_name", resource_dict
+            )
+            self._add_multilang_value(
+                distribution, DCT.description, "description", resource_dict
+            )
 
             #  Language
-            languages = resource_dict.get('language', [])
+            languages = resource_dict.get("language", [])
             for lang in languages:
                 uri = language_uri_map.get(lang)
                 if uri:
                     g.add((distribution, DCT.language, URIRef(uri)))
 
             # Language
-            languages = resource_dict.get('language', [])
+            languages = resource_dict.get("language", [])
             for lang in languages:
-                if 'https://publications.europa.eu/resource/authority' in lang:
+                if "https://publications.europa.eu/resource/authority" in lang:
                     # Already a valid EU language URI
                     g.add((distribution, DCT.language, URIRef(lang)))
                 else:
@@ -1053,24 +993,19 @@ class SwissDCATAPProfile(MultiLangProfile):
                     if uri:
                         g.add((distribution, DCT.language, URIRef(uri)))
                     else:
-                        log.debug("Language '{}' not found in"
-                                  " language_uri_map".format(lang))
+                        log.debug(f"Language '{lang}' not found in language_uri_map")
 
             # Download URL & Access URL
-            download_url = resource_dict.get('download_url')
+            download_url = resource_dict.get("download_url")
             if download_url:
                 try:
                     download_url = dh.uri_to_iri(download_url)
-                    g.add((
-                        distribution,
-                        DCAT.downloadURL,
-                        URIRef(download_url)
-                    ))
+                    g.add((distribution, DCAT.downloadURL, URIRef(download_url)))
                 except ValueError:
                     # only add valid URL
                     pass
 
-            url = resource_dict.get('url')
+            url = resource_dict.get("url")
             if (url and not download_url) or (url and url != download_url):
                 try:
                     url = dh.uri_to_iri(url)
@@ -1082,42 +1017,45 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((distribution, DCAT.accessURL, URIRef(download_url)))
 
             # Documentation
-            documentation = resource_dict.get('documentation', [])
+            documentation = resource_dict.get("documentation", [])
             for link in documentation:
                 doc = URIRef(link)
                 g.add((doc, RDF.type, FOAF.Document))
                 g.add((distribution, FOAF.page, doc))
 
             # Access Services
-            access_services = resource_dict.get('access_services', [])
+            access_services = resource_dict.get("access_services", [])
             for uri in access_services:
                 ref = URIRef(uri)
                 g.add((distribution, DCAT.accessService, ref))
 
             # Temporal Resolution
-            if resource_dict.get('temporal_resolution'):
-                g.add((
-                    distribution,
-                    DCAT.temporalResolution,
-                    Literal(resource_dict['temporal_resolution'],
-                            datatype=XSD.duration)
-                ))
+            if resource_dict.get("temporal_resolution"):
+                g.add(
+                    (
+                        distribution,
+                        DCAT.temporalResolution,
+                        Literal(
+                            resource_dict["temporal_resolution"], datatype=XSD.duration
+                        ),
+                    )
+                )
 
             # Dates
             items = [
-                ('issued', DCT.issued, None, Literal),
-                ('modified', DCT.modified, None, Literal),
+                ("issued", DCT.issued, None, Literal),
+                ("modified", DCT.modified, None, Literal),
             ]
-            self._add_date_triples_from_dict(resource_dict, distribution,
-                                             items)
+            self._add_date_triples_from_dict(resource_dict, distribution, items)
 
             # ByteSize
-            if resource_dict.get('byte_size'):
-                g.add((distribution, DCAT.byteSize,
-                       Literal(resource_dict['byte_size'])))
+            if resource_dict.get("byte_size"):
+                g.add(
+                    (distribution, DCAT.byteSize, Literal(resource_dict["byte_size"]))
+                )
 
-    def _get_rights_and_license_uri(self, resource_dict, property='license'):
-        if property not in ['license', 'rights']:
+    def _get_rights_and_license_uri(self, resource_dict, property="license"):
+        if property not in ["license", "rights"]:
             raise ValueError("Property must be 'license' or 'rights'")
 
         homepage_uri = resource_dict.get(property)
@@ -1139,14 +1077,12 @@ class SwissDCATAPProfile(MultiLangProfile):
     def _rights_and_license_to_graph(self, resource_dict, distribution):
         g = self.g
 
-        rights_uri_ref = self._get_rights_and_license_uri(resource_dict,
-                                                          'rights')
+        rights_uri_ref = self._get_rights_and_license_uri(resource_dict, "rights")
         if rights_uri_ref is not None:
             g.add((rights_uri_ref, RDF.type, DCT.RightsStatement))
             g.add((distribution, DCT.rights, rights_uri_ref))
 
-        license_uri_ref = self._get_rights_and_license_uri(resource_dict,
-                                                           'license')
+        license_uri_ref = self._get_rights_and_license_uri(resource_dict, "license")
         if license_uri_ref is not None:
             g.add((license_uri_ref, RDF.type, DCT.LicenseDocument))
             g.add((distribution, DCT.license, license_uri_ref))
@@ -1156,33 +1092,31 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Export format value if it matches EU vocabulary
         # Exception: if a format is not available in the EU vocabulary,
         # use IANA media type vocabulary
-        if resource_dict.get('format'):
-            format_key = self._munge_format(resource_dict.get('format'))
-            media_type_key = self._munge_media_type(
-                resource_dict.get('format')
-            )
+        if resource_dict.get("format"):
+            format_key = self._munge_format(resource_dict.get("format"))
+            media_type_key = self._munge_media_type(resource_dict.get("format"))
             if format_key in valid_formats:
-                g.add((
-                    distribution,
-                    DCT['format'],
-                    URIRef(valid_formats[format_key])
-                ))
+                g.add((distribution, DCT["format"], URIRef(valid_formats[format_key])))
             elif media_type_key in valid_media_types:
-                g.add((
-                    distribution,
-                    DCT['format'],
-                    URIRef(valid_media_types[media_type_key])
-                ))
+                g.add(
+                    (
+                        distribution,
+                        DCT["format"],
+                        URIRef(valid_media_types[media_type_key]),
+                    )
+                )
 
         # Export media type if it matches IANA media type vocabulary
-        if resource_dict.get('media_type'):
-            media_type = resource_dict.get('media_type')
+        if resource_dict.get("media_type"):
+            media_type = resource_dict.get("media_type")
             if media_type in valid_media_types:
-                g.add((
-                    distribution,
-                    DCAT.mediaType,
-                    URIRef(valid_media_types[media_type])
-                ))
+                g.add(
+                    (
+                        distribution,
+                        DCAT.mediaType,
+                        URIRef(valid_media_types[media_type]),
+                    )
+                )
 
     def graph_from_catalog(self, catalog_dict, catalog_ref):
         g = self.g
@@ -1190,25 +1124,24 @@ class SwissDCATAPProfile(MultiLangProfile):
 
     def _accrual_periodicity_to_graph(self, dataset_ref, accrual_periodicity):
         g = self.g
-        old_valid_frequencies = [i for i in list(valid_frequencies.values()) if i != URIRef(
-                "http://purl.org/cld/freq/completelyIrregular")]
-        if URIRef(accrual_periodicity) in \
-                old_valid_frequencies + list(valid_frequencies.keys()):
-            g.add((
-                dataset_ref,
-                DCT.accrualPeriodicity,
-                URIRef(accrual_periodicity)
-            ))
+        old_valid_frequencies = [
+            i
+            for i in list(valid_frequencies.values())
+            if i != URIRef("http://purl.org/cld/freq/completelyIrregular")
+        ]
+        if URIRef(accrual_periodicity) in old_valid_frequencies + list(
+            valid_frequencies.keys()
+        ):
+            g.add((dataset_ref, DCT.accrualPeriodicity, URIRef(accrual_periodicity)))
 
     def _publisher_to_graph(self, dataset_ref, dataset_dict):
-        """ Supporting both FOAF.Agent (with multilingual names)
+        """Supporting both FOAF.Agent (with multilingual names)
         and FOAF.Organization (with a single name)
         """
         g = self.g
-        publisher_uri, publisher_name = \
-            dh.get_publisher_dict_from_dataset(
-                dataset_dict.get('publisher')
-            )
+        publisher_uri, publisher_name = dh.get_publisher_dict_from_dataset(
+            dataset_dict.get("publisher")
+        )
 
         # determine publisher structure FOAF.Agent or FOAF.Organization
         if isinstance(publisher_name, dict):
@@ -1234,31 +1167,32 @@ class SwissDCATAPProfile(MultiLangProfile):
 class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
     def _basic_fields_graph(self, dataset_ref, dataset_dict):
         items = [
-            ('identifier', SCHEMA.identifier, None, Literal),
-            ('version', SCHEMA.version, ['dcat_version'], Literal),
-            ('issued', SCHEMA.datePublished, None, Literal),
-            ('modified', SCHEMA.dateModified, None, Literal),
-            ('author', SCHEMA.author, ['contact_name', 'maintainer'], Literal),
-            ('url', SCHEMA.sameAs, None, Literal),
+            ("identifier", SCHEMA.identifier, None, Literal),
+            ("version", SCHEMA.version, ["dcat_version"], Literal),
+            ("issued", SCHEMA.datePublished, None, Literal),
+            ("modified", SCHEMA.dateModified, None, Literal),
+            ("author", SCHEMA.author, ["contact_name", "maintainer"], Literal),
+            ("url", SCHEMA.sameAs, None, Literal),
         ]
         self._add_triples_from_dict(dataset_dict, dataset_ref, items)
 
         items = [
-            ('title', SCHEMA.name, None, Literal),
-            ('description', SCHEMA.description, None, Literal),
+            ("title", SCHEMA.name, None, Literal),
+            ("description", SCHEMA.description, None, Literal),
         ]
         self._add_multilang_triples_from_dict(dataset_dict, dataset_ref, items)
 
     def _publisher_graph(self, dataset_ref, dataset_dict):
-        if any([
-            self._get_dataset_value(dataset_dict, 'publisher_uri'),
-            self._get_dataset_value(dataset_dict, 'publisher_name'),
-            dataset_dict.get('organization'),
-        ]):
-            publisher_uri, publisher_name = \
-                dh.get_publisher_dict_from_dataset(
-                    dataset_dict.get('publisher')
-                )
+        if any(
+            [
+                self._get_dataset_value(dataset_dict, "publisher_uri"),
+                self._get_dataset_value(dataset_dict, "publisher_name"),
+                dataset_dict.get("organization"),
+            ]
+        ):
+            publisher_uri, publisher_name = dh.get_publisher_dict_from_dataset(
+                dataset_dict.get("publisher")
+            )
             if publisher_uri:
                 publisher_details = CleanedURIRef(publisher_uri)
             else:
@@ -1266,31 +1200,41 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             self.g.add((publisher_details, RDF.type, SCHEMA.Organization))
             self.g.add((dataset_ref, SCHEMA.publisher, publisher_details))
-            self.g.add((dataset_ref, SCHEMA.sourceOrganization, publisher_details))  # noqa
+            self.g.add((dataset_ref, SCHEMA.sourceOrganization, publisher_details))
 
-            if not publisher_name and dataset_dict.get('organization'):
-                publisher_name = dataset_dict['organization']['title']
+            if not publisher_name and dataset_dict.get("organization"):
+                publisher_name = dataset_dict["organization"]["title"]
                 self._add_multilang_value(
-                    publisher_details,
-                    SCHEMA.name,
-                    multilang_values=publisher_name
+                    publisher_details, SCHEMA.name, multilang_values=publisher_name
                 )
             else:
-                self.g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))  # noqa
+                self.g.add((publisher_details, SCHEMA.name, Literal(publisher_name)))
 
             contact_point = BNode()
             self.g.add((publisher_details, SCHEMA.contactPoint, contact_point))
 
-            self.g.add((contact_point, SCHEMA.contactType, Literal('customer service')))  # noqa
+            self.g.add((contact_point, SCHEMA.contactType, Literal("customer service")))
 
-            publisher_url = self._get_dataset_value(dataset_dict, 'publisher_url')  # noqa
-            if not publisher_url and dataset_dict.get('organization'):
-                publisher_url = dataset_dict['organization'].get('url') or config.get('ckan.site_url', '')  # noqa
+            publisher_url = self._get_dataset_value(dataset_dict, "publisher_url")
+            if not publisher_url and dataset_dict.get("organization"):
+                publisher_url = dataset_dict["organization"].get("url") or config.get(
+                    "ckan.site_url", ""
+                )
 
             self.g.add((contact_point, SCHEMA.url, Literal(publisher_url)))
             items = [
-                ('publisher_email', SCHEMA.email, ['contact_email', 'maintainer_email', 'author_email'], Literal),  # noqa
-                ('publisher_name', SCHEMA.name, ['contact_name', 'maintainer', 'author'], Literal),  # noqa
+                (
+                    "publisher_email",
+                    SCHEMA.email,
+                    ["contact_email", "maintainer_email", "author_email"],
+                    Literal,
+                ),
+                (
+                    "publisher_name",
+                    SCHEMA.name,
+                    ["contact_name", "maintainer", "author"],
+                    Literal,
+                ),
             ]
 
             self._add_triples_from_dict(dataset_dict, contact_point, items)
@@ -1299,70 +1243,61 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         # schema.org temporalCoverage only allows to specify one temporal
         # DCAT-AP Switzerland allows to specify multiple
         # for the mapping we always use the first one
-        temporals = self._get_dataset_value(dataset_dict, 'temporals')
+        temporals = self._get_dataset_value(dataset_dict, "temporals")
         try:
-            start = temporals[0].get('start_date')
-            end = temporals[0].get('end_date')
+            start = temporals[0].get("start_date")
+            end = temporals[0].get("end_date")
         except (IndexError, KeyError, TypeError):
             # do not add temporals if there are none
             return
         if start or end:
             if start and end:
-                self.g.add((dataset_ref, SCHEMA.temporalCoverage, Literal('%s/%s' % (start, end))))  # noqa
+                self.g.add(
+                    (
+                        dataset_ref,
+                        SCHEMA.temporalCoverage,
+                        Literal(f"{start}/{end}"),
+                    )
+                )
             elif start:
-                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, start)  # noqa
+                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, start)
             elif end:
-                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, end)  # noqa
+                self._add_date_triple(dataset_ref, SCHEMA.temporalCoverage, end)
 
     def _tags_graph(self, dataset_ref, dataset_dict):
-        for tag in dataset_dict.get('keywords', []):
+        for tag in dataset_dict.get("keywords", []):
             items = [
-                ('keywords', SCHEMA.keywords, None, Literal),
+                ("keywords", SCHEMA.keywords, None, Literal),
             ]
-            self._add_multilang_triples_from_dict(
-                dataset_dict,
-                dataset_ref,
-                items
-            )
+            self._add_multilang_triples_from_dict(dataset_dict, dataset_ref, items)
 
     def _distribution_basic_fields_graph(self, distribution, resource_dict):
         items = [
-            ('issued', SCHEMA.datePublished, None, Literal),
-            ('modified', SCHEMA.dateModified, None, Literal),
+            ("issued", SCHEMA.datePublished, None, Literal),
+            ("modified", SCHEMA.dateModified, None, Literal),
         ]
 
         self._add_triples_from_dict(resource_dict, distribution, items)
 
         items = [
-            ('title', SCHEMA.name, None, Literal),
-            ('description', SCHEMA.description, None, Literal),
+            ("title", SCHEMA.name, None, Literal),
+            ("description", SCHEMA.description, None, Literal),
         ]
-        self._add_multilang_triples_from_dict(
-            resource_dict,
-            distribution,
-            items
-        )
+        self._add_multilang_triples_from_dict(resource_dict, distribution, items)
 
     def contact_details(self, dataset_dict, dataset_ref, g):
         # Contact details used by graph_from_dataset
         if dataset_dict.get("contact_points"):
-            contact_points = self._get_dataset_value(
-                dataset_dict, "contact_points"
-            )
+            contact_points = self._get_dataset_value(dataset_dict, "contact_points")
             for contact_point in contact_points:
-                if not contact_point.get('email') \
-                        or not contact_point.get('name'):
+                if not contact_point.get("email") or not contact_point.get("name"):
                     continue
                 contact_details = BNode()
-                contact_point_email = \
-                    EMAIL_MAILTO_PREFIX + contact_point["email"]
+                contact_point_email = EMAIL_MAILTO_PREFIX + contact_point["email"]
                 contact_point_name = contact_point["name"]
 
                 g.add((contact_details, RDF.type, VCARD.Organization))
-                g.add(
-                    (contact_details, VCARD.hasEmail,
-                     URIRef(contact_point_email))
-                )  # noqa
+                g.add((contact_details, VCARD.hasEmail, URIRef(contact_point_email)))
                 g.add((contact_details, VCARD.fn, Literal(contact_point_name)))
 
                 g.add((dataset_ref, SCHEMA.contactPoint, contact_details))
@@ -1375,8 +1310,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
         if download_url:
             try:
                 download_url = dh.uri_to_iri(download_url)
-                g.add((distribution, SCHEMA.downloadURL,
-                       URIRef(download_url)))
+                g.add((distribution, SCHEMA.downloadURL, URIRef(download_url)))
             except ValueError:
                 # only add valid URL
                 pass
@@ -1421,15 +1355,15 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             self._add_multilang_value(
                 distribution, DCT.title, "display_name", resource_dict
-            )  # noqa
+            )
             self._add_multilang_value(
                 distribution, DCT.description, "description", resource_dict
-            )  # noqa
+            )
 
             # Language
-            languages = resource_dict.get('language', [])
+            languages = resource_dict.get("language", [])
             for lang in languages:
-                if 'https://publications.europa.eu/resource/authority' in lang:
+                if "https://publications.europa.eu/resource/authority" in lang:
                     # Already a valid EU language URI
                     g.add((distribution, DCT.language, URIRef(lang)))
                 else:
@@ -1437,8 +1371,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                     if uri:
                         g.add((distribution, DCT.language, URIRef(uri)))
                     else:
-                        log.debug("Language '{}' not found in"
-                                  " language_uri_map".format(lang))
+                        log.debug(f"Language '{lang}' not found in language_uri_map")
 
             # Download URL & Access URL
             self.download_access_url(resource_dict, distribution, g)
@@ -1449,18 +1382,14 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
                 ("modified", DCT.modified, None, Literal),
             ]
 
-            self._add_date_triples_from_dict(resource_dict, distribution,
-                                             items)
+            self._add_date_triples_from_dict(resource_dict, distribution, items)
             # ByteSize
             if resource_dict.get("byte_size"):
                 g.add(
-                    (distribution, SCHEMA.byteSize,
-                     Literal(resource_dict["byte_size"]))
+                    (distribution, SCHEMA.byteSize, Literal(resource_dict["byte_size"]))
                 )
 
-        super(SwissSchemaOrgProfile, self).graph_from_dataset(dataset_dict,
-                                                              dataset_ref)
+        super(SwissSchemaOrgProfile, self).graph_from_dataset(dataset_dict, dataset_ref)
 
     def parse_dataset(self, dataset_dict, dataset_ref):
-        super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict,
-                                                         dataset_ref)
+        super(SwissSchemaOrgProfile, self).parse_dataset(dataset_dict, dataset_ref)
