@@ -78,7 +78,7 @@ class MultiLangProfile(RDFProfile):
                     if values:
                         # the values can be either a multilang-dict or they are
                         # nested in another iterable (e.g. keywords)
-                        if not hasattr(values, "__iter__"):
+                        if not isinstance(values, list):
                             values = [values]
                         for value in values:
                             if value:
