@@ -398,26 +398,26 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         dataset = [d for d in p.datasets()][0]
         assert len(dataset["temporals"]) == 5
 
-        assert sorted(dataset["temporals"]) == [
+        assert sorted(dataset["temporals"], key=lambda x: x["start_date"]) == [
             {
-                "start_date": "1998-04-01T00:00:00",
-                "end_date": "1999-01-01T23:59:59.999999",
+                "start_date": "2006-11-21T00:00:00",
+                "end_date": "2007-11-01T23:59:59.999999",
             },
             {
-                "start_date": "2000-11-21T00:00:00",
-                "end_date": "2001-01-01T23:59:59.999999",
+                "start_date": "2008-01-01T00:00:00",
+                "end_date": "2009-12-31T23:59:59.999999",
             },
             {
-                "start_date": "2002-01-01T00:00:00",
-                "end_date": "2003-01-31T23:59:59.999999",
+                "start_date": "2010-04-01T00:00:00",
+                "end_date": "2011-05-01T23:59:59.999999",
             },
             {
-                "start_date": "2004-01-01T00:00:00",
-                "end_date": "2005-12-31T23:59:59.999999",
+                "start_date": "2012-11-21T00:00:00",
+                "end_date": "2013-11-21T23:59:59.999999",
             },
             {
-                "start_date": "2006-01-01T00:00:00",
-                "end_date": "2007-01-31T23:59:59.999999",
+                "start_date": "2014-04-01T00:00:00",
+                "end_date": "2015-01-31T23:59:59.999999",
             },
         ]
 
