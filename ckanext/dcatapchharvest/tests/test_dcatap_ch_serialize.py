@@ -1,7 +1,6 @@
 import json
 import logging
 
-import nose
 from rdflib import XSD, Literal, URIRef
 from rdflib.namespace import RDF
 
@@ -11,8 +10,6 @@ from ckanext.dcat.processors import RDFSerializer
 from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, VCARD, XSD
 from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
 
-eq_ = nose.tools.eq_
-assert_true = nose.tools.assert_true
 log = logging.getLogger(__name__)
 
 
@@ -28,7 +25,7 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        eq_(str(dataset_ref), utils.dataset_uri(dataset))
+        assert str(dataset_ref) == utils.dataset_uri(dataset)
 
         # Basic fields
         assert self._triple(g, dataset_ref, RDF.type, DCAT.Dataset)
@@ -41,14 +38,15 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
         assert len(list(g.objects(dataset_ref, DCT.modified))) == 0
 
         for key, value in dataset["description"].items():
-            if dataset["description"].get(key):
+            print(key, value)
+            if value:
                 assert self._triple(
                     g, dataset_ref, DCT.description, Literal(value, lang=key)
                 )
-        eq_(len([t for t in g.triples((dataset_ref, DCT.description, None))]), 2)
+        assert len([t for t in g.triples((dataset_ref, DCT.description, None))]) == 2
 
         # Tags
-        eq_(len([t for t in g.triples((dataset_ref, DCAT.keyword, None))]), 3)
+        assert len([t for t in g.triples((dataset_ref, DCAT.keyword, None))]) == 3
         for key, keywords in dataset["keywords"].items():
             if dataset["keywords"].get(key):
                 for keyword in keywords:
@@ -57,25 +55,26 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
                     )
 
         # Documentation
-        eq_(len([t for t in g.triples((dataset_ref, FOAF.page, None))]), 2)
+        assert len([t for t in g.triples((dataset_ref, FOAF.page, None))]) == 2
         for documentation_link in dataset["documentation"]:
             assert self._triple(g, dataset_ref, FOAF.page, URIRef(documentation_link))
 
         # Contact points
-        eq_(len([t for t in g.triples((dataset_ref, DCAT.contactPoint, None))]), 1)
+        assert len([t for t in g.triples((dataset_ref, DCAT.contactPoint, None))]) == 1
 
         contact_point = next(g.objects(dataset_ref, DCAT.contactPoint))
-        eq_(next(g.objects(contact_point, RDF.type)), VCARD.Organization)
-        eq_(
-            next(g.objects(contact_point, VCARD.hasEmail)),
-            URIRef("mailto:maria.muster@example.com"),
+        assert next(g.objects(contact_point, RDF.type)) == VCARD.Organization
+        assert next(g.objects(contact_point, VCARD.hasEmail)) == URIRef(
+            "mailto:maria.muster@example.com"
         )
-        eq_(next(g.objects(contact_point, VCARD.fn)), Literal("Maria Muster"))
+        assert next(g.objects(contact_point, VCARD.fn)) == Literal("Maria Muster")
 
         # Conformance
         conforms_to = dataset.get("conforms_to", [])
         # Check if the number of triples matches the number of conformance uris
-        eq_(len(list(g.triples((dataset_ref, DCT.conformsTo, None)))), len(conforms_to))
+        assert len(list(g.triples((dataset_ref, DCT.conformsTo, None)))) == len(
+            conforms_to
+        )
         for link in conforms_to:
             # Check if the triple (dataset_ref, DCT.conformsTo, URIRef(link)) exists in the graph
             assert (dataset_ref, DCT.conformsTo, URIRef(link)) in g
@@ -88,26 +87,23 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
             g.add((dataset_ref, DCT.language, Literal(lang)))
 
         # Assert number of language triples matches expected
-        eq_(
-            len(list(g.triples((dataset_ref, DCT.language, None)))),
-            len(language_values),
+        assert len(list(g.triples((dataset_ref, DCT.language, None)))) == len(
+            language_values
         )
 
         # Resources
-        eq_(
-            len([t for t in g.triples((dataset_ref, DCAT.distribution, None))]),
-            len(dataset["resources"]),
-        )
+        assert len(
+            [t for t in g.triples((dataset_ref, DCAT.distribution, None))]
+        ) == len(dataset["resources"])
         for resource_dict in dataset.get("resources", []):
             distribution = URIRef(dh.resource_uri(resource_dict))
             assert self._triple(g, distribution, RDF.type, DCAT.Distribution)
             for link in resource_dict.get("documentation", []):
                 assert self._triple(g, distribution, FOAF.page, URIRef(link))
 
-            eq_(
-                len([t for t in g.triples((distribution, DCAT.accessService, None))]),
-                len(resource_dict.get("access_services", [])),
-            )
+            assert len(
+                [t for t in g.triples((distribution, DCAT.accessService, None))]
+            ) == len(resource_dict.get("access_services", []))
             for link in resource_dict.get("access_services", []):
                 assert self._triple(g, distribution, DCAT.accessService, URIRef(link))
 
