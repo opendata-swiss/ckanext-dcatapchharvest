@@ -542,7 +542,8 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Deduplicate group names before returning list of group dicts
         return [{"name": name} for name in list(set(group_names))]
 
-    def parse_dataset(self, dataset_dict, dataset_ref):
+    def parse_dataset(self, dataset_dict, dataset_ref):  # noqa C901
+        # TODO: This method is too complex (flake8 says 30). Refactor it!
         log.debug(f"Parsing dataset '{dataset_ref!r}'")
 
         dataset_dict["temporals"] = []
@@ -760,7 +761,8 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         return dataset_dict
 
-    def graph_from_dataset(self, dataset_dict, dataset_ref):
+    def graph_from_dataset(self, dataset_dict, dataset_ref):  # noqa C901
+        # TODO: This method is too complex (flake8 says 49, I am amazed). Refactor it!
 
         log.debug(f"Create graph from dataset '{dataset_dict['name']}'")
 

@@ -71,7 +71,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         url = url.replace("ogd.global.szh.loc", "data.stadt-zuerich.ch")
         return url, []
 
-    def _get_guid(self, dataset_dict, source_url=None):
+    def _get_guid(self, dataset_dict, source_url=None):  # noqa C901
         """
         Try to get a unique identifier for a harvested dataset
         It will be the first found of:
@@ -82,6 +82,8 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
          The last two are obviously not optimal, as depend on title, which
          might change.
          Returns None if no guid could be decided.
+
+         TODO: This method is too complex (flake8 says 16). Refactor it!
         """
         guid = None
 
