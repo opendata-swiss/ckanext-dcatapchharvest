@@ -19,16 +19,17 @@ jobs:
     needs: lint
     strategy:
       matrix:
-        ckan-version: [2.8]
+        ckan-version: ["2.10", "2.11"]
       fail-fast: false
 
     name: CKAN ${{ matrix.ckan-version }}
     runs-on: ubuntu-latest
     container:
-      image: openknowledge/ckan-dev:${{ matrix.ckan-version }}
+      image: ckan/ckan-dev:${{ matrix.ckan-version }}
+      options: --user root
     services:
       solr:
-        image: ckan/ckan-solr:${{ matrix.ckan-version }}
+        image: ckan/ckan-solr:${{ matrix.ckan-version }}-solr9
       postgres:
         image: ckan/ckan-postgres-dev:${{ matrix.ckan-version }}
         env:
@@ -37,7 +38,7 @@ jobs:
           POSTGRES_DB: postgres
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       redis:
-          image: redis:3
+        image: redis:3
     env:
       CKAN_SQLALCHEMY_URL: postgresql://ckan_default:pass@postgres/ckan_test
       CKAN_DATASTORE_WRITE_URL: postgresql://datastore_write:pass@postgres/datastore_test
@@ -47,25 +48,23 @@ jobs:
       CKAN_SITE_URL: http://test.ckan.net
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Install requirements
-      run: |
-        # Replace default path to CKAN core config file with the one on the container
-        sed -i -e 's/use = config:.*/use = config:\/srv\/app\/src\/ckan\/test-core.ini/' test.ini
-        pip install -r requirements.txt
-        pip install -r dev-requirements.txt
-        pip install -e .
-        # Last commit before support for Python 2 was dropped
-        pip install -e git+https://github.com/ckan/ckanext-harvest.git@v1.4.2#egg=ckanext-harvest
-        pip install -r https://raw.githubusercontent.com/ckan/ckanext-harvest/v1.4.2/requirements.txt
-        # Last commit before support for Python 2 was dropped
-        pip install -e git+https://github.com/ckan/ckanext-dcat.git@0c26bed5b7a3a7fca8e7b78e338aace096e0ebf6#egg=ckanext-dcat
-        pip install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/0c26bed5b7a3a7fca8e7b78e338aace096e0ebf6/requirements-py2.txt
-        pip install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/0c26bed5b7a3a7fca8e7b78e338aace096e0ebf6/dev-requirements-py2.txt
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install requirements
+        run: |
+          pip install -r requirements.txt
+          pip install -r dev-requirements.txt
+          pip install -e .
+          pip install -e git+https://github.com/ckan/ckanext-harvest.git#egg=ckanext-harvest
+          pip install -r https://raw.githubusercontent.com/ckan/ckanext-harvest/master/requirements.txt
+          pip install -e git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext-dcat
+          pip install -r https://raw.githubusercontent.com/ckan/ckanext-dcat/master/requirements.txt
+          # Replace default path to CKAN core config file with the one on the container
+          sed -i -e 's/use = config:.*/use = config:\/srv\/app\/src\/ckan\/test-core.ini/' test.ini
 
-    - name: Setup extension
-      run: |
-        paster --plugin=ckan db init -c test.ini
-        paster --plugin=ckanext-harvest harvester initdb -c test.ini
-    - name: Run tests
-      run: nosetests --ckan --nocapture --nologcapture --with-pylons=test.ini --with-coverage --cover-package=ckanext.dcatapchharvest --cover-inclusive --cover-erase --cover-tests ckanext/dcatapchharvest
+      - name: Setup extension
+        run: |
+          ckan -c test.ini db init
+          ckan -c test.ini db pending-migrations --apply
+      - name: Run tests
+        run: pytest --ckan-ini=test.ini --disable-warnings  --cov=ckanext.dcatapchharvest ckanext/dcatapchharvest
