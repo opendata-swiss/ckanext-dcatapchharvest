@@ -7,7 +7,7 @@ from rdflib.namespace import RDF
 import ckanext.dcatapchharvest.dcat_helpers as dh
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
-from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, VCARD, XSD
+from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, VCARD, XSD
 from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
 
 log = logging.getLogger(__name__)
@@ -15,7 +15,8 @@ log = logging.getLogger(__name__)
 
 class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
-    def test_graph_from_dataset(self):
+    # This test is too complex, according to flake8. TODO: refactor it.
+    def test_graph_from_dataset(self):  # noqa C901
 
         dataset = json.loads(self._get_file_contents("dataset.json"))
         extras = self._extras(dataset)

@@ -1,5 +1,4 @@
 import json
-from pprint import pprint
 
 from rdflib import Graph, Literal, URIRef
 from rdflib.namespace import RDF
@@ -338,6 +337,8 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         datasets = [d for d in p.datasets()]
 
         resource = datasets[0]["resources"][0]
+
+        assert resource["format"] == "CSV"
 
     def test_temporals_accepted_formats(self):
         contents = self._get_file_contents("dataset-datetimes.xml")
