@@ -5,7 +5,7 @@ CKAN extension for DCAT-AP-CH harvesting for [opendata.swiss](https://opendata.s
 
 ## Requirements
 
-- CKAN 2.8+
+- CKAN 2.10+
 - ckanext-dcat
 - ckanext-fluent
 - ckanext-scheming
@@ -83,6 +83,8 @@ the CKAN config file, comma separated:
 
     ckanext.dcat_ch_rdf_harvester.test_env_urls = https://test.example.com,https://staging.example.com 
 
+See also `ckanext/dcatapchharvest/config_declaration.yaml`.
+
 The Swiss DCAT Harvester inherits all configuration options from the DCAT RDF harvester. 
 It has the following additional configuration options:
 
@@ -101,4 +103,3 @@ license.
 
 Both configurations only work on the first import. Once imported the harvest 
 source must be cleared in order to prevent the import.
-
