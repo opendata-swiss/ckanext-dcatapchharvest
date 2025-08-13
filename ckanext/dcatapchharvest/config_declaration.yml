@@ -1,0 +1,17 @@
+version: 1
+
+groups:
+  - annotation: SwissDCATRDFHarvester settings
+    options:
+      - key: ckanext.dcat_ch_rdf_harvester.test_env_urls
+        default: ""
+        description: |
+          A list of URLs of test environments, comma separated. Any dataset URIs that contain the test environment URLs
+          will be transformed to contain the current `ckan.site_url` instead.
+          
+          This is a workaround for the use case where data publishers create datsets on the test environment, export
+          them to XML and then import them to the production site. In that case, the dataset uris will contain the url
+          of the test environment, so we have to replace it with the prod one.
+          
+          Example: "https://test.example.com,https://staging.example.com"
+        required: false
