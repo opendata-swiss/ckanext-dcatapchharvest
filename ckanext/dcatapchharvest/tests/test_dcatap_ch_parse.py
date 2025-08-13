@@ -338,7 +338,7 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
 
         resource = datasets[0]["resources"][0]
 
-        assert resource["format"] == "CSV"
+        assert resource["format"] == "csv"
 
     def test_temporals_accepted_formats(self):
         contents = self._get_file_contents("dataset-datetimes.xml")
