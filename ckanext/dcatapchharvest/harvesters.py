@@ -203,6 +203,7 @@ def _derive_flat_title(title_dict):
     )
 
 
+@tk.blanket.config_declarations
 class SwissDCATI14YRDFHarvester(SwissDCATRDFHarvester):
 
     def info(self):
