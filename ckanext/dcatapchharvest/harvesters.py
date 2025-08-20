@@ -17,7 +17,6 @@ from ckanext.dcatapchharvest.harvest_helper import (
 log = logging.getLogger(__name__)
 
 
-@tk.blanket.config_declarations
 class SwissDCATRDFHarvester(DCATRDFHarvester):
     p.implements(IDCATRDFHarvester, inherit=True)
 
