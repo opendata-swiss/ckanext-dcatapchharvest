@@ -17,7 +17,6 @@ from ckanext.dcatapchharvest.harvest_helper import (
 log = logging.getLogger(__name__)
 
 
-@tk.blanket.config_declarations
 class SwissDCATRDFHarvester(DCATRDFHarvester):
     p.implements(IDCATRDFHarvester, inherit=True)
 
@@ -204,6 +203,7 @@ def _derive_flat_title(title_dict):
     )
 
 
+@tk.blanket.config_declarations
 class SwissDCATI14YRDFHarvester(SwissDCATRDFHarvester):
 
     def info(self):
