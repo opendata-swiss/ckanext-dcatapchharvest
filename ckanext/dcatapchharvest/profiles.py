@@ -1365,7 +1365,7 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
             # Language
             languages = resource_dict.get("language", [])
             for lang in languages:
-                if "https://publications.europa.eu/resource/authority" in lang:
+                if "http://publications.europa.eu/resource/authority" in lang:
                     # Already a valid EU language URI
                     g.add((distribution, DCT.language, URIRef(lang)))
                 else:
