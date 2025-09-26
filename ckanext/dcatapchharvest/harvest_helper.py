@@ -33,7 +33,7 @@ def map_resources_to_ids(pkg_dict, package_id):
 
 
 def create_activity(package_id, message):
-    notification_user = tk.get_action("user_show")({}, {"id": NOTIFICATION_USER})
+    notification_user = tk.get_action("user_show")({"ignore_auth": True}, {"id": NOTIFICATION_USER})
     activity_dict = {
         "user_id": notification_user["id"],
         "object_id": package_id,
