@@ -833,7 +833,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Languages
         languages = dataset_dict.get("language", [])
         for lang in languages:
-            if "https://publications.europa.eu/resource/authority" in lang:
+            if "http://publications.europa.eu/resource/authority" in lang:
                 # Already a valid EU language URI
                 g.add((dataset_ref, DCT.language, URIRef(lang)))
             else:
@@ -987,7 +987,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             # Language
             languages = resource_dict.get("language", [])
             for lang in languages:
-                if "https://publications.europa.eu/resource/authority" in lang:
+                if "http://publications.europa.eu/resource/authority" in lang:
                     # Already a valid EU language URI
                     g.add((distribution, DCT.language, URIRef(lang)))
                 else:
@@ -1364,7 +1364,11 @@ class SwissSchemaOrgProfile(SchemaOrgProfile, MultiLangProfile):
 
             # Language
             languages = resource_dict.get("language", [])
+            log.info("languages @@@@1")
+            log.info(languages)
             for lang in languages:
+                log.info("lang @@@@")
+                log.info(lang)
                 if "http://publications.europa.eu/resource/authority" in lang:
                     # Already a valid EU language URI
                     g.add((distribution, DCT.language, URIRef(lang)))
