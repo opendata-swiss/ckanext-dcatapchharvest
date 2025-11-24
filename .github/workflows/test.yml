@@ -53,7 +53,6 @@ jobs:
       - name: Install requirements
         run: |
           pip install -e .[dev]
-        # TODO: remove installing requirements.txt once these are switched to pyproject.toml
           pip install -e git+https://github.com/ckan/ckanext-harvest.git#egg=ckanext-harvest
           pip install -r https://raw.githubusercontent.com/ckan/ckanext-harvest/master/requirements.txt
           pip install -e git+https://github.com/ckan/ckanext-dcat.git#egg=ckanext-dcat
@@ -64,6 +63,5 @@ jobs:
       - name: Setup extension
         run: |
           ckan -c test.ini db init
-          ckan -c test.ini db pending-migrations --apply
       - name: Run tests
         run: pytest --ckan-ini=test.ini --disable-warnings -v --cov=ckanext.dcatapchharvest ckanext/dcatapchharvest
