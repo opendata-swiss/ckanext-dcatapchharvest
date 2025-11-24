@@ -35,11 +35,9 @@ To install ckanext-dcatapchharvest:
 To install ckanext-dcatapchharvest for development, activate your CKAN virtualenv and
 do:
 
-    git clone https://github.com/ogdch/ckanext-dcatapchharvest.git
+    git clone https://github.com/opendata-swiss/ckanext-dcatapchharvest.git
     cd ckanext-dcatapchharvest
-    python setup.py develop
-    pip install -r dev-requirements.txt
-    pip install -r requirements.txt
+    pip install -e .[dev]
 
 ## Mapping datetime fields from RDF
 
