@@ -1,0 +1,53 @@
+[project]
+name = "ckanext-dcatapchharvest"
+version = "0.0.1"
+dynamic = ["dependencies", "optional-dependencies"]
+description = "DCAT-AP Harvester"
+authors = [
+    {name = "Liip AG", email = "ogdch@liip.ch"}
+]
+maintainers = [
+    {name = "Liip AG", email = "ogdch@liip.ch"}
+]
+license = {text = "AGPL"}
+classifiers = [
+    "Intended Audience :: Developers",
+    "Development Status :: 5 - Production/Stable",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+]
+keywords = [
+    "CKAN",
+    "dcat",
+    "dcat-ap",
+    "harvester",
+    "switzerland",
+]
+
+[project.urls]
+Documentation = "https://github.com/opendata-swiss/ckanext-dcatapchharvest"
+Repository = "https://github.com/opendata-swiss/ckanext-dcatapchharvest"
+Issues = "https://github.com/opendata-swiss/ckanext-dcatapchharvest/issues"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies = {dev = { file = ["dev-requirements.txt"] }}
+
+[tool.isort]
+profile = "black"
+
+[project.entry-points."ckan.plugins"]
+ogdch_dcat = "ckanext.dcatapchharvest.plugins:OgdchDcatPlugin"
+dcat_ch_rdf_harvester = "ckanext.dcatapchharvest.harvesters:SwissDCATRDFHarvester"
+dcat_ch_i14y_rdf_harvester = "ckanext.dcatapchharvest.harvesters:SwissDCATI14YRDFHarvester"
+
+[project.entry-points."ckan.rdf.profiles"]
+swiss_dcat_ap = "ckanext.dcatapchharvest.profiles:SwissDCATAPProfile"
+swiss_schemaorg = "ckanext.dcatapchharvest.profiles:SwissSchemaOrgProfile"
