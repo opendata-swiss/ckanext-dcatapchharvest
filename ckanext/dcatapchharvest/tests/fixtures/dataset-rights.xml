@@ -13,8 +13,8 @@
             </rdf:Description>
         </dct:relation>
         <dcat:distribution>
-            <dcat:Distribution rdf:about="https://opendata.swiss/dataset/7451e012-64b2-4bbc-af20-a0e2bc61b585/resource/c8ec6ca0-6923-4cf3-92f2-95a10e6f8e25">
-                <dct:title xml:lang="fr">Annuaire statistique de la Suisse 1901</dct:title>
+            <dcat:Distribution rdf:about="https://opendata.swiss/dataset/statistisches-Jahrbuch-der-schweiz-1901/resource/resource-1">
+                <dct:title xml:lang="en">Resource with license given with URI</dct:title>
                 <dcat:mediaType>text/html</dcat:mediaType>
                 <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1900-12-31T00:00:00</dct:issued>
                 <dcat:accessURL rdf:resource="https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901"/>
@@ -23,6 +23,44 @@
                 <dct:format>HTML</dct:format>
                 <dct:rights rdf:datatype="http://www.w3.org/2001/XMLSchema#string">NonCommercialAllowed-CommercialAllowed-ReferenceRequired</dct:rights>
                 <dct:license rdf:resource="http://dcat-ap.ch/vocabulary/licenses/terms_by_ask"/>
+                <foaf:page>
+                    <foaf:Document rdf:about="https://example.com/documentation-distribution-1"/>
+                </foaf:page>
+                <foaf:page>
+                    <foaf:Document rdf:about="https://example.com/documentation-distribution-2"/>
+                </foaf:page>
+            </dcat:Distribution>
+        </dcat:distribution>
+        <dcat:distribution>
+            <dcat:Distribution rdf:about="https://opendata.swiss/dataset/statistisches-Jahrbuch-der-schweiz-1901/resource/resource-2">
+                <dct:title xml:lang="en">Resource with license given as string containing URI</dct:title>
+                <dcat:mediaType>text/html</dcat:mediaType>
+                <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1900-12-31T00:00:00</dct:issued>
+                <dcat:accessURL rdf:resource="https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901"/>
+                <dct:language>fr</dct:language>
+                <dct:identifier>346265-fr@bundesamt-fur-statistik-bfs</dct:identifier>
+                <dct:format>HTML</dct:format>
+                <dct:rights rdf:datatype="http://www.w3.org/2001/XMLSchema#string">NonCommercialAllowed-CommercialAllowed-ReferenceRequired</dct:rights>
+                <dct:license>http://dcat-ap.ch/vocabulary/licenses/terms_by_ask</dct:license>
+                <foaf:page>
+                    <foaf:Document rdf:about="https://example.com/documentation-distribution-1"/>
+                </foaf:page>
+                <foaf:page>
+                    <foaf:Document rdf:about="https://example.com/documentation-distribution-2"/>
+                </foaf:page>
+            </dcat:Distribution>
+        </dcat:distribution>
+        <dcat:distribution>
+            <dcat:Distribution rdf:about="https://opendata.swiss/dataset/statistisches-Jahrbuch-der-schweiz-1901/resource/resource-3">
+                <dct:title xml:lang="en">Resource with license given as string containing license name</dct:title>
+                <dcat:mediaType>text/html</dcat:mediaType>
+                <dct:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1900-12-31T00:00:00</dct:issued>
+                <dcat:accessURL rdf:resource="https://www.bfs.admin.ch/asset/fr/hs-b-00.01-jb-1901"/>
+                <dct:language>fr</dct:language>
+                <dct:identifier>346265-fr@bundesamt-fur-statistik-bfs</dct:identifier>
+                <dct:format>HTML</dct:format>
+                <dct:rights rdf:datatype="http://www.w3.org/2001/XMLSchema#string">NonCommercialAllowed-CommercialAllowed-ReferenceRequired</dct:rights>
+                <dct:license>NonCommercialAllowed-CommercialWithPermission-ReferenceRequired</dct:license>
                 <foaf:page>
                     <foaf:Document rdf:about="https://example.com/documentation-distribution-1"/>
                 </foaf:page>

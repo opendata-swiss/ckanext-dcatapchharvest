@@ -25,13 +25,18 @@ class TestSwissDCATAPProfileParsing(BaseParseTest):
         dataset = datasets[0]
 
         # Resources
-        assert len(dataset["resources"]) == 1
-        resource = dataset["resources"][0]
-        assert str(resource["rights"]) == "https://opendata.swiss/terms-of-use#terms_by"
-        assert (
-            str(resource["license"])
-            == "https://opendata.swiss/terms-of-use#terms_by_ask"
-        )
+        assert len(dataset["resources"]) == 3
+
+        for resource in dataset["resources"]:
+            assert (
+                str(resource["rights"])
+                == "https://opendata.swiss/terms-of-use#terms_by"
+            )
+            assert (
+                str(resource["license"])
+                == "https://opendata.swiss/terms-of-use#terms_by_ask",
+                f"Failed to map resource license for case '{resource['title']}'",
+            )
 
     def test_dataset_all_fields(self):
         contents = self._get_file_contents("1901.xml")
