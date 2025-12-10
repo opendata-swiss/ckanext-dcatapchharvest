@@ -315,10 +315,23 @@ class SwissDCATAPProfile(MultiLangProfile):
                 return media_type_key
 
     def _license_rights_homepage_uri(self, subject, predicate):
+        """Get the correct DCAT-AP CH v2 license homepage URI from the dct:license or
+        dct:rights node of a distribution.
+
+        Handle the following cases:
+        - the license name as a string Literal
+        - the license URI as a string Literal
+        - the license URI as a URIref
+        """
         for node in self.g.objects(subject, predicate):
-            # DCAT-AP CH v2 compatible license has to be a URI.
             if isinstance(node, Literal):
-                return license_handler.get_license_homepage_uri_by_name(node)
+                uri = license_handler.get_license_homepage_uri_by_name(node)
+                if uri:
+                    return uri
+
+                # Handle case where data provider gives the license URI as a Literal,
+                # not as the URIRef
+                return license_handler.get_license_homepage_uri_by_uri(node)
             if isinstance(node, URIRef):
                 return license_handler.get_license_homepage_uri_by_uri(node)
         return None
