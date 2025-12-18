@@ -1013,25 +1013,7 @@ class SwissDCATAPProfile(MultiLangProfile):
                 g.add((distribution, DCT.language, URIRef(uri)))
 
         # Download URL & Access URL
-        download_url = resource_dict.get("download_url")
-        if download_url:
-            try:
-                download_url = dh.uri_to_iri(download_url)
-                g.add((distribution, DCAT.downloadURL, URIRef(download_url)))
-            except ValueError:
-                # only add valid URL
-                pass
-
-        url = resource_dict.get("url")
-        if (url and not download_url) or (url and url != download_url):
-            try:
-                url = dh.uri_to_iri(url)
-                g.add((distribution, DCAT.accessURL, URIRef(url)))
-            except ValueError:
-                # only add valid URL
-                pass
-        elif download_url:
-            g.add((distribution, DCAT.accessURL, URIRef(download_url)))
+        self._map_resource_urls(distribution, g, resource_dict)
 
         # Documentation
         documentation = resource_dict.get("documentation", [])
@@ -1068,6 +1050,27 @@ class SwissDCATAPProfile(MultiLangProfile):
         # ByteSize
         if resource_dict.get("byte_size"):
             g.add((distribution, DCAT.byteSize, Literal(resource_dict["byte_size"])))
+
+    def _map_resource_urls(self, distribution: str, g, resource_dict):
+        download_url = resource_dict.get("download_url")
+        if download_url:
+            try:
+                download_url = dh.uri_to_iri(download_url)
+                g.add((distribution, DCAT.downloadURL, URIRef(download_url)))
+            except ValueError:
+                # only add valid URL
+                pass
+
+        url = resource_dict.get("url")
+        if (url and not download_url) or (url and url != download_url):
+            try:
+                url = dh.uri_to_iri(url)
+                g.add((distribution, DCAT.accessURL, URIRef(url)))
+            except ValueError:
+                # only add valid URL
+                pass
+        elif download_url:
+            g.add((distribution, DCAT.accessURL, URIRef(download_url)))
 
     def _get_rights_and_license_uri(self, resource_dict, property="license"):
         if property not in ["license", "rights"]:
