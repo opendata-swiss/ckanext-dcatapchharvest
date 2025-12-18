@@ -790,7 +790,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         return dataset_dict
 
     def graph_from_dataset(self, dataset_dict, dataset_ref):  # noqa C901
-        # TODO: This method is too complex (flake8 says 49, I am amazed). Refactor it!
+        # TODO: This method is too complex (flake8 says 33). Refactor it!
 
         log.debug(f"Create graph from dataset '{dataset_dict['name']}'")
 
@@ -977,95 +977,96 @@ class SwissDCATAPProfile(MultiLangProfile):
 
         # Resources
         for resource_dict in dataset_dict.get("resources", []):
-            distribution = URIRef(dh.resource_uri(resource_dict))
+            self._map_resource_to_graph(dataset_ref, g, resource_dict)
 
-            g.add((dataset_ref, DCAT.distribution, distribution))
-            g.add((distribution, RDF.type, DCAT.Distribution))
+    def _map_resource_to_graph(self, dataset_ref: str, g, resource_dict):
+        distribution = URIRef(dh.resource_uri(resource_dict))
 
-            #  Simple values
-            items = [
-                ("status", ADMS.status, None, Literal),
-                ("coverage", DCT.coverage, None, Literal),
-                ("identifier", DCT.identifier, None, Literal),
-                ("spatial", DCT.spatial, None, Literal),
-            ]
+        g.add((dataset_ref, DCAT.distribution, distribution))
+        g.add((distribution, RDF.type, DCAT.Distribution))
 
-            self._rights_and_license_to_graph(resource_dict, distribution)
-            self._format_and_media_type_to_graph(resource_dict, distribution)
+        #  Simple values
+        items = [
+            ("status", ADMS.status, None, Literal),
+            ("coverage", DCT.coverage, None, Literal),
+            ("identifier", DCT.identifier, None, Literal),
+            ("spatial", DCT.spatial, None, Literal),
+        ]
 
-            self._add_triples_from_dict(resource_dict, distribution, items)
-            self._add_multilang_value(
-                distribution, DCT.title, "display_name", resource_dict
-            )
-            self._add_multilang_value(
-                distribution, DCT.description, "description", resource_dict
-            )
+        self._rights_and_license_to_graph(resource_dict, distribution)
+        self._format_and_media_type_to_graph(resource_dict, distribution)
 
-            #  Language
-            languages = resource_dict.get("language", [])
-            for lang in languages:
-                uri = language_uri_map.get(lang)
-                if uri:
-                    g.add((distribution, DCT.language, URIRef(uri)))
+        self._add_triples_from_dict(resource_dict, distribution, items)
+        self._add_multilang_value(
+            distribution, DCT.title, "display_name", resource_dict
+        )
+        self._add_multilang_value(
+            distribution, DCT.description, "description", resource_dict
+        )
 
-            # Download URL & Access URL
-            download_url = resource_dict.get("download_url")
-            if download_url:
-                try:
-                    download_url = dh.uri_to_iri(download_url)
-                    g.add((distribution, DCAT.downloadURL, URIRef(download_url)))
-                except ValueError:
-                    # only add valid URL
-                    pass
+        #  Language
+        languages = resource_dict.get("language", [])
+        for lang in languages:
+            uri = language_uri_map.get(lang)
+            if uri:
+                g.add((distribution, DCT.language, URIRef(uri)))
 
-            url = resource_dict.get("url")
-            if (url and not download_url) or (url and url != download_url):
-                try:
-                    url = dh.uri_to_iri(url)
-                    g.add((distribution, DCAT.accessURL, URIRef(url)))
-                except ValueError:
-                    # only add valid URL
-                    pass
-            elif download_url:
-                g.add((distribution, DCAT.accessURL, URIRef(download_url)))
+        # Download URL & Access URL
+        download_url = resource_dict.get("download_url")
+        if download_url:
+            try:
+                download_url = dh.uri_to_iri(download_url)
+                g.add((distribution, DCAT.downloadURL, URIRef(download_url)))
+            except ValueError:
+                # only add valid URL
+                pass
 
-            # Documentation
-            documentation = resource_dict.get("documentation", [])
-            for link in documentation:
-                doc = URIRef(link)
-                g.add((doc, RDF.type, FOAF.Document))
-                g.add((distribution, FOAF.page, doc))
+        url = resource_dict.get("url")
+        if (url and not download_url) or (url and url != download_url):
+            try:
+                url = dh.uri_to_iri(url)
+                g.add((distribution, DCAT.accessURL, URIRef(url)))
+            except ValueError:
+                # only add valid URL
+                pass
+        elif download_url:
+            g.add((distribution, DCAT.accessURL, URIRef(download_url)))
 
-            # Access Services
-            access_services = resource_dict.get("access_services", [])
-            for uri in access_services:
-                ref = URIRef(uri)
-                g.add((distribution, DCAT.accessService, ref))
+        # Documentation
+        documentation = resource_dict.get("documentation", [])
+        for link in documentation:
+            doc = URIRef(link)
+            g.add((doc, RDF.type, FOAF.Document))
+            g.add((distribution, FOAF.page, doc))
 
-            # Temporal Resolution
-            if resource_dict.get("temporal_resolution"):
-                g.add(
-                    (
-                        distribution,
-                        DCAT.temporalResolution,
-                        Literal(
-                            resource_dict["temporal_resolution"], datatype=XSD.duration
-                        ),
-                    )
+        # Access Services
+        access_services = resource_dict.get("access_services", [])
+        for uri in access_services:
+            ref = URIRef(uri)
+            g.add((distribution, DCAT.accessService, ref))
+
+        # Temporal Resolution
+        if resource_dict.get("temporal_resolution"):
+            g.add(
+                (
+                    distribution,
+                    DCAT.temporalResolution,
+                    Literal(
+                        resource_dict["temporal_resolution"], datatype=XSD.duration
+                    ),
                 )
+            )
 
-            # Dates
-            items = [
-                ("issued", DCT.issued, None, Literal),
-                ("modified", DCT.modified, None, Literal),
-            ]
-            self._add_date_triples_from_dict(resource_dict, distribution, items)
+        # Dates
+        items = [
+            ("issued", DCT.issued, None, Literal),
+            ("modified", DCT.modified, None, Literal),
+        ]
+        self._add_date_triples_from_dict(resource_dict, distribution, items)
 
-            # ByteSize
-            if resource_dict.get("byte_size"):
-                g.add(
-                    (distribution, DCAT.byteSize, Literal(resource_dict["byte_size"]))
-                )
+        # ByteSize
+        if resource_dict.get("byte_size"):
+            g.add((distribution, DCAT.byteSize, Literal(resource_dict["byte_size"])))
 
     def _get_rights_and_license_uri(self, resource_dict, property="license"):
         if property not in ["license", "rights"]:
