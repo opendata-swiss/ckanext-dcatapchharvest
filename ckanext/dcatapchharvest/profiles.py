@@ -993,10 +993,11 @@ class SwissDCATAPProfile(MultiLangProfile):
             ("spatial", DCT.spatial, None, Literal),
         ]
 
+        self._add_triples_from_dict(resource_dict, distribution, items)
+
         self._rights_and_license_to_graph(resource_dict, distribution)
         self._format_and_media_type_to_graph(resource_dict, distribution)
 
-        self._add_triples_from_dict(resource_dict, distribution, items)
         self._add_multilang_value(
             distribution, DCT.title, "display_name", resource_dict
         )
