@@ -7,8 +7,7 @@ CKAN extension for DCAT-AP-CH harvesting for [opendata.swiss](https://opendata.s
 
 - CKAN 2.10+
 - ckanext-dcat
-- ckanext-fluent
-- ckanext-scheming
+- ckanext-harvest
 
 ## Installation
 
