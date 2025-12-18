@@ -555,6 +555,24 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Deduplicate group names before returning list of group dicts
         return [{"name": name} for name in list(set(group_names))]
 
+    def _get_languages(self, subject):
+        """Get the languages from a dcat:Dataset or dcat:Distribution as a list of
+        two-character codes.
+
+        Handle the following cases:
+        - the URI of a dcterms:language node, which belongs to the EU language vocab
+        - a string literal of a two-character language code (deprecated)
+        """
+        results = []
+        languages = self._object_value_list(subject, DCT.language)
+        for lang in languages:
+            for code, uri in language_uri_map.items():
+                if lang == code or lang == uri:
+                    results.append(code)
+                    break
+
+        return results
+
     def parse_dataset(self, dataset_dict, dataset_ref):  # noqa C901
         # TODO: This method is too complex (flake8 says 30). Refactor it!
         log.debug(f"Parsing dataset '{dataset_ref!r}'")
@@ -619,9 +637,7 @@ class SwissDCATAPProfile(MultiLangProfile):
         dataset_dict["groups"] = self._get_groups(dataset_ref)
 
         #  Languages
-        languages = self._object_value_list(dataset_ref, DCT.language)
-        if languages:
-            dataset_dict["language"] = languages
+        dataset_dict["language"] = self._get_languages(dataset_ref)
 
         # Contact details
         dataset_dict["contact_points"] = self._contact_points(
@@ -757,8 +773,7 @@ class SwissDCATAPProfile(MultiLangProfile):
             )
 
             # languages
-            for language in self._object_value_list(distribution, DCT.language):
-                resource_dict["language"].append(language)
+            resource_dict["language"] = self._get_languages(distribution)
 
             # byteSize
             byte_size = self._object_value_int(distribution, DCAT.byteSize)
