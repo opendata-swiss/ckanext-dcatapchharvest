@@ -846,15 +846,11 @@ class SwissDCATAPProfile(MultiLangProfile):
         # Languages
         languages = dataset_dict.get("language", [])
         for lang in languages:
-            if "http://publications.europa.eu/resource/authority" in lang:
-                # Already a valid EU language URI
-                g.add((dataset_ref, DCT.language, URIRef(lang)))
+            uri = language_uri_map.get(lang, None)
+            if uri:
+                g.add((dataset_ref, DCT.language, URIRef(uri)))
             else:
-                uri = language_uri_map.get(lang, None)
-                if uri:
-                    g.add((dataset_ref, DCT.language, URIRef(uri)))
-                else:
-                    log.debug(f"Language '{lang}' not found in language_uri_map")
+                log.debug(f"Language '{lang}' not found in language_uri_map")
 
         # Relations
         if dataset_dict.get("relations"):
@@ -996,19 +992,6 @@ class SwissDCATAPProfile(MultiLangProfile):
                 uri = language_uri_map.get(lang)
                 if uri:
                     g.add((distribution, DCT.language, URIRef(uri)))
-
-            # Language
-            languages = resource_dict.get("language", [])
-            for lang in languages:
-                if "http://publications.europa.eu/resource/authority" in lang:
-                    # Already a valid EU language URI
-                    g.add((distribution, DCT.language, URIRef(lang)))
-                else:
-                    uri = language_uri_map.get(lang, None)
-                    if uri:
-                        g.add((distribution, DCT.language, URIRef(uri)))
-                    else:
-                        log.debug(f"Language '{lang}' not found in language_uri_map")
 
             # Download URL & Access URL
             download_url = resource_dict.get("download_url")
