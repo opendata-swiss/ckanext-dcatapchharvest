@@ -25,3 +25,12 @@ class TestConformantProfileParse(BaseParseTest):
             "it": "Ufficio economico",
         }
         assert publisher["url"] == "https://some-org.org/info"
+
+    def test_dcatap_conformant_language_import(self):
+        contents = self._get_file_contents("conformant/dataset-language.xml")
+        p = RDFParser(profiles=["swiss_dcat_ap"])
+        p.parse(contents)
+        dataset = [d for d in p.datasets()][0]
+        assert dataset["language"] == ["de", "en", "fr", "it"]
+        assert len(dataset["resources"]) == 1
+        assert dataset["resources"][0]["language"] == ["de", "en"]
