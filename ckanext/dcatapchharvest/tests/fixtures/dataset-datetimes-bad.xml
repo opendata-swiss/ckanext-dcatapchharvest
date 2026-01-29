@@ -34,37 +34,61 @@
         <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">1997</schema:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
-    <!--  using xsd:date, xsd:gYearMonth or xsd:gYear, but incorrectly specifying date: will be parsed as isodate as
-    far as possible when rdflib creates the graph and will be mapped, but values might not be what the data publisher
-    expected.  -->
+    <!--  using xsd:date, xsd:gYearMonth or xsd:gYear, but incorrectly specifying date: will not be mapped  -->
     <dct:temporal>
       <dct:PeriodOfTime>
-        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1998-04</schema:startDate>
-        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1999</schema:endDate>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1998</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">1999-4-4</schema:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
     <dct:temporal>
       <dct:PeriodOfTime>
-        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2000-11-21T01:02:03</schema:startDate>
-        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2001T01:02:03</schema:endDate>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2000-4</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2001-6-06</dcat:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
     <dct:temporal>
       <dct:PeriodOfTime>
-        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2002-01-01T00:00:00</dcat:startDate>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2002-01T00:00:00</dcat:startDate>
         <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2003</dcat:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
     <dct:temporal>
       <dct:PeriodOfTime>
-        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2004-01-02</dcat:startDate>
-        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2005-12</dcat:endDate>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2004-4-1</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2005-6-6</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <!--  using xsd:gYear, but incorrectly specifying date: will be parsed as isodate as far as possible when rdflib
+    creates the graph and will be mapped, but values might not be what the data publisher expected.  -->
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2006-11-21T01:02:03</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2007-11T01:02:03</schema:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
     <dct:temporal>
       <dct:PeriodOfTime>
-        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2006-4</dcat:startDate>
-        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2007-6-6</dcat:endDate>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2008-04-02</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYear">2009-06</dcat:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2010-04</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-05</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <schema:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2012-11-21T01:02:03</schema:startDate>
+        <schema:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-11-21T01:02:03</schema:endDate>
+      </dct:PeriodOfTime>
+    </dct:temporal>
+    <dct:temporal>
+      <dct:PeriodOfTime>
+        <dcat:startDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2014-04-06T00:00:00</dcat:startDate>
+        <dcat:endDate rdf:datatype="http://www.w3.org/2001/XMLSchema#gYearMonth">2015-01-02</dcat:endDate>
       </dct:PeriodOfTime>
     </dct:temporal>
     <!--  using XSD datatypes, with an invalid date or datetime: should not be mapped  -->

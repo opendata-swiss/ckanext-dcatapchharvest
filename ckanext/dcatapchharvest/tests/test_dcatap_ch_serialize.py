@@ -1,173 +1,294 @@
 import json
-
 import logging
 
-import nose
-
-from rdflib import URIRef, Literal, XSD
+from rdflib import XSD, Literal, URIRef
 from rdflib.namespace import RDF
 
+import ckanext.dcatapchharvest.dcat_helpers as dh
 from ckanext.dcat import utils
 from ckanext.dcat.processors import RDFSerializer
-from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, SCHEMA, VCARD, XSD
-
-import ckanext.dcatapchharvest.dcat_helpers as dh
-
+from ckanext.dcat.profiles import DCAT, DCT, FOAF, OWL, VCARD, XSD
 from ckanext.dcatapchharvest.tests.base_test_classes import BaseSerializeTest
 
-eq_ = nose.tools.eq_
-assert_true = nose.tools.assert_true
 log = logging.getLogger(__name__)
 
 
 class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
-    def test_graph_from_dataset(self):
+    # This test is too complex, according to flake8. TODO: refactor it.
+    def test_graph_from_dataset(self):  # noqa C901
 
-        dataset = json.loads(
-            self._get_file_contents('dataset.json')
-        )
+        dataset = json.loads(self._get_file_contents("dataset.json"))
         extras = self._extras(dataset)
 
-        s = RDFSerializer(profiles=['swiss_dcat_ap'])
+        s = RDFSerializer(profiles=["swiss_dcat_ap"])
         g = s.g
 
         dataset_ref = s.graph_from_dataset(dataset)
 
-        eq_(unicode(dataset_ref), utils.dataset_uri(dataset))
+        assert str(dataset_ref) == utils.dataset_uri(dataset)
 
         # Basic fields
         assert self._triple(g, dataset_ref, RDF.type, DCAT.Dataset)
-        assert self._triple(g, dataset_ref, DCT.title, dataset['title'])
-        assert self._triple(g, dataset_ref, OWL.versionInfo, dataset['version'])
-        assert self._triple(g, dataset_ref, DCT.identifier, extras['identifier'])
+        assert self._triple(g, dataset_ref, DCT.title, dataset["title"])
+        assert self._triple(g, dataset_ref, OWL.versionInfo, dataset["version"])
+        assert self._triple(g, dataset_ref, DCT.identifier, extras["identifier"])
 
         # Dates
-        assert self._triple(g, dataset_ref, DCT.issued, dataset['issued'], XSD.dateTime)
+        assert self._triple(g, dataset_ref, DCT.issued, dataset["issued"], XSD.dateTime)
         assert len(list(g.objects(dataset_ref, DCT.modified))) == 0
 
-        for key, value in dataset['description'].iteritems():
-            if dataset['description'].get(key):
-                assert self._triple(g, dataset_ref, DCT.description, Literal(value, lang=key))
-        eq_(len([t for t in g.triples((dataset_ref, DCT.description, None))]), 2)
+        for key, value in dataset["description"].items():
+            print(key, value)
+            if value:
+                assert self._triple(
+                    g, dataset_ref, DCT.description, Literal(value, lang=key)
+                )
+        assert len([t for t in g.triples((dataset_ref, DCT.description, None))]) == 2
 
         # Tags
-        eq_(len([t for t in g.triples((dataset_ref, DCAT.keyword, None))]), 3)
-        for key, keywords in dataset['keywords'].iteritems():
-            if dataset['keywords'].get(key):
+        assert len([t for t in g.triples((dataset_ref, DCAT.keyword, None))]) == 3
+        for key, keywords in dataset["keywords"].items():
+            if dataset["keywords"].get(key):
                 for keyword in keywords:
-                    assert self._triple(g, dataset_ref, DCAT.keyword, Literal(keyword, lang=key))
+                    assert self._triple(
+                        g, dataset_ref, DCAT.keyword, Literal(keyword, lang=key)
+                    )
 
         # Documentation
-        eq_(len([t for t in g.triples((dataset_ref, FOAF.page, None))]), 2)
-        for documentation_link in dataset['documentation']:
+        assert len([t for t in g.triples((dataset_ref, FOAF.page, None))]) == 2
+        for documentation_link in dataset["documentation"]:
             assert self._triple(g, dataset_ref, FOAF.page, URIRef(documentation_link))
 
         # Contact points
-        eq_(len([t for t in g.triples((dataset_ref, DCAT.contactPoint, None))]), 1)
+        assert len([t for t in g.triples((dataset_ref, DCAT.contactPoint, None))]) == 1
 
         contact_point = next(g.objects(dataset_ref, DCAT.contactPoint))
-        eq_(next(g.objects(contact_point, RDF.type)), VCARD.Organization)
-        eq_(
-            next(g.objects(contact_point, VCARD.hasEmail)),
-            URIRef("mailto:maria.muster@example.com")
+        assert next(g.objects(contact_point, RDF.type)) == VCARD.Organization
+        assert next(g.objects(contact_point, VCARD.hasEmail)) == URIRef(
+            "mailto:maria.muster@example.com"
         )
-        eq_(next(g.objects(contact_point, VCARD.fn)), Literal("Maria Muster"))
+        assert next(g.objects(contact_point, VCARD.fn)) == Literal("Maria Muster")
 
         # Conformance
         conforms_to = dataset.get("conforms_to", [])
         # Check if the number of triples matches the number of conformance uris
-        eq_(
-            len(list(g.triples((dataset_ref, DCT.conformsTo, None)))),
-            len(conforms_to)
+        assert len(list(g.triples((dataset_ref, DCT.conformsTo, None)))) == len(
+            conforms_to
         )
         for link in conforms_to:
             # Check if the triple (dataset_ref, DCT.conformsTo, URIRef(link)) exists in the graph
             assert (dataset_ref, DCT.conformsTo, URIRef(link)) in g
 
         # Languages
-        language_values = json.loads(extras.get('language', '[]'))
+        language_values = json.loads(extras.get("language", "[]"))
 
         # Assert each language value is correctly represented as a triple
         for lang in language_values:
             g.add((dataset_ref, DCT.language, Literal(lang)))
 
         # Assert number of language triples matches expected
-        eq_(len(list(g.triples((dataset_ref, DCT.language, None)))),
-            len(language_values))
+        assert len(list(g.triples((dataset_ref, DCT.language, None)))) == len(
+            language_values
+        )
 
         # Resources
-        eq_(len([t for t in g.triples((dataset_ref, DCAT.distribution, None))]), len(dataset["resources"]))
+        assert len(
+            [t for t in g.triples((dataset_ref, DCAT.distribution, None))]
+        ) == len(dataset["resources"])
         for resource_dict in dataset.get("resources", []):
             distribution = URIRef(dh.resource_uri(resource_dict))
             assert self._triple(g, distribution, RDF.type, DCAT.Distribution)
             for link in resource_dict.get("documentation", []):
                 assert self._triple(g, distribution, FOAF.page, URIRef(link))
 
-            eq_(
-                len([t for t in g.triples((distribution, DCAT.accessService, None))]),
-                len(resource_dict.get("access_services", []))
-            )
+            assert len(
+                [t for t in g.triples((distribution, DCAT.accessService, None))]
+            ) == len(resource_dict.get("access_services", []))
             for link in resource_dict.get("access_services", []):
                 assert self._triple(g, distribution, DCAT.accessService, URIRef(link))
 
             # e2c50e70-67ad-4f86-bb1b-3f93867eadaa
-            if resource_dict.get('rights') == "http://www.opendefinition.org/licenses/cc-zero":
-                assert self._triple(g, distribution, DCT.rights, URIRef("https://creativecommons.org/publicdomain/zero/1.0/"))
+            if (
+                resource_dict.get("rights")
+                == "http://www.opendefinition.org/licenses/cc-zero"
+            ):
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT.rights,
+                    URIRef("https://creativecommons.org/publicdomain/zero/1.0/"),
+                )
 
-            if resource_dict.get('license') == "https://opendata.swiss/terms-of-use#terms_open":
-                assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_open"))
+            if (
+                resource_dict.get("license")
+                == "https://opendata.swiss/terms-of-use#terms_open"
+            ):
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT.license,
+                    URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_open"),
+                )
 
             # 28e75e40-e1a1-497b-a1b9-8c1834d60201
-            if resource_dict.get('rights') == "https://opendata.swiss/terms-of-use#terms_by":
-                assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"))
+            if (
+                resource_dict.get("rights")
+                == "https://opendata.swiss/terms-of-use#terms_by"
+            ):
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT.rights,
+                    URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"),
+                )
 
-            if resource_dict.get('license') == "https://opendata.swiss/terms-of-use#terms_by":
-                assert self._triple(g, distribution, DCT.license, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"))
+            if (
+                resource_dict.get("license")
+                == "https://opendata.swiss/terms-of-use#terms_by"
+            ):
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT.license,
+                    URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by"),
+                )
 
             # 0cfce6ba-28f4-4229-b733-f6492c650395
-            if resource_dict.get('rights') == "https://opendata.swiss/terms-of-use#terms_by_ask":
-                assert self._triple(g, distribution, DCT.rights, URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by_ask"))
+            if (
+                resource_dict.get("rights")
+                == "https://opendata.swiss/terms-of-use#terms_by_ask"
+            ):
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT.rights,
+                    URIRef("http://dcat-ap.ch/vocabulary/licenses/terms_by_ask"),
+                )
 
-            if resource_dict.get('rights') == "http://www.opendefinition.org/licenses/cc-by/":
-                assert self._triple(g, distribution, DCT.rights, URIRef("https://creativecommons.org/licenses/by/4.0/"))
+            if (
+                resource_dict.get("rights")
+                == "http://www.opendefinition.org/licenses/cc-by/"
+            ):
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT.rights,
+                    URIRef("https://creativecommons.org/licenses/by/4.0/"),
+                )
 
-            if resource_dict.get('format') == "CSV":
-                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/CSV"))
+            if resource_dict.get("format") == "CSV":
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT["format"],
+                    URIRef(
+                        "http://publications.europa.eu/resource/authority/file-type/CSV"
+                    ),
+                )
 
-            if resource_dict.get('format') == "HTML":
-                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/HTML"))
+            if resource_dict.get("format") == "HTML":
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT["format"],
+                    URIRef(
+                        "http://publications.europa.eu/resource/authority/file-type/HTML"
+                    ),
+                )
 
-            if resource_dict.get('format') == "RDF N-Triples":
-                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/RDF_N_TRIPLES"))
+            if resource_dict.get("format") == "RDF N-Triples":
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT["format"],
+                    URIRef(
+                        "http://publications.europa.eu/resource/authority/file-type/RDF_N_TRIPLES"
+                    ),
+                )
 
-            if resource_dict.get('format') == "JSON-LD":
-                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/JSON_LD"))
+            if resource_dict.get("format") == "JSON-LD":
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT["format"],
+                    URIRef(
+                        "http://publications.europa.eu/resource/authority/file-type/JSON_LD"
+                    ),
+                )
 
-            if resource_dict.get('format') == "ESRI ASCII Grid":
-                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/GRID_ASCII"))
+            if resource_dict.get("format") == "ESRI ASCII Grid":
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT["format"],
+                    URIRef(
+                        "http://publications.europa.eu/resource/authority/file-type/GRID_ASCII"
+                    ),
+                )
 
-            if resource_dict.get('format') == "WORLDFILE":
-                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/WORLD"))
+            if resource_dict.get("format") == "WORLDFILE":
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT["format"],
+                    URIRef(
+                        "http://publications.europa.eu/resource/authority/file-type/WORLD"
+                    ),
+                )
 
-            if resource_dict.get('format') == "WCS":
-                assert self._triple(g, distribution, DCT['format'], URIRef("http://publications.europa.eu/resource/authority/file-type/WCS_SRVC"))
+            if resource_dict.get("format") == "WCS":
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT["format"],
+                    URIRef(
+                        "http://publications.europa.eu/resource/authority/file-type/WCS_SRVC"
+                    ),
+                )
 
-            if resource_dict.get('media_type') == "application/1d-interleaved-parityfec":
-                assert self._triple(g, distribution, DCAT.mediaType, URIRef("http://www.iana.org/assignments/media-types/application/1d-interleaved-parityfec"))
+            if (
+                resource_dict.get("media_type")
+                == "application/1d-interleaved-parityfec"
+            ):
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCAT.mediaType,
+                    URIRef(
+                        "http://www.iana.org/assignments/media-types/application/1d-interleaved-parityfec"
+                    ),
+                )
 
-            if resource_dict.get('format') == "application/1d-interleaved-parityfec":
-                assert self._triple(g, distribution, DCT['format'], URIRef("http://www.iana.org/assignments/media-types/application/1d-interleaved-parityfec"))
+            if resource_dict.get("format") == "application/1d-interleaved-parityfec":
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT["format"],
+                    URIRef(
+                        "http://www.iana.org/assignments/media-types/application/1d-interleaved-parityfec"
+                    ),
+                )
 
-            if resource_dict.get('temporal_resolution') == "P1D":
+            if resource_dict.get("temporal_resolution") == "P1D":
                 expected_literal = Literal("P1D", datatype=XSD.duration)
-                assert self._triple(g, distribution, DCAT.temporalResolution, expected_literal)
+                assert self._triple(
+                    g, distribution, DCAT.temporalResolution, expected_literal
+                )
 
-            if resource_dict.get('issued'):
-                assert self._triple(g, distribution, DCT.issued, resource_dict["issued"], XSD.dateTime)
+            if resource_dict.get("issued"):
+                assert self._triple(
+                    g, distribution, DCT.issued, resource_dict["issued"], XSD.dateTime
+                )
 
-            if resource_dict.get('modified'):
-                assert self._triple(g, distribution, DCT.modified, resource_dict["modified"], XSD.dateTime)
+            if resource_dict.get("modified"):
+                assert self._triple(
+                    g,
+                    distribution,
+                    DCT.modified,
+                    resource_dict["modified"],
+                    XSD.dateTime,
+                )
 
     def test_graph_from_dataset_uri(self):
         """Tests that datasets (resources) with a uri from the test system
@@ -175,11 +296,9 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
         as a graph
         """
 
-        dataset = json.loads(
-            self._get_file_contents('dataset-test-uri.json')
-        )
+        dataset = json.loads(self._get_file_contents("dataset-test-uri.json"))
 
-        s = RDFSerializer(profiles=['swiss_dcat_ap'])
+        s = RDFSerializer(profiles=["swiss_dcat_ap"])
         g = s.g
         dataset_ref = s.graph_from_dataset(dataset)
 
@@ -193,6 +312,6 @@ class TestDCATAPCHProfileSerializeDataset(BaseSerializeTest):
 
         # Basic fields
         assert self._triple(g, dataset_ref_changed, RDF.type, DCAT.Dataset)
-        assert self._triple(g, dataset_ref_changed, DCT.title, dataset['title'])
-        assert self._triple(g, dataset_ref_changed, OWL.versionInfo, dataset['version'])
+        assert self._triple(g, dataset_ref_changed, DCT.title, dataset["title"])
+        assert self._triple(g, dataset_ref_changed, OWL.versionInfo, dataset["version"])
         assert self._triple(g, distribution, RDF.type, DCAT.Distribution)

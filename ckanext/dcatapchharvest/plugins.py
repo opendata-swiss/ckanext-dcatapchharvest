@@ -1,10 +1,8 @@
-from ckanext.dcat.plugins import DCATPlugin
 import os
 
-__location__ = os.path.realpath(os.path.join(
-    os.getcwd(),
-    os.path.dirname(__file__))
-)
+from ckanext.dcat.plugins import DCATPlugin
+
+__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 
 class OgdchDcatPlugin(DCATPlugin):
