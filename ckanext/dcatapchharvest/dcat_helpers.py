@@ -326,7 +326,7 @@ def get_pagination(catalog_graph):
 
 def get_format_values():
     """Generate a dict that maps our standardised formats (the keys in this file
-    https://github.com/opendata-swiss/ckanext-switzerland-ng/blob/master/ckanext/switzerland/helpers/format_mapping.yaml)
+    https://github.com/opendata-swiss/ckanext-switzerland-ng/blob/main/ckanext/switzerland/helpers/format_mapping.yaml)
     to the URIs in the EU file-type vocabulary
     (http://publications.europa.eu/resource/authority/file-type).
 
