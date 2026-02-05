@@ -191,6 +191,28 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         log.debug(f"datasets parsed: {','.join(dataset_identifiers)}")
         return rdf_parser, []
 
+    def _read_datasets_from_db(self, guid):
+        """
+        Returns a database result of datasets matching the given guid.
+        """
+        if tk.check_ckan_version(max_version="2.11.99"):
+            datasets = (
+                model.Session.query(model.Package.id)
+                .join(model.PackageExtra)
+                .filter(model.PackageExtra.key == "guid")
+                .filter(model.PackageExtra.value == guid)
+                .filter(model.Package.state == "active")
+                .all()
+            )
+        else:
+            datasets = (
+                model.Session.query(model.Package.id)
+                .filter(model.Package.extras["guid"] == f'"{guid}"')
+                .all()
+            )
+
+        return datasets
+
 
 def _derive_flat_title(title_dict):
     """localizes language dict if no language is specified"""
