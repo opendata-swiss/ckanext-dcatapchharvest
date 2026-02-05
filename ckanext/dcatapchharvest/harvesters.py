@@ -191,6 +191,30 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         log.debug(f"datasets parsed: {','.join(dataset_identifiers)}")
         return rdf_parser, []
 
+    def _read_datasets_from_db(self, guid):
+        """Overwritten from DCATHarvester as the guid disappears from package_extras
+        when the dataset is updated outside the harvesting context.
+
+        The guid is set to the identifier value, so we can search in this field instead.
+        """
+        if tk.check_ckan_version(max_version="2.11.99"):
+            datasets = (
+                model.Session.query(model.Package.id)
+                .join(model.PackageExtra)
+                .filter(model.PackageExtra.key == "identifier")
+                .filter(model.PackageExtra.value == guid)
+                .filter(model.Package.state == "active")
+                .all()
+            )
+        else:
+            datasets = (
+                model.Session.query(model.Package.id)
+                .filter(model.Package.extras["identifier"] == f'"{guid}"')
+                .all()
+            )
+
+        return datasets
+
 
 def _derive_flat_title(title_dict):
     """localizes language dict if no language is specified"""
