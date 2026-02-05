@@ -192,14 +192,16 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         return rdf_parser, []
 
     def _read_datasets_from_db(self, guid):
-        """
-        Returns a database result of datasets matching the given guid.
+        """Overwritten from DCATHarvester as the guid disappears from package_extras
+        when the dataset is updated outside the harvesting context.
+
+        The guid is set to the identifier value, so we can search in this field instead.
         """
         if tk.check_ckan_version(max_version="2.11.99"):
             datasets = (
                 model.Session.query(model.Package.id)
                 .join(model.PackageExtra)
-                .filter(model.PackageExtra.key == "guid")
+                .filter(model.PackageExtra.key == "identifier")
                 .filter(model.PackageExtra.value == guid)
                 .filter(model.Package.state == "active")
                 .all()
@@ -207,7 +209,7 @@ class SwissDCATRDFHarvester(DCATRDFHarvester):
         else:
             datasets = (
                 model.Session.query(model.Package.id)
-                .filter(model.Package.extras["guid"] == f'"{guid}"')
+                .filter(model.Package.extras["identifier"] == f'"{guid}"')
                 .all()
             )
 
