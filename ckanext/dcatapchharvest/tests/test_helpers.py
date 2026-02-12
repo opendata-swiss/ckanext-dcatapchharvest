@@ -60,6 +60,32 @@ class TestHarvestHelpersUnit(object):
             "resource modified date changed: 2020-01-02T12:00:00",
         )
 
+    def test_check_package_change_new_url(self):
+        existing_package = {
+            "url": "http://example.org/landing",
+        }
+        dataset_dict = {
+            "url": "http://example.org/new/landing",
+        }
+
+        assert check_package_change(existing_package, dataset_dict) == (
+            True,
+            "dataset url value changed from 'http://example.org/landing' to 'http://example.org/new/landing'",
+        )
+
+    def test_check_package_change_empty_new_url(self):
+        existing_package = {
+            "url": "http://example.org/landing",
+        }
+        dataset_dict = {
+            "url": "",
+        }
+
+        assert check_package_change(existing_package, dataset_dict) == (
+            True,
+            "dataset url value changed from 'http://example.org/landing' to ''",
+        )
+
     def test_check_package_change_new_resource_url(self):
         existing_package = {
             "resources": [

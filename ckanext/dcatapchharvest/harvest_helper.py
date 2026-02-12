@@ -53,6 +53,14 @@ def create_activity(package_id, message):
 
 
 def check_package_change(existing_pkg, dataset_dict):
+    # Check if the URL has changed
+    existing_pkg_url = existing_pkg.get("url", "")
+    dataset_dict_url = dataset_dict.get("url", "")
+    if existing_pkg_url != dataset_dict_url:
+        msg = "dataset url value changed from '{}' to '{}'".format(
+            existing_pkg_url, dataset_dict_url
+        )
+        return True, msg
     if _changes_in_date(existing_pkg.get("modified"), dataset_dict.get("modified")):
         msg = f"dataset modified date changed: {dataset_dict.get('modified')}"
         return True, msg
