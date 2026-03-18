@@ -1,7 +1,6 @@
 import os
 
 import ckan.plugins as plugins
-from rdflib import URIRef
 
 from ckanext.dcat.interfaces import IDCATURIGenerator
 from ckanext.dcat.plugins import DCATPlugin
@@ -25,8 +24,7 @@ class OgdchDcatPlugin(DCATPlugin):
         Return the resource URI for RDF serializations (make sure the URL matches
         the environment).
         """
-        distribution = URIRef(default_uri) if default_uri else None
-        return dcat_helpers.resource_uri(resource_dict, distribution)
+        return dcat_helpers.resource_uri(resource_dict)
 
     def after_show(self, context, data_dict):
         """
