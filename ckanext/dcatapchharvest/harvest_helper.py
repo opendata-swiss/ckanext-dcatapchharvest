@@ -36,11 +36,19 @@ def create_activity(package_id, message):
     notification_user = tk.get_action("user_show")(
         {"ignore_auth": True}, {"id": NOTIFICATION_USER}
     )
+    data = {"message": message, "actor": notification_user.get("name")}
+    pkg = model.Package.get(package_id)
+    if pkg:
+        data["package"] = {
+            "id": pkg.id,
+            "type": pkg.type or "dataset",
+            "title": getattr(pkg, "title", None) or pkg.name,
+        }
     activity_dict = {
         "user_id": notification_user["id"],
         "object_id": package_id,
         "activity_type": "changed package",
-        "data": {"message": message},
+        "data": data,
     }
     activity_create_context = {
         "model": model,
