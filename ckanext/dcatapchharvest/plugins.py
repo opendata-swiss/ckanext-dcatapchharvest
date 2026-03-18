@@ -5,8 +5,7 @@ from rdflib import URIRef
 
 from ckanext.dcat.interfaces import IDCATURIGenerator
 from ckanext.dcat.plugins import DCATPlugin
-
-from . import dcat_helpers
+from ckanext.dcatapchharvest import dcat_helpers
 
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
