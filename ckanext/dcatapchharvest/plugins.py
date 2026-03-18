@@ -19,8 +19,7 @@ class OgdchDcatPlugin(DCATPlugin):
         Return the dataset URI for RDF serializations (make sure the URL matches
         the environment and that we use the permalink).
         """
-        dataset_ref = URIRef(default_uri) if default_uri else None
-        return dcat_helpers.dataset_uri(dataset_dict, dataset_ref)
+        return dcat_helpers.dataset_uri(dataset_dict)
 
     def resource_uri(self, resource_dict, default_uri):
         """
