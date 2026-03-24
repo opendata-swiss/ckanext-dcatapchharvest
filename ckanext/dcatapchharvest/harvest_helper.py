@@ -12,6 +12,25 @@ NOTIFICATION_USER = "harvest-notification"
 DEFAULT_TIMEZONE = tz.gettz("Europe/Zurich")
 
 
+def _package_dict_for_activity(package_id):
+    """Return package_show output so activity data matches core (incl. resources)."""
+    context = {
+        "model": model,
+        "session": model.Session,
+        "ignore_auth": True,
+        "for_view": True,
+    }
+    try:
+        return tk.get_action("package_show")(context, {"id": package_id})
+    except (tk.ObjectNotFound, tk.NotAuthorized) as exc:
+        log.warning(
+            "create_activity: package_show failed for %s: %s",
+            package_id,
+            exc,
+        )
+        return None
+
+
 def map_resources_to_ids(pkg_dict, package_id):
     existing_package = tk.get_action("package_show")({}, {"id": package_id})
     existing_resources = existing_package.get("resources")
@@ -39,11 +58,17 @@ def create_activity(package_id, message):
     data = {"message": message, "actor": notification_user.get("name")}
     pkg = model.Package.get(package_id)
     if pkg:
-        data["package"] = {
-            "id": pkg.id,
-            "type": pkg.type or "dataset",
-            "title": getattr(pkg, "title", None) or pkg.name,
-        }
+        pkg_dict = _package_dict_for_activity(package_id)
+        if pkg_dict is not None:
+            data["package"] = pkg_dict
+        else:
+            data["package"] = {
+                "id": pkg.id,
+                "type": pkg.type or "dataset",
+                "title": getattr(pkg, "title", None) or pkg.name,
+                "name": pkg.name,
+                "resources": [],
+            }
     activity_dict = {
         "user_id": notification_user["id"],
         "object_id": package_id,
