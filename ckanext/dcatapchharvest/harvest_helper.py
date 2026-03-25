@@ -2,6 +2,7 @@ import logging
 
 import ckan.model as model
 import ckan.plugins.toolkit as tk
+from ckan.lib.dictization.model_dictize import package_dictize
 from dateutil.parser import ParserError
 from dateutil.parser import parse as dateutil_parse
 from dateutil.tz import tz
@@ -13,18 +14,22 @@ DEFAULT_TIMEZONE = tz.gettz("Europe/Zurich")
 
 
 def _package_dict_for_activity(package_id):
-    """Return package_show output so activity data matches core (incl. resources)."""
+    """
+    Return a full package dict (incl. resources) for activity snapshots.
+    """
+    pkg = model.Package.get(package_id)
+    if not pkg:
+        return None
     context = {
         "model": model,
         "session": model.Session,
         "ignore_auth": True,
-        "for_view": True,
     }
     try:
-        return tk.get_action("package_show")(context, {"id": package_id})
-    except (tk.ObjectNotFound, tk.NotAuthorized) as exc:
+        return package_dictize(pkg, context)
+    except Exception as exc:
         log.warning(
-            "create_activity: package_show failed for %s: %s",
+            "create_activity: package_dictize failed for %s: %s",
             package_id,
             exc,
         )
