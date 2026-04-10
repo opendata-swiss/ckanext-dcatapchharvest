@@ -2,6 +2,7 @@ import logging
 
 import ckan.model as model
 import ckan.plugins.toolkit as tk
+from ckan.lib.dictization.model_dictize import package_dictize
 from dateutil.parser import ParserError
 from dateutil.parser import parse as dateutil_parse
 from dateutil.tz import tz
@@ -10,6 +11,29 @@ log = logging.getLogger(__name__)
 
 NOTIFICATION_USER = "harvest-notification"
 DEFAULT_TIMEZONE = tz.gettz("Europe/Zurich")
+
+
+def _package_dict_for_activity(package_id):
+    """
+    Return a full package dict (incl. resources) for activity snapshots.
+    """
+    pkg = model.Package.get(package_id)
+    if not pkg:
+        return None
+    context = {
+        "model": model,
+        "session": model.Session,
+        "ignore_auth": True,
+    }
+    try:
+        return package_dictize(pkg, context)
+    except Exception as exc:
+        log.warning(
+            "create_activity: package_dictize failed for %s: %s",
+            package_id,
+            exc,
+        )
+        return None
 
 
 def map_resources_to_ids(pkg_dict, package_id):
@@ -39,11 +63,17 @@ def create_activity(package_id, message):
     data = {"message": message, "actor": notification_user.get("name")}
     pkg = model.Package.get(package_id)
     if pkg:
-        data["package"] = {
-            "id": pkg.id,
-            "type": pkg.type or "dataset",
-            "title": getattr(pkg, "title", None) or pkg.name,
-        }
+        pkg_dict = _package_dict_for_activity(package_id)
+        if pkg_dict is not None:
+            data["package"] = pkg_dict
+        else:
+            data["package"] = {
+                "id": pkg.id,
+                "type": pkg.type or "dataset",
+                "title": getattr(pkg, "title", None) or pkg.name,
+                "name": pkg.name,
+                "resources": [],
+            }
     activity_dict = {
         "user_id": notification_user["id"],
         "object_id": package_id,
